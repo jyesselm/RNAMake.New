@@ -87,7 +87,7 @@ public:
     
     inline
     String const
-    to_str() const {
+    get_str() const {
         return std::to_string(x_) + " " + std::to_string(y_) + " " +
                std::to_string(z_);
     }
@@ -348,122 +348,13 @@ public: // Methods
 		Value const inv_t( Value ( 1 ) / t );
 		return xyzVector( v.x_ * inv_t, v.y_ * inv_t, v.z_ * inv_t );
 	}
-	
-	/// @brief Add: xyzVector + xyzVector
-	friend
-	inline
-	void
-	add( xyzVector const & a, xyzVector const & b, xyzVector & r )
-	{
-		r.x_ = a.x_ + b.x_;
-		r.y_ = a.y_ + b.y_;
-		r.z_ = a.z_ + b.z_;
-	}
-	
-	
-	/// @brief Add: xyzVector + Value
-	friend
-	inline
-	void
-	add( xyzVector const & v, Value const & t, xyzVector & r )
-	{
-		r.x_ = v.x_ + t;
-		r.y_ = v.y_ + t;
-		r.z_ = v.z_ + t;
-	}
-	
-	
-	/// @brief Add: Value + xyzVector
-	friend
-	inline
-	void
-	add( Value const & t, xyzVector const & v, xyzVector & r )
-	{
-		r.x_ = t + v.x_;
-		r.y_ = t + v.y_;
-		r.z_ = t + v.z_;
-	}
-	
-	
-	/// @brief Subtract: xyzVector - xyzVector
-	friend
-	inline
-	void
-	subtract( xyzVector const & a, xyzVector const & b, xyzVector & r )
-	{
-		r.x_ = a.x_ - b.x_;
-		r.y_ = a.y_ - b.y_;
-		r.z_ = a.z_ - b.z_;
-	}
-	
-	
-	/// @brief Subtract: xyzVector - Value
-	friend
-	inline
-	void
-	subtract( xyzVector const & v, Value const & t, xyzVector & r )
-	{
-		r.x_ = v.x_ - t;
-		r.y_ = v.y_ - t;
-		r.z_ = v.z_ - t;
-	}
-	
-	
-	/// @brief Subtract: Value - xyzVector
-	friend
-	inline
-	void
-	subtract( Value const & t, xyzVector const & v, xyzVector & r )
-	{
-		r.x_ = t - v.x_;
-		r.y_ = t - v.y_;
-		r.z_ = t - v.z_;
-	}
-	
-	
-	/// @brief Multiply: xyzVector * Value
-	friend
-	inline
-	void
-	multiply( xyzVector const & v, Value const & t, xyzVector & r )
-	{
-		r.x_ = v.x_ * t;
-		r.y_ = v.y_ * t;
-		r.z_ = v.z_ * t;
-	}
-	
-	
-	/// @brief Multiply: Value * xyzVector
-	friend
-	inline
-	void
-	multiply( Value const & t, xyzVector const & v, xyzVector & r )
-	{
-		r.x_ = t * v.x_;
-		r.y_ = t * v.y_;
-		r.z_ = t * v.z_;
-	}
-	
-	
-	/// @brief Divide: xyzVector / Value
-	friend
-	inline
-	void
-	divide( xyzVector const & v, Value const & t, xyzVector & r )
-	{
-		assert( t != Value( 0 ) );
-		Value const inv_t( Value( 1 ) / t );
-		r.x_ = v.x_ * inv_t;
-		r.y_ = v.y_ * inv_t;
-		r.z_ = v.z_ * inv_t;
-	}
-	
+
 	/// @brief Normalize
 	inline
 	xyzVector &
 	normalize()
 	{
-		Value const length_ = length();
+		Value const length_ = get_length();
 		assert( length_ != Value ( 0 ) );
 		Value const inv_length( Value( 1 ) / length_ );
 		x_ *= inv_length;
@@ -495,16 +386,7 @@ public: // Methods
 	{
 		return ( x_ * v.x_ ) + ( y_ * v.y_ ) + ( z_ * v.z_ );
 	}
-	
-	/// @brief Dot product
-	friend
-	inline
-	Value
-	dot_product( xyzVector const & a, xyzVector const & b )
-	{
-		return ( a.x_ * b.x_ ) + ( a.y_ * b.y_ ) + ( a.z_ * b.z_ );
-	}
-	
+
 	/// @brief Cross product
 	inline
 	xyzVector
@@ -516,21 +398,7 @@ public: // Methods
 						 ( x_ * v.y_ ) - ( y_ * v.x_ )
 						 );
 	}
-	
-	
-	/// @brief Cross product
-	friend
-	inline
-	xyzVector
-	cross_product( xyzVector const & a, xyzVector const & b )
-	{
-		return xyzVector(
-						 ( a.y_ * b.z_ ) - ( a.z_ * b.y_ ),
-						 ( a.z_ * b.x_ ) - ( a.x_ * b.z_ ),
-						 ( a.x_ * b.y_ ) - ( a.y_ * b.x_ )
-						 );
-	}
-	
+
 
 public: // Properties: accessors
 	
@@ -555,7 +423,7 @@ public: // Properties: accessors
 	/// @brief Length
 	inline
 	Value
-	length() const {
+	get_length() const {
 		return std::sqrt( ( x_ * x_ ) + ( y_ * y_ ) + ( z_ * z_ ) );
 	}
 	
@@ -563,7 +431,7 @@ public: // Properties: accessors
 	/// @brief Length squared
 	inline
 	Value
-	length_squared() const {
+	get_length_squared() const {
 		return ( x_ * x_ ) + ( y_ * y_ ) + ( z_ * z_ );
 	}
 	
@@ -571,7 +439,7 @@ public: // Properties: accessors
 	/// @brief Norm
 	inline
 	Value
-	norm() const {
+	get_norm() const {
 		return std::sqrt( ( x_ * x_ ) + ( y_ * y_ ) + ( z_ * z_ ) );
 	}
 	
@@ -579,7 +447,7 @@ public: // Properties: accessors
 	/// @brief Norm squared
 	inline
 	Value
-	norm_squared() const {
+	get_norm_squared() const {
 		return ( x_ * x_ ) + ( y_ * y_ ) + ( z_ * z_ );
 	}
 	
@@ -587,7 +455,7 @@ public: // Properties: accessors
 	/// @brief Magnitude
 	inline
 	Value
-	magnitude() const {
+	get_magnitude() const {
 		return std::sqrt( ( x_ * x_ ) + ( y_ * y_ ) + ( z_ * z_ ) );
 	}
 	
@@ -595,7 +463,7 @@ public: // Properties: accessors
 	/// @brief Magnitude squared
 	inline
 	Value
-	magnitude_squared() const {
+	get_magnitude_squared() const {
 		return ( x_ * x_ ) + ( y_ * y_ ) + ( z_ * z_ );
 	}
 	
@@ -620,50 +488,7 @@ public: // Properties: value assignment
 	void
 	set_z( Value const & z_a ) { z_ = z_a; }
 		
-	
-public: // Indexers
-	
-	
-	/// @brief xyzVector[ i ] const: 0-based index
-	inline
-	Value const &
-	operator []( int const i ) const
-	{
-		assert( ( i >= 0 ) && ( i < 3 ) );
-		return ( i == 0 ? x_ : ( i == 1 ? y_ : z_ ) );
-	}
-	
-	
-	/// @brief xyzVector[ i ]: 0-based index
-	inline
-	Value &
-	operator []( int const i )
-	{
-		assert( ( i >= 0 ) && ( i < 3 ) );
-		return ( i == 0 ? x_ : ( i == 1 ? y_ : z_ ) );
-	}
-	
-	
-	/// @brief xyzVector( i ) const: 1-based index
-	inline
-	Value const &
-	operator ()( int const i ) const
-	{
-		assert( ( i > 0 ) && ( i <= 3 ) );
-		return ( i == 1 ? x_ : ( i == 2 ? y_ : z_ ) );
-	}
-	
-	
-	/// @brief xyzVector( i ): 1-based index
-	inline
-	Value &
-	operator ()( int const i )
-	{
-		assert( ( i > 0 ) && ( i <= 3 ) );
-		return ( i == 1 ? x_ : ( i == 2 ? y_ : z_ ) );
-	}
-	
-	
+
 public: // Comparison
 	
 	
@@ -712,81 +537,6 @@ typedef std::vector<Vector> Vectors;
 
 typedef xyzVector<double> Point;
 typedef std::vector<Point> Points;
-
-/*template< typename T >
-std::ostream &
-operator <<( std::ostream & stream, xyzVector< T > const & v ) {
-	// Output xyzVector
-	stream << v.x() << ' ' << v.y() << ' ' << v.z();
-	return stream;
-}
-
-
-inline
-const
-Vector
-vector_from_str(
-	std::string const & s) {
-	
-	std::vector<std::string> values = split_str_by_delimiter(s," ");
-	std::vector<double> point;
-	
-	for (std::vector<std::string>::iterator i = values.begin();
-		 i != values.end(); ++i) {
-		point.push_back(atof(i->c_str()));
-	}
-	
-	Vector p(point);
-	return p;
-	
-}
-
-inline
-const
-String
-vector_to_str(
-    Vector const & v) {
-    std::stringstream ss;
-    ss << v.x() << " " << v.y() << " " << v.z();
-    return ss.str();
-}
-
-inline
-String
-vectors_to_str(
-    Vectors const & vs) {
-    std::stringstream ss;
-    for (auto const & v : vs) {
-        ss << v.x() << " " << v.y() << " " << v.z() << " ";
-    }
-    return ss.str();
-    
-}
-
-inline
-const
-Vectors
-vectors_from_str(
-	std::string const & s) {
-	
-	std::vector<std::string> values = split_str_by_delimiter(s," ");
-	std::vector<double> point;
-	
-	Vectors vecs;
-	
-	for (auto value : values) {
-		point.push_back(atof(value.c_str()));
-		
-		if(point.size() == 3) {
-			Vector vec(point);
-			vecs.push_back(vec);
-			point = std::vector<double>();
-		}
-	}
-	
-	return vecs;
-	
-}*/
 
 
 #endif /* defined(__REDESIGNC__xyzVector__) */

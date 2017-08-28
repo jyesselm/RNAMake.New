@@ -1,4 +1,6 @@
 import shutil
 
-shutil.copy("math_util.so", "rnamake/math_util/math_util.so")
-shutil.copy("all_atom.so", "rnamake/all_atom/all_atom.so")
+shutil.copy("libutil.so", "rnamake_new/util.so")
+shutil.copy("libbase_util.so", "rnamake_new/base_util.so")
+shutil.copy("libmath_util.so", "rnamake_new/math_util.so")
+shutil.copy("all_atom.so", "rnamake_new/all_atom.so")

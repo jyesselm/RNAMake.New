@@ -13,7 +13,7 @@
 
 String
 Atom::to_str() {
-    return name_ + " " + coords_.to_str();
+    return name_ + " " + coords_.get_str();
 }
 
 String
@@ -21,7 +21,8 @@ Atom::to_pdb_str(
     int acount) {
 
     char buffer [200];
-    std::sprintf(buffer, "ATOM %6d  P   C   A   1 %11.3f%8.3f%8.3f  1.00 62.18           P\n", acount, coords_[0], coords_[1], coords_[2]);
+    std::sprintf(buffer, "ATOM %6d  P   C   A   1 %11.3f%8.3f%8.3f  1.00 62.18           P\n",
+                 acount, coords_.get_x(), coords_.get_y(), coords_.get_z());
     return String(buffer);
 
 }
