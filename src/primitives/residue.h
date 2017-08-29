@@ -63,6 +63,13 @@ public:
 public: //getters
 
     /**
+     * getter the chain_id, i.e. "A", "B", the id of the chain this residue belongs to
+     */
+    inline
+    char
+    get_chain_id() { return chain_id_; }
+
+    /**
     * getter for the name of the residue, i.e. "A", "G" etc
     */
     inline
@@ -77,13 +84,6 @@ public: //getters
     get_num() { return num_; }
 
     /**
-     * getter the chain_id, i.e. "A", "B", the id of the chain this residue belongs to
-     */
-    inline
-    char
-    get_chain_id() { return chain_id_; }
-
-    /**
     * getter for the residue insertion code
     */
     inline
@@ -96,6 +96,10 @@ public: //getters
     inline
     Uuid const &
     get_uuid() const { return uuid_; }
+
+    inline
+    String
+    get_str() const { return String(""); }
 
 protected:
 

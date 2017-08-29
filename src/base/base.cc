@@ -3,16 +3,24 @@
 //
 
 #include <pybind11/pybind11.h>
+#include <pybind11/operators.h>
 
 //rnamake headers
+#include <base/types.h>
 #include <base/file_io.h>
+#include <base/simple_string.h>
 
 namespace py = pybind11;
 
 PYBIND11_PLUGIN(base_util) {
     py::module m("base_util", "rnamake's most basic classes and functions");
 
-    m.def("get_lines_from_file", &get_lines_from_file);
+    // SimpleString Class
+    py::class_<SimpleString>(m, "SimpleString")
+            .def(py::init<const String &>())
+            .def("get_str", &SimpleString::get_str)
+            .def(py::self == py::self)
+            .def(py::self != py::self);
 
     return m.ptr();
 

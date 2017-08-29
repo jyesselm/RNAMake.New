@@ -3,6 +3,7 @@
 //
 
 #include <pybind11/pybind11.h>
+#include <pybind11/operators.h>
 
 //rnamake headers
 #include <util/uuid.h>

@@ -18,10 +18,14 @@ find_library(PYBIND11 pybind11)
 set(PYBIND11_CPP_STANDARD -std=c++11)
 add_subdirectory(pybind11)
 
+############################################################################
+# Base
+############################################################################
 set(base_files
         ./src/base/string.cc
         ./src/base/file_io.cc
         ./src/base/base.cc
+        ./src/base/simple_string.cc
         )
 
 add_library(base_lib ${base_files})
@@ -29,6 +33,10 @@ target_link_libraries(base_lib pybind11::module)
 
 add_library(base_util MODULE ${base_files})
 target_link_libraries(base_util PRIVATE pybind11::module)
+
+############################################################################
+# Math
+############################################################################
 
 set(math_files
         ./src/math/numerical.cc
@@ -46,17 +54,39 @@ target_link_libraries(math_lib base_lib pybind11::module)
 add_executable(xyz_matrix_unittest unittests/xyz_matrix_unittest.cpp)
 target_link_libraries(xyz_matrix_unittest math_lib)
 
+############################################################################
+# Util
+############################################################################
+
 set(util_files
         ./src/util/util.cc
         ./src/util/uuid.cc
         )
 
-add_library(util MODULE ${math_files})
+add_library(util MODULE ${util_files})
 target_link_libraries(util PRIVATE math_lib pybind11::module )
 
-add_library(util_lib ${math_files})
+add_library(util_lib ${util_files})
 target_link_libraries(util_lib math_lib pybind11::module)
 
+############################################################################
+# Primitives
+############################################################################
+
+set(primitives_files
+        ./src/primitives/residue.cc
+        ./src/primitives/primitives.cc
+        )
+
+add_library(primitives MODULE ${primitives_files})
+target_link_libraries(primitives PRIVATE util_lib pybind11::module )
+
+add_library(primitives_lib ${primitives_files})
+target_link_libraries(primitives_lib util_lib pybind11::module)
+
+############################################################################
+# All Atom
+############################################################################
 
 set(all_atom_files
         ./src/all_atom/atom.cc

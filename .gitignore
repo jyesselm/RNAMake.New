@@ -4,4 +4,6 @@
 *.dylib
 *.so
 *.idea
-*.ninja
+*.ninja*
+CMakeCache.txt
+CMakeFiles
