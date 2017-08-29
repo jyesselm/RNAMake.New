@@ -55,8 +55,43 @@ class ChainUnittest(unittest.TestCase):
         self.failUnless(new_c.get_residue(0).unique() == 1)
 
     def test_iterator(self):
+        count = 0
         for r in self.c:
-            print r
+            count += 1
+        self.failUnless(count == 3)
+
+
+class StructureUnittest(unittest.TestCase):
+
+    def setUp(self):
+        self.r1 = Residue('A', 1, 'A', ' ', Uuid())
+        self.r2 = Residue('A', 2, 'A', ' ', Uuid())
+        self.r3 = Residue('A', 2, 'A', ' ', Uuid())
+        self.s = Structure([self.r1, self.r2, self.r3], [3])
+
+    def test_get_residue(self):
+        r = self.s.get_residue(1, 'A', ' ')
+        self.failUnless(self.r1 == r)
+
+        r1 = self.s.get_residue(r.get_uuid())
+        self.failUnless(self.r1 == r1)
+
+        # by internal position
+        r2 = self.s.get_residue(0)
+        self.failUnless(self.r1 == r2)
+
+    def test_getters(self):
+        self.failUnless(self.s.get_num_chains() == 1)
+        self.failUnless(self.s.get_num_residues() == 3)
+        self.failUnless(self.s.get_sequence() == "AAA")
+        self.failUnless(self.s.get_res_index(self.r1) == 0)
+
+class BasepairUnittest(unittest.TestCase):
+    def setUp(self):
+        pass
+
+
+
 
 
 def main():

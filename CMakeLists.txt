@@ -75,6 +75,9 @@ target_link_libraries(util_lib math_lib pybind11::module)
 
 set(primitives_files
         ./src/primitives/residue.cc
+        ./src/primitives/chain.cc
+        ./src/primitives/structure.cc
+        ./src/primitives/basepair.cc
         ./src/primitives/primitives.cc
         )
 

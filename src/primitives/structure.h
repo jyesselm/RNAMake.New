@@ -58,7 +58,7 @@ public: //get_residue interface
             char i_code) const{
 
         for (auto const & r : residues_) {
-            if (num == r->num() && chain_id == r->chain_id() && i_code == r->i_code()) {
+            if (num == r->get_num() && chain_id == r->get_chain_id() && i_code == r->get_i_code()) {
                 return r;
             }
         }
@@ -70,7 +70,7 @@ public: //get_residue interface
             Uuid const & uuid) const {
 
         for (auto const & r : residues_) {
-            if (r->uuid() == uuid) { return r; }
+            if (r->get_uuid() == uuid) { return r; }
         }
 
         return ResidueOP(nullptr);
@@ -89,18 +89,18 @@ public: //get_residue interface
             i++;
             if (r == res) { return i; }
         }
-        throw StructureException("cannot find index for res: " + std::to_string(res->num()));
+        throw StructureException("cannot find index for res: " + std::to_string(res->get_num()));
     }
 
 public:
     size_t
-    num_residues() { return residues_.size(); }
+    get_num_residues() { return residues_.size(); }
 
     size_t
-    num_chains() { return chain_cuts_.size(); }
+    get_num_chains() { return chain_cuts_.size(); }
 
     String
-    sequence() {
+    get_sequence() {
         auto i = -1;
         auto seq = String("");
         auto pos = 0;
@@ -110,7 +110,7 @@ public:
                 seq += "&";
                 pos++;
             }
-            seq += r->name();
+            seq += r->get_name();
         }
         return seq;
     }
