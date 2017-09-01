@@ -148,7 +148,7 @@ public: //get basepairs interface
     get_basepairs(
             String const & name) {
         for (auto const & bp : basepairs_) {
-            if (name == bp->get_name())) { return BasepairOPs{bp}; }
+            if (name == bp->get_name()) { return BasepairOPs{bp}; }
         }
 
         throw RNAStructureException("could not find basepair with name " + name);

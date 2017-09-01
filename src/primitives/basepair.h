@@ -99,7 +99,7 @@ protected:
 
 template <typename Restype>
 String
-calc_bp_name(std::vector<std::shared_ptr<Restype>> const & res) {
+calc_bp_name(std::vector<std::shared_ptr<Restype> > const & res) {
     auto res1 = res[0];
     auto res2 = res[1];
 

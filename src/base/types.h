@@ -29,6 +29,6 @@ typedef std::map<String, float> StringFloatMap;
 typedef std::map<String, String> StringStringMap;
 
 template<typename T>
-using   VectorUP = std::unique_ptr<std::vector<T>>;
+using   VectorUP = std::unique_ptr<std::vector<T> >;
 
 #endif
