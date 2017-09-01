@@ -98,6 +98,8 @@ protected:
     ResidueOPs residues_;
 };
 
+
+
 }
 
 #endif //PRIMITIVES_CHAIN_H

@@ -125,6 +125,7 @@ protected:
     Ints chain_cuts_;
 };
 
+
 }
 
 #endif //RNAMAKE_PRIMITIVES_STRUCTURE_H

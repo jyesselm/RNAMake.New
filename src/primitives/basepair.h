@@ -129,6 +129,10 @@ calc_bp_name(std::vector<std::shared_ptr<Restype>> const & res) {
 
 }
 
+typedef std::shared_ptr<Basepair> BasepairOP;
+typedef std::vector<BasepairOP>   BasepairOPs;
+
+
 /*template <typename Restype>
 Basepair::BasepairType
 get_bp_type(std::vector<std::shared_ptr<Restype>> const & res,

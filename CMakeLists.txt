@@ -78,6 +78,7 @@ set(primitives_files
         ./src/primitives/chain.cc
         ./src/primitives/structure.cc
         ./src/primitives/basepair.cc
+        ./src/primitives/rna_structure.cc
         ./src/primitives/primitives.cc
         )
 

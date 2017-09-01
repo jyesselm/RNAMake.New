@@ -88,9 +88,15 @@ class StructureUnittest(unittest.TestCase):
 
 class BasepairUnittest(unittest.TestCase):
     def setUp(self):
-        pass
+        self.r1 = Residue('A', 1, 'A', ' ', Uuid())
+        self.r2 = Residue('U', 2, 'A', ' ', Uuid())
+        self.bp = Basepair(self.r1.get_uuid(), self.r2.get_uuid(), Uuid(),
+                           BasepairType.WC)
 
-
+    def test_getters(self):
+        self.failUnless(self.r1.get_uuid() == self.bp.get_res1_uuid())
+        self.failUnless(self.r2.get_uuid() == self.bp.get_res2_uuid())
+        self.failUnless(self.bp.get_bp_type() == BasepairType.WC)
 
 
 
