@@ -13,8 +13,6 @@ include_directories(/usr/include/python2.7)
 include_directories(src/)
 include_directories(unittests/)
 include_directories(pybind11/include)
-include_directories(bindings)
-include_directories(bindings/source)
 
 find_library(PYBIND11 pybind11)
 set(PYBIND11_CPP_STANDARD -std=c++11)
@@ -26,11 +24,15 @@ add_subdirectory(pybind11)
 set(base_files
         ./src/base/string.cc
         ./src/base/file_io.cc
+        ./src/base/base.cc
         ./src/base/simple_string.cc
         )
 
 add_library(base_lib ${base_files})
-#target_link_libraries(base_lib)
+target_link_libraries(base_lib pybind11::module)
+
+add_library(base_util MODULE ${base_files})
+target_link_libraries(base_util PRIVATE pybind11::module)
 
 ############################################################################
 # Math
@@ -40,10 +42,14 @@ set(math_files
         ./src/math/numerical.cc
         ./src/math/xyz_vector.cc
         ./src/math/xyz_matrix.cc
+        ./src/math/math.cc
         )
 
+add_library(math_util MODULE ${math_files})
+target_link_libraries(math_util PRIVATE base_lib pybind11::module)
+
 add_library(math_lib ${math_files})
-target_link_libraries(math_lib base_lib)
+target_link_libraries(math_lib base_lib pybind11::module)
 
 add_executable(xyz_matrix_unittest unittests/xyz_matrix_unittest.cpp)
 target_link_libraries(xyz_matrix_unittest math_lib)
@@ -53,11 +59,15 @@ target_link_libraries(xyz_matrix_unittest math_lib)
 ############################################################################
 
 set(util_files
+        ./src/util/util.cc
         ./src/util/uuid.cc
         )
 
+add_library(util MODULE ${util_files})
+target_link_libraries(util PRIVATE math_lib pybind11::module )
+
 add_library(util_lib ${util_files})
-target_link_libraries(util_lib math_lib)
+target_link_libraries(util_lib math_lib pybind11::module)
 
 ############################################################################
 # Primitives
@@ -69,10 +79,14 @@ set(primitives_files
         ./src/primitives/structure.cc
         ./src/primitives/basepair.cc
         ./src/primitives/rna_structure.cc
+        ./src/primitives/primitives.cc
         )
 
+add_library(primitives MODULE ${primitives_files})
+target_link_libraries(primitives PRIVATE util_lib pybind11::module )
+
 add_library(primitives_lib ${primitives_files})
-target_link_libraries(primitives_lib util_lib)
+target_link_libraries(primitives_lib util_lib pybind11::module)
 
 ############################################################################
 # All Atom
@@ -80,31 +94,16 @@ target_link_libraries(primitives_lib util_lib)
 
 set(all_atom_files
         ./src/all_atom/atom.cc
+        ./src/all_atom/all_atom.cc
         )
 
+add_library(all_atom MODULE ${all_atom_files})
+target_link_libraries(all_atom math_lib pybind11::module)
 
 add_library(all_atom_lib ${all_atom_files})
-target_link_libraries(all_atom_lib math_lib)
+target_link_libraries(all_atom_lib math_lib pybind11::module)
 
-set(binder_files
-        ./bindings/source/all_atom/atom.cpp
-        ./bindings/source/base/file_io.cpp
-        ./bindings/source/base/simple_string.cpp
-        ./bindings/source/base/string.cpp
-        ./bindings/source/math/xyz_matrix.cpp
-        ./bindings/source/math/xyz_vector.cpp
-        ./bindings/source/primitives/basepair.cpp
-        ./bindings/source/primitives/basepair_1.cpp
-        ./bindings/source/primitives/chain.cpp
-        ./bindings/source/primitives/residue.cpp
-        ./bindings/source/primitives/residue_1.cpp
-        ./bindings/source/primitives/rna_structure.cpp
-        ./bindings/source/util/uuid.cpp
-        ./bindings/source/rnamake_new.cpp
-        )
 
-add_library(rnamake_new MODULE ${binder_files})
-target_link_libraries(rnamake_new all_atom_lib primitives_lib pybind11::module)
 
 
 #pybind11_add_module(example)
