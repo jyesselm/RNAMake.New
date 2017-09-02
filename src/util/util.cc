@@ -8,6 +8,8 @@
 //rnamake headers
 #include <util/uuid.h>
 
+namespace util {
+
 namespace py = pybind11;
 
 PYBIND11_PLUGIN(util) {
@@ -20,4 +22,6 @@ PYBIND11_PLUGIN(util) {
             .def(py::self != py::self);
 
     return m.ptr();
+}
+
 }

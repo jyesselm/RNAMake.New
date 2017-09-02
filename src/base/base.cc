@@ -16,9 +16,9 @@ PYBIND11_PLUGIN(base_util) {
     py::module m("base_util", "rnamake's most basic classes and functions");
 
     // SimpleString Class
-    py::class_<SimpleString>(m, "SimpleString")
+    py::class_<base::SimpleString>(m, "SimpleString")
             .def(py::init<const String &>())
-            .def("get_str", &SimpleString::get_str)
+            .def("get_str", &base::SimpleString::get_str)
             .def(py::self == py::self)
             .def(py::self != py::self);
 
