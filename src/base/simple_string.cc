@@ -4,10 +4,14 @@
 
 #include <base/simple_string.h>
 
+namespace base {
+
 std::ostream &
-operator <<( std::ostream & stream, SimpleString const & ss) {
+operator<<(std::ostream & stream, SimpleString const & ss) {
     auto string_stream = std::stringstream();
     string_stream << ss.chars_;
     stream << string_stream.str();
     return stream;
+}
+
 }

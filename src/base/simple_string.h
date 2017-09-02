@@ -10,10 +10,12 @@
 #include "sstream"
 #include "iostream"
 
+namespace base {
+
 class SimpleString {
 public:
     friend
-    std::ostream & operator << (std::ostream &, SimpleString const &);
+    std::ostream & operator<<(std::ostream &, SimpleString const &);
 
 public:
     inline
@@ -26,7 +28,10 @@ public:
     SimpleString(String const & s) {
         chars_ = new char[s.length()];
         int i = 0;
-        for(auto const & e : s) { chars_[i] = e; i++; }
+        for (auto const & e : s) {
+            chars_[i] = e;
+            i++;
+        }
         size_ = s.length();
     }
 
@@ -44,22 +49,22 @@ public:
 public:
     inline
     bool
-    operator == (SimpleString const & other) const {
-        if(size_ != other.size_) { return false; }
+    operator==(SimpleString const & other) const {
+        if (size_ != other.size_) { return false; }
 
-        for(int i = 0; i < size_; i++) {
-            if(chars_[i] != other.chars_[i]) { return false; }
+        for (int i = 0; i < size_; i++) {
+            if (chars_[i] != other.chars_[i]) { return false; }
         }
         return true;
     }
 
     inline
     bool
-    operator != (SimpleString const & other) const {
-        if(size_ != other.size_) { return true; }
+    operator!=(SimpleString const & other) const {
+        if (size_ != other.size_) { return true; }
 
-        for(int i = 0; i < size_; i++) {
-            if(chars_[i] != other.chars_[i]) { return true; }
+        for (int i = 0; i < size_; i++) {
+            if (chars_[i] != other.chars_[i]) { return true; }
         }
         return false;
     }
@@ -71,14 +76,16 @@ public:
     }
 
 private:
-    char * chars_;
+    char *chars_;
     size_t size_;
 };
 
 std::ostream &
-operator <<( std::ostream &, SimpleString const &);
+operator<<(std::ostream &, SimpleString const &);
 
 typedef std::shared_ptr<SimpleString> SimpleStringOP;
-typedef std::vector<SimpleStringOP>   SimpleStringOPs;
+typedef std::vector<SimpleStringOP> SimpleStringOPs;
+
+}
 
 #endif //TEST_SIMPLE_STRING_H

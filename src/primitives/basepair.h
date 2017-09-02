@@ -34,9 +34,9 @@ class Basepair {
 public:
     inline
     Basepair(
-            Uuid const & res1_uuid,
-            Uuid const & res2_uuid,
-            Uuid const & uuid,
+            util::Uuid const & res1_uuid,
+            util::Uuid const & res2_uuid,
+            util::Uuid const & uuid,
             BasepairType const & bp_type):
             res1_uuid_(res1_uuid),
             res2_uuid_(res2_uuid),
@@ -66,34 +66,34 @@ public:
 protected:
     inline
     Basepair():
-            res1_uuid_(Uuid()),
-            res2_uuid_(Uuid()),
-            uuid_(Uuid()) {}
+            res1_uuid_(util::Uuid()),
+            res2_uuid_(util::Uuid()),
+            uuid_(util::Uuid()) {}
 
 public:
-    Uuid const &
-    get_partner(Uuid const &);
+    util::Uuid const &
+    get_partner(util::Uuid const &);
 
     inline
     BasepairType const &
     get_bp_type() { return bp_type_; }
 
     inline
-    Uuid const &
+    util::Uuid const &
     get_uuid() { return uuid_; }
 
     inline
-    Uuid const &
+    util::Uuid const &
     get_res1_uuid() const { return res1_uuid_; }
 
     inline
-    Uuid const &
+    util::Uuid const &
     get_res2_uuid() const { return res2_uuid_; }
 
 
 protected:
-    Uuid uuid_;
-    Uuid res1_uuid_, res2_uuid_;
+    util::Uuid uuid_;
+    util::Uuid res1_uuid_, res2_uuid_;
     BasepairType bp_type_;
 };
 

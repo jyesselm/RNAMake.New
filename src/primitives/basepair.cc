@@ -7,8 +7,8 @@
 
 namespace primitives {
 
-Uuid const &
-Basepair::get_partner(Uuid const & r_uuid) {
+util::Uuid const &
+Basepair::get_partner(util::Uuid const & r_uuid) {
     if     (r_uuid == res1_uuid_) { return res2_uuid_; }
     else if(r_uuid == res2_uuid_) { return res1_uuid_; }
     else {

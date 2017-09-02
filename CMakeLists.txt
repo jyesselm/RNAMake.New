@@ -14,6 +14,7 @@ include_directories(src/)
 include_directories(unittests/)
 include_directories(pybind11/include)
 include_directories(bindings)
+include_directories(bindings/source)
 
 find_library(PYBIND11 pybind11)
 set(PYBIND11_CPP_STANDARD -std=c++11)
@@ -85,11 +86,25 @@ set(all_atom_files
 add_library(all_atom_lib ${all_atom_files})
 target_link_libraries(all_atom_lib math_lib)
 
-set (binder_files
-        ./bindings/sourcernamake_new.cpp)
+set(binder_files
+        ./bindings/source/all_atom/atom.cpp
+        ./bindings/source/base/file_io.cpp
+        ./bindings/source/base/simple_string.cpp
+        ./bindings/source/base/string.cpp
+        ./bindings/source/math/xyz_matrix.cpp
+        ./bindings/source/math/xyz_vector.cpp
+        ./bindings/source/primitives/basepair.cpp
+        ./bindings/source/primitives/basepair_1.cpp
+        ./bindings/source/primitives/chain.cpp
+        ./bindings/source/primitives/residue.cpp
+        ./bindings/source/primitives/residue_1.cpp
+        ./bindings/source/primitives/rna_structure.cpp
+        ./bindings/source/util/uuid.cpp
+        ./bindings/source/rnamake_new.cpp
+        )
 
-add_library(binder_lib MODULE ${binder_files})
-target_link_libraries(binder_lib all_atom_lib pybind11::module)
+add_library(rnamake_new MODULE ${binder_files})
+target_link_libraries(rnamake_new all_atom_lib primitives_lib pybind11::module)
 
 
 #pybind11_add_module(example)

@@ -15,47 +15,50 @@
 //RNAMake Headers
 #include <base/types.h>
 
+namespace util {
 
 class Uuid {
 public:
     Uuid();
-    
+
     ~Uuid() {}
-    
+
 public:
 
-    
-    inline
-    bool 
-    operator ==(Uuid const & uuid) const {
-        return id_ == uuid.id_;
-    }
- 
+
     inline
     bool
-    operator ==(Uuid const & uuid)  {
+    operator==(Uuid const & uuid) const {
         return id_ == uuid.id_;
     }
-    
+
     inline
     bool
-    operator != (Uuid const & uuid) const {
+    operator==(Uuid const & uuid) {
+        return id_ == uuid.id_;
+    }
+
+    inline
+    bool
+    operator!=(Uuid const & uuid) const {
         return id_ != uuid.id_;
     }
 
-    
+
     inline
     bool
-    operator != (Uuid & uuid)  {
+    operator!=(Uuid & uuid) {
         return id_ != uuid.id_;
     }
 
-    
+
 private:
     uint64_t id_;
-    
+
 };
 
 typedef std::shared_ptr<Uuid> UuidOP;
+
+}
 
 #endif

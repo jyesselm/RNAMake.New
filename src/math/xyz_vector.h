@@ -19,517 +19,483 @@
 #include <string>
 
 //RNAMake Headers
-#include "base/string.h"
+#include <base/string.h>
 
-template< typename T >
+namespace math {
+
+template<typename T>
 class xyzVector {
 
 private:
-	template< typename > friend class xyzMatrix;
-	
+	template<typename> friend
+	class xyzMatrix;
+
 public:
-	
-	typedef  T          Value;
-	
+
+	typedef T Value;
+
 public: // Creation
-    
+
 	inline
-	xyzVector()
-	{}
-	
+	xyzVector() {}
+
 	inline
-	xyzVector( xyzVector const & v ) :
-	x_( v.x_ ),
-	y_( v.y_ ),
-	z_( v.z_ )
-	{}
-	
-	template< typename U >
+	xyzVector(xyzVector const & v) :
+			x_(v.x_),
+			y_(v.y_),
+			z_(v.z_) {}
+
+	template<typename U>
 	inline
-	xyzVector( xyzVector< U > const & v ) :
-	x_( v.x_ ),
-	y_( v.y_ ),
-	z_( v.z_ )
-	{}
-	
+	xyzVector(xyzVector<U> const & v) :
+			x_(v.x_),
+			y_(v.y_),
+			z_(v.z_) {}
+
 	inline
-	xyzVector (Value const & x, Value const & y, Value const & z) :
-	x_(x),
-	y_(y),
-	z_(z)
-	{}
-	
+	xyzVector(Value const & x, Value const & y, Value const & z) :
+			x_(x),
+			y_(y),
+			z_(z) {}
+
 	inline
-	xyzVector (std::vector< T > const & v):
-	x_(v[0]),
-	y_(v[1]),
-	z_(v[2])
-	{}
-	
+	xyzVector(std::vector<T> const & v) :
+			x_(v[0]),
+			y_(v[1]),
+			z_(v[2]) {}
+
 	inline
 	explicit
-	xyzVector( Value const & t ) :
-	x_( t ),
-	y_( t ),
-	z_( t )
-	{}
-    
-    inline
-    xyzVector( String const & s) {
-        auto spl = split_str_by_delimiter(s, " ");
-        assert(spl.size() >= 3);
-        x_ = (Value)std::stod(spl[0]);
-        y_ = (Value)std::stod(spl[1]);
-        z_ = (Value)std::stod(spl[2]);
-    }
-    
+	xyzVector(Value const & t) :
+			x_(t),
+			y_(t),
+			z_(t) {}
+
+	inline
+	xyzVector(String const & s) {
+		auto spl = base::split_str_by_delimiter(s, " ");
+		assert(spl.size() >= 3);
+		x_ = (Value) std::stod(spl[0]);
+		y_ = (Value) std::stod(spl[1]);
+		z_ = (Value) std::stod(spl[2]);
+	}
+
 public:
-    
-    inline
-    String const
-    get_str() const {
-        return std::to_string(x_) + " " + std::to_string(y_) + " " +
-               std::to_string(z_);
-    }
-	
+
+	inline
+	String const
+	get_str() const {
+		return std::to_string(x_) + " " + std::to_string(y_) + " " +
+			   std::to_string(z_);
+	}
+
 public: // Assignment
-	
+
 	/// @brief Copy assignment
 	inline
 	xyzVector &
-	operator =( xyzVector const & v )
-	{
-		if ( this != &v ) {
+	operator=(xyzVector const & v) {
+		if (this != &v) {
 			x_ = v.x_;
 			y_ = v.y_;
 			z_ = v.z_;
 		}
 		return *this;
 	}
-	
+
 	/// @brief Copy assignment
-	template< typename U >
+	template<typename U>
 	inline
 	xyzVector &
-	operator =( xyzVector< U > const & v )
-	{
+	operator=(xyzVector<U> const & v) {
 		x_ = v.x_;
 		y_ = v.y_;
 		z_ = v.z_;
 		return *this;
 	}
-	
+
 	/// @brief += xyzVector
-	template< typename U >
+	template<typename U>
 	inline
 	xyzVector &
-	operator +=( xyzVector< U > const & v )
-	{
+	operator+=(xyzVector<U> const & v) {
 		x_ += v.x_;
 		y_ += v.y_;
 		z_ += v.z_;
 		return *this;
 	}
-	
-	
+
+
 	/// @brief -= xyzVector
-	template< typename U >
+	template<typename U>
 	inline
 	xyzVector &
-	operator -=( xyzVector< U > const & v )
-	{
+	operator-=(xyzVector<U> const & v) {
 		x_ -= v.x_;
 		y_ -= v.y_;
 		z_ -= v.z_;
 		return *this;
 	}
-	
+
 	// @brief = Value
 	inline
 	xyzVector &
-	operator =( Value const & t )
-	{
+	operator=(Value const & t) {
 		x_ = y_ = z_ = t;
 		return *this;
 	}
-	
-	
+
+
 	/// @brief += Value
 	inline
 	xyzVector &
-	operator +=( Value const & t )
-	{
+	operator+=(Value const & t) {
 		x_ += t;
 		y_ += t;
 		z_ += t;
 		return *this;
 	}
-	
-	
+
+
 	/// @brief -= Value
 	inline
 	xyzVector &
-	operator -=( Value const & t )
-	{
+	operator-=(Value const & t) {
 		x_ -= t;
 		y_ -= t;
 		z_ -= t;
 		return *this;
 	}
-	
-	
+
+
 	/// @brief *= Value
 	inline
 	xyzVector &
-	operator *=( Value const & t )
-	{
+	operator*=(Value const & t) {
 		x_ *= t;
 		y_ *= t;
 		z_ *= t;
 		return *this;
 	}
-	
-	
+
+
 	/// @brief /= Value
 	inline
 	xyzVector &
-	operator /=( Value const & t )
-	{
-		assert( t != Value( 0 ) );
-		Value const inv_t( Value( 1 ) / t );
+	operator/=(Value const & t) {
+		assert(t != Value(0));
+		Value const inv_t(Value(1) / t);
 		x_ *= inv_t;
 		y_ *= inv_t;
 		z_ *= inv_t;
 		return *this;
 	}
-	
-	
+
+
 public: // Methods
-	
-		
+
+
 	/// @brief Zero
 	inline
 	xyzVector &
-	zero()
-	{
-		x_ = y_ = z_ = Value( 0 );
+	zero() {
+		x_ = y_ = z_ = Value(0);
 		return *this;
 	}
-	
-	
+
+
 	/// @brief Negate
 	inline
 	xyzVector &
-	negate()
-	{
+	negate() {
 		x_ = -x_;
 		y_ = -y_;
 		z_ = -z_;
 		return *this;
 	}
-	
-	
+
+
 	/// @brief -xyzVector (negated copy)
 	inline
 	xyzVector
-	operator -() const
-	{
-		return xyzVector( -x_, -y_, -z_ );
+	operator-() const {
+		return xyzVector(-x_, -y_, -z_);
 	}
-	
-	
+
+
 	/// @brief Negated copy
 	inline
 	xyzVector
-	negated() const
-	{
-		return xyzVector( -x_, -y_, -z_ );
+	negated() const {
+		return xyzVector(-x_, -y_, -z_);
 	}
-	
-	
+
+
 	/// @brief Negated: Return via argument (slightly faster)
 	inline
 	void
-	negated( xyzVector & a ) const
-	{
+	negated(xyzVector & a) const {
 		a.x_ = -x_;
 		a.y_ = -y_;
 		a.z_ = -z_;
 	}
-	
-	
+
+
 	/// @brief xyzVector + xyzVector
 	friend
 	inline
 	xyzVector
-	operator +( xyzVector const & a, xyzVector const & b )
-	{
-		return xyzVector( a.x_ + b.x_, a.y_ + b.y_, a.z_ + b.z_ );
+	operator+(xyzVector const & a, xyzVector const & b) {
+		return xyzVector(a.x_ + b.x_, a.y_ + b.y_, a.z_ + b.z_);
 	}
-	
-	
+
+
 	/// @brief xyzVector + Value
 	friend
 	inline
 	xyzVector
-	operator +( xyzVector const & v, Value const & t )
-	{
-		return xyzVector( v.x_ + t, v.y_ + t, v.z_ + t );
+	operator+(xyzVector const & v, Value const & t) {
+		return xyzVector(v.x_ + t, v.y_ + t, v.z_ + t);
 	}
-	
-	
+
+
 	/// @brief Value + xyzVector
 	friend
 	inline
 	xyzVector
-	operator +( Value const & t, xyzVector const & v )
-	{
-		return xyzVector( t + v.x_, t + v.y_, t + v.z_ );
+	operator+(Value const & t, xyzVector const & v) {
+		return xyzVector(t + v.x_, t + v.y_, t + v.z_);
 	}
-	
-	
+
+
 	/// @brief xyzVector - xyzVector
 	friend
 	inline
 	xyzVector
-	operator -( xyzVector const & a, xyzVector const & b )
-	{
-		return xyzVector( a.x_ - b.x_, a.y_ - b.y_, a.z_ - b.z_ );
+	operator-(xyzVector const & a, xyzVector const & b) {
+		return xyzVector(a.x_ - b.x_, a.y_ - b.y_, a.z_ - b.z_);
 	}
-	
-	
+
+
 	/// @brief xyzVector - Value
 	friend
 	inline
 	xyzVector
-	operator -( xyzVector const & v, Value const & t )
-	{
-		return xyzVector( v.x_ - t, v.y_ - t, v.z_ - t );
+	operator-(xyzVector const & v, Value const & t) {
+		return xyzVector(v.x_ - t, v.y_ - t, v.z_ - t);
 	}
-	
-	
+
+
 	/// @brief Value - xyzVector
 	friend
 	inline
 	xyzVector
-	operator -( Value const & t, xyzVector const & v )
-	{
-		return xyzVector( t - v.x_, t - v.y_, t - v.z_ );
+	operator-(Value const & t, xyzVector const & v) {
+		return xyzVector(t - v.x_, t - v.y_, t - v.z_);
 	}
-	
-	
+
+
 	/// @brief xyzVector * Value
 	friend
 	inline
 	xyzVector
-	operator *( xyzVector const & v, Value const & t )
-	{
-		return xyzVector( v.x_ * t, v.y_ * t, v.z_ * t );
+	operator*(xyzVector const & v, Value const & t) {
+		return xyzVector(v.x_ * t, v.y_ * t, v.z_ * t);
 	}
-	
-	
+
+
 	/// @brief Value * xyzVector
 	friend
 	inline
 	xyzVector
-	operator *( Value const & t, xyzVector const & v )
-	{
-		return xyzVector( t * v.x_, t * v.y_, t * v.z_ );
+	operator*(Value const & t, xyzVector const & v) {
+		return xyzVector(t * v.x_, t * v.y_, t * v.z_);
 	}
-	
-	
+
+
 	/// @brief xyzVector / Value
 	friend
 	inline
 	xyzVector
-	operator /( xyzVector const & v, Value const & t )
-	{
-		assert( t != Value( 0 ) );
-		Value const inv_t( Value ( 1 ) / t );
-		return xyzVector( v.x_ * inv_t, v.y_ * inv_t, v.z_ * inv_t );
+	operator/(xyzVector const & v, Value const & t) {
+		assert(t != Value(0));
+		Value const inv_t(Value(1) / t);
+		return xyzVector(v.x_ * inv_t, v.y_ * inv_t, v.z_ * inv_t);
 	}
 
 	/// @brief Normalize
 	inline
 	xyzVector &
-	normalize()
-	{
+	normalize() {
 		Value const length_ = get_length();
-		assert( length_ != Value ( 0 ) );
-		Value const inv_length( Value( 1 ) / length_ );
+		assert(length_ != Value(0));
+		Value const inv_length(Value(1) / length_);
 		x_ *= inv_length;
 		y_ *= inv_length;
 		z_ *= inv_length;
 		return *this;
 	}
-	
+
 	/// @brief Distance
 	inline
 	Value
-	distance( xyzVector const & v ) const
-	{
-		return std::sqrt( square( x_ - v.x_ ) + square( y_ - v.y_ ) + square( z_ - v.z_ ) );
+	distance(xyzVector const & v) const {
+		return std::sqrt(square(x_ - v.x_) + square(y_ - v.y_) + square(z_ - v.z_));
 	}
-	
+
 	/// @brief Distance squared
 	inline
 	Value
-	distance_squared( xyzVector const & v ) const
-	{
-		return square( x_ - v.x_ ) + square( y_ - v.y_ ) + square( z_ - v.z_ );
+	distance_squared(xyzVector const & v) const {
+		return square(x_ - v.x_) + square(y_ - v.y_) + square(z_ - v.z_);
 	}
-	
+
 	/// @brief Dot product
 	inline
 	Value
-	dot( xyzVector const & v ) const
-	{
-		return ( x_ * v.x_ ) + ( y_ * v.y_ ) + ( z_ * v.z_ );
+	dot(xyzVector const & v) const {
+		return (x_ * v.x_) + (y_ * v.y_) + (z_ * v.z_);
 	}
 
 	/// @brief Cross product
 	inline
 	xyzVector
-	cross( xyzVector const & v ) const
-	{
+	cross(xyzVector const & v) const {
 		return xyzVector(
-						 ( y_ * v.z_ ) - ( z_ * v.y_ ),
-						 ( z_ * v.x_ ) - ( x_ * v.z_ ),
-						 ( x_ * v.y_ ) - ( y_ * v.x_ )
-						 );
+				(y_ * v.z_) - (z_ * v.y_),
+				(z_ * v.x_) - (x_ * v.z_),
+				(x_ * v.y_) - (y_ * v.x_)
+		);
 	}
 
 
 public: // Properties: accessors
-	
-	
+
+
 	/// @brief Value x const
 	inline
 	Value const &
 	get_x() const { return x_; }
-	
+
 	/// @brief Value y const
 	inline
 	Value const &
 	get_y() const { return y_; }
-	
+
 
 	/// @brief Value z const
 	inline
 	Value const &
-    get_z() const { return z_; }
-	
-    
+	get_z() const { return z_; }
+
+
 	/// @brief Length
 	inline
 	Value
 	get_length() const {
-		return std::sqrt( ( x_ * x_ ) + ( y_ * y_ ) + ( z_ * z_ ) );
+		return std::sqrt((x_ * x_) + (y_ * y_) + (z_ * z_));
 	}
-	
-	
+
+
 	/// @brief Length squared
 	inline
 	Value
 	get_length_squared() const {
-		return ( x_ * x_ ) + ( y_ * y_ ) + ( z_ * z_ );
+		return (x_ * x_) + (y_ * y_) + (z_ * z_);
 	}
-	
-	
+
+
 	/// @brief Norm
 	inline
 	Value
 	get_norm() const {
-		return std::sqrt( ( x_ * x_ ) + ( y_ * y_ ) + ( z_ * z_ ) );
+		return std::sqrt((x_ * x_) + (y_ * y_) + (z_ * z_));
 	}
-	
-	
+
+
 	/// @brief Norm squared
 	inline
 	Value
 	get_norm_squared() const {
-		return ( x_ * x_ ) + ( y_ * y_ ) + ( z_ * z_ );
+		return (x_ * x_) + (y_ * y_) + (z_ * z_);
 	}
-	
-	
+
+
 	/// @brief Magnitude
 	inline
 	Value
 	get_magnitude() const {
-		return std::sqrt( ( x_ * x_ ) + ( y_ * y_ ) + ( z_ * z_ ) );
+		return std::sqrt((x_ * x_) + (y_ * y_) + (z_ * z_));
 	}
-	
-	
+
+
 	/// @brief Magnitude squared
 	inline
 	Value
 	get_magnitude_squared() const {
-		return ( x_ * x_ ) + ( y_ * y_ ) + ( z_ * z_ );
+		return (x_ * x_) + (y_ * y_) + (z_ * z_);
 	}
-	
-	
+
+
 public: // Properties: value assignment
-	
-	
+
+
 	/// @brief x assignment
 	inline
 	void
-	set_x( Value const & x_a ) { x_ = x_a; }
-	
-	
+	set_x(Value const & x_a) { x_ = x_a; }
+
+
 	/// @brief y assignment
 	inline
 	void
-    set_y( Value const & y_a ) { y_ = y_a; }
-	
-	
+	set_y(Value const & y_a) { y_ = y_a; }
+
+
 	/// @brief z assignment
 	inline
 	void
-	set_z( Value const & z_a ) { z_ = z_a; }
-		
+	set_z(Value const & z_a) { z_ = z_a; }
+
 
 public: // Comparison
-	
-	
+
+
 	/// @brief xyzVector == xyzVector
 	friend
 	inline
 	bool
-	operator ==( xyzVector const & a, xyzVector const & b )
-	{
-		return ( a.x_ == b.x_ ) && ( a.y_ == b.y_ ) && ( a.z_ == b.z_ );
+	operator==(xyzVector const & a, xyzVector const & b) {
+		return (a.x_ == b.x_) && (a.y_ == b.y_) && (a.z_ == b.z_);
 	}
-	
-	
+
+
 	/// @brief xyzVector != xyzVector
 	friend
 	inline
 	bool
-	operator !=( xyzVector const & a, xyzVector const & b )
-	{
-		return ( a.x_ != b.x_ ) || ( a.y_ != b.y_ ) || ( a.z_ != b.z_ );
+	operator!=(xyzVector const & a, xyzVector const & b) {
+		return (a.x_ != b.x_) || (a.y_ != b.y_) || (a.z_ != b.z_);
 	}
-	
-	
-	
+
+
 private: // Methods
-	
-	
+
+
 	/// @brief square( t ) == t * t
 	inline
 	static
 	Value
-	square( Value const & t ) { return t * t; }
-	
+	square(Value const & t) { return t * t; }
+
 private: // Fields
-	
+
 	/// @brief Coordinates of the 3 coordinate vector
 	Value x_;
 	Value y_;
 	Value z_;
-	
-	
+
+
 }; // xyzVector
 
 typedef xyzVector<double> Vector;
@@ -538,5 +504,6 @@ typedef std::vector<Vector> Vectors;
 typedef xyzVector<double> Point;
 typedef std::vector<Point> Points;
 
+}
 
 #endif /* defined(__REDESIGNC__xyzVector__) */

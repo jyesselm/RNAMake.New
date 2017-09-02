@@ -10,28 +10,28 @@
 TEST_CASE( "Test Matrix math ", "[XYZMatrix]" ) {
     
     SECTION("Test Stringify Matrices") {
-        auto m = Matrix(5.0);
+        auto m = math::Matrix(5.0);
         auto s = m.get_str();
-        auto m2 = Matrix(s);
+        auto m2 = math::Matrix(s);
         
-        REQUIRE(are_matrices_equal(m, m2));
+        REQUIRE(math::are_matrices_equal(m, m2));
     }
     
 
     SECTION("Single known test of unitarize compared to python") {
     
         auto path ="/Users/jyesselm/projects/RNAMake.New/rnamake_new/unittests/resources/math/test_unitarize.dat";
-        auto lines = get_lines_from_file(path);
-        auto org_m = Matrix(lines[0]);
+        auto lines = base::get_lines_from_file(path);
+        auto org_m = math::Matrix(lines[0]);
         
-        auto m = Matrix(1.0, 2.0, 3.0,
-                        4.0, 5.0, 6.0,
-                        1.0, 1.0, 1.0);
+        auto m = math::Matrix(1.0, 2.0, 3.0,
+                              4.0, 5.0, 6.0,
+                              1.0, 1.0, 1.0);
     
         auto unit = m.get_unitarize();
         std::cout << unit.get_str_readable() << std::endl;
     
-        REQUIRE(are_matrices_equal(org_m, unit));
+        REQUIRE(math::are_matrices_equal(org_m, unit));
         
     }
     

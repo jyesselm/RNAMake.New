@@ -12,16 +12,18 @@
 //RNAMake Headers
 #include "util/uuid.h"
 
-int length = 10;
+namespace util {
 
 Uuid::Uuid() {
+    int length = 10;
     id_ = rand() % length;
     uint64_t digit = 10;
-    for ( int i = 1; i < 15; i++) {
+    for (int i = 1; i < 15; i++) {
         int pos = rand() % length;
-        id_ += (digit*i)*pos;
+        id_ += (digit * i) * pos;
         digit *= 10;
     }
+}
 }
 
 /*std::ostream &

@@ -36,7 +36,7 @@ public:
     inline
     Atom(
         String const & name,
-        Point const & coords):
+        math::Point const & coords):
     name_ ( name ),
     coords_ ( coords )
     {}
@@ -57,9 +57,9 @@ public:
     Atom(
         String const & s) {
         
-        auto spl = split_str_by_delimiter(s, " ");
+        auto spl = base::split_str_by_delimiter(s, " ");
         name_   = spl[0];
-        coords_ = Point(std::stof(spl[1]), std::stof(spl[2]), std::stof(spl[3]));
+        coords_ = math::Point(std::stof(spl[1]), std::stof(spl[2]), std::stof(spl[3]));
     }
     
     /**
@@ -101,7 +101,7 @@ public:
 
     inline
     void
-    move(Point const & p) {
+    move(math::Point const & p) {
         coords_ = coords_ + p;
 
     }
@@ -136,7 +136,7 @@ public: //accessors
      * Accessor for coords_
      */
     inline
-    Point const
+    math::Point const
     get_coords() const { return coords_; }
 
 private:
@@ -148,7 +148,7 @@ private:
     /**
      * private variable of 3D coordinates of atom
      */
-    Point coords_;
+    math::Point coords_;
     
 };
 

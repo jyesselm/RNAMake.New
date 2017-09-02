@@ -67,7 +67,7 @@ public: //get_residue interface
 
     ResidueOP const
     get_residue(
-            Uuid const & uuid) const {
+            util::Uuid const & uuid) const {
 
         for (auto const & r : residues_) {
             if (r->get_uuid() == uuid) { return r; }

@@ -31,7 +31,7 @@ public:
             int num,
             char chain_id,
             char i_code,
-            Uuid const & uuid):
+            util::Uuid const & uuid):
             name_(name),
             num_(num),
             chain_id_(chain_id),
@@ -94,7 +94,7 @@ public: //getters
     * getter for residue unique indentifier
     */
     inline
-    Uuid const &
+    util::Uuid const &
     get_uuid() const { return uuid_; }
 
     inline
@@ -107,7 +107,7 @@ protected:
     int num_;
     char chain_id_;
     char i_code_;
-    Uuid uuid_;
+    util::Uuid uuid_;
 
 };
 

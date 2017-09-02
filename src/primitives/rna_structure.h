@@ -45,8 +45,8 @@ public:
             StructureOP const & structure,
             BasepairOPs const & basepairs,
             BasepairOPs const & ends,
-            SimpleStringOPs const & end_ids,
-            SimpleStringOP const & name) :
+            base::SimpleStringOPs const & end_ids,
+            base::SimpleStringOP const & name) :
             structure_(structure),
             basepairs_(basepairs),
             ends_(ends),
@@ -101,7 +101,7 @@ public: //structure wrappers
     inline
     ResidueOP const
     get_residue(
-            Uuid const & uuid) const {
+            util::Uuid const & uuid) const {
         return structure_->get_residue(uuid); }
 
     inline
@@ -121,7 +121,7 @@ public: //structure wrappers
 public: //get basepairs interface
 
     BasepairOPs
-    get_basepairs(Uuid const & bp_uuid) {
+    get_basepairs(util::Uuid const & bp_uuid) {
         BasepairOPs bps;
         for (auto const & bp : basepairs_) {
             if (bp->get_uuic() == bp_uuid) { bps.push_back(bp); }
@@ -133,8 +133,8 @@ public: //get basepairs interface
 
     BasepairOPs
     get_basepairs(
-            Uuid const & uuid1,
-            Uuid const & uuid2) {
+            util::Uuid const & uuid1,
+            util::Uuid const & uuid2) {
 
         BasepairOPs bps;
         for (auto const & bp : basepairs_) {
@@ -147,8 +147,9 @@ public: //get basepairs interface
     BasepairOPs
     get_basepairs(
             String const & name) {
+        auto bps = BasepairOPs();
         for (auto const & bp : basepairs_) {
-            if (name == bp->get_name()) { return BasepairOPs{bp}; }
+            if (name == bp->get_name()) { bps.push_back(bp); return bps; }
         }
 
         throw RNAStructureException("could not find basepair with name " + name);
@@ -159,7 +160,7 @@ public: //get basepairs interface
 public: // get basepair interface  (single basepair!)
 
     BasepairOP
-    get_basepair(Uuid const & bp_uuid) {
+    get_basepair(util::Uuid const & bp_uuid) {
         BasepairOPs bps;
         for (auto const & bp : basepairs_) {
             if (bp->get_uuid() == bp_uuid) { bps.push_back(bp); }
@@ -175,8 +176,8 @@ public: // get basepair interface  (single basepair!)
 
     BasepairOP
     get_basepair(
-            Uuid const & uuid1,
-            Uuid const & uuid2) {
+            util::Uuid const & uuid1,
+            util::Uuid const & uuid2) {
 
         BasepairOPs bps;
         for (auto const & bp : basepairs_) {
@@ -213,7 +214,7 @@ public: // get basepair interface  (single basepair!)
 public: // get end interace
 
     BasepairOP
-    get_end(Uuid const & bp_uuid) {
+    get_end(util::Uuid const & bp_uuid) {
         BasepairOPs bps;
         for (auto const & bp : ends_) {
             if (bp->uuid() == bp_uuid) { bps.push_back(bp); }
@@ -229,8 +230,8 @@ public: // get end interace
 
     BasepairOP
     get_end(
-            Uuid const & uuid1,
-            Uuid const & uuid2) {
+            util::Uuid const & uuid1,
+            util::Uuid const & uuid2) {
 
         BasepairOPs bps;
         for (auto const & bp : ends_) {
@@ -245,7 +246,7 @@ public: // get end interace
     }
 
     BasepairOP
-    get_end(SimpleString const & name) {
+    get_end(base::SimpleString const & name) {
         BasepairOPs bps;
         for (auto const & bp : ends_) {
             if (bp->name()== name) { bps.push_back(bp); }
@@ -281,11 +282,11 @@ public: // get end interace
 public: // other getters
 
     inline
-    SimpleString const &
+    base::SimpleString const &
     get_end_id(int index) { return *end_ids_[index]; }
 
     int
-    get_end_index(SimpleString const & name) {
+    get_end_index(base::SimpleString const & name) {
         auto bp = get_end(name);
         if(bp == nullptr) { throw RNAStructureException("cannot find end with name: " + name.get_str()); }
         int i = 0;
@@ -310,8 +311,10 @@ public: // other getters
 
     ResidueOPs
     get_bp_res(BPtype const & bp) const {
-        return ResidueOPs({get_residue(bp.res1_uuid()),
-                           get_residue(bp.res2_uuid())});
+        auto res = ResidueOPs(2);
+        res[0] = get_residue(bp.get_res1_uuid());
+        res[1] = get_residue(bp.get_res2_uuid());
+        return res;
     }
 
     size_t
@@ -320,25 +323,25 @@ public: // other getters
     size_t
     get_num_ends() const{ return ends_.size(); }
 
-    SimpleString const &
+    base::SimpleString const &
     get_name() { return *name_; }
 
 protected:
     std::shared_ptr<Structuretype> structure_;
-    std::vector<std::shared_ptr<BPtype>> basepairs_;
-    std::vector<std::shared_ptr<BPtype>> ends_;
-    SimpleStringOPs end_ids_;
-    SimpleStringOP name_;
+    std::vector<std::shared_ptr<BPtype> > basepairs_;
+    std::vector<std::shared_ptr<BPtype> > ends_;
+    base::SimpleStringOPs end_ids_;
+    base::SimpleStringOP name_;
 
 };
 
 
 template<typename BPtype, typename Structuretype>
-std::vector<std::shared_ptr<BPtype>>
+std::vector<std::shared_ptr<BPtype> >
 ends_from_basepairs(
         Structuretype const & s,
-        std::vector<std::shared_ptr<BPtype>> const & bps) {
-    auto chain_end_uuids = std::vector<Uuid>();
+        std::vector<std::shared_ptr<BPtype> > const & bps) {
+    auto chain_end_uuids = std::vector<util::Uuid>();
     for(auto const & c : s.get_chains()) {
         chain_end_uuids.push_back(c->first()->uuid());
         if(c->length() > 1) {
@@ -346,7 +349,7 @@ ends_from_basepairs(
         }
     }
 
-    auto ends = std::vector<std::shared_ptr<BPtype>>();
+    auto ends = std::vector<std::shared_ptr<BPtype> >();
     for(auto const & bp : bps) {
         if(bp->bp_type() == BasepairType::NC) { continue; }
         if(std::find(chain_end_uuids.begin(), chain_end_uuids.end(), bp->res1_uuid()) == chain_end_uuids.end())  { continue; }
@@ -361,8 +364,8 @@ ends_from_basepairs(
 template<typename BPtype, typename Restype>
 std::shared_ptr<BPtype>
 get_res_wc_or_gu_basepair(
-        std::vector<std::shared_ptr<BPtype>> const & basepairs,
-        std::vector<std::shared_ptr<BPtype>> const & ends,
+        std::vector<std::shared_ptr<BPtype> > const & basepairs,
+        std::vector<std::shared_ptr<BPtype> > const & ends,
         Restype const & r) {
 
     for(auto const & bp : basepairs) {
@@ -385,11 +388,11 @@ template<typename BPtype, typename Structuretype, typename Chaintype, typename R
 String
 assign_end_id(
         Structuretype const & s,
-        std::vector<std::shared_ptr<BPtype>> const & bps,
-        std::vector<std::shared_ptr<BPtype>> const & ends,
+        std::vector<std::shared_ptr<BPtype> > const & bps,
+        std::vector<std::shared_ptr<BPtype> > const & ends,
         std::shared_ptr<BPtype> const & end) {
 
-    auto open_chains = std::vector<std::shared_ptr<Chaintype>>();
+    auto open_chains = std::vector<std::shared_ptr<Chaintype> >();
     auto chains = s.get_chains();
     for(auto const & c : chains) {
     if(c->first()->uuid() == end->res1_uuid() || c->first()->uuid() == end->res2_uuid()) {
@@ -414,7 +417,7 @@ assign_end_id(
     auto ss = String("");
     auto dot_bracket = ' ';
 
-    auto best_chains = std::vector<std::shared_ptr<Chaintype>>();
+    auto best_chains = std::vector<std::shared_ptr<Chaintype> >();
     auto best_chain = std::shared_ptr<Chaintype>();
     auto c = std::shared_ptr<Chaintype>();
     auto best_score = 0;
@@ -452,11 +455,13 @@ assign_end_id(
             if(saved_bp != nullptr ) { seen_bps[saved_bp] = 1; }
         }
 
-        ss_chains.push_back(Strings{seq, ss});
+        auto dummy_str = Strings(2);
+        dummy_str[0] = seq; dummy_str[1] = ss;
+        ss_chains.push_back(dummy_str);
         ss = "";
         seq = "";
         best_score = -1;
-        best_chains = std::vector<std::shared_ptr<Chaintype>>();
+        best_chains = std::vector<std::shared_ptr<Chaintype> >();
         for(auto const & c : chains) {
             if(seen_chains.find(c) != seen_chains.end()) { continue; }
             score = 0;
@@ -530,7 +535,7 @@ Strings
 end_id_to_seq_and_db(String const & ss_id) {
     auto ss = String("");
     auto seq = String("");
-    auto spl = split_str_by_delimiter(ss_id, "_");
+    auto spl = base::split_str_by_delimiter(ss_id, "_");
     for(int i = 0; i < spl.size()-1; i+=2) {
         seq += spl[i];
         for(auto const & e : spl[i+1]) {
@@ -548,7 +553,9 @@ end_id_to_seq_and_db(String const & ss_id) {
         }
     }
 
-    return Strings({seq, ss});
+    auto dummy_str = Strings(2);
+    dummy_str[0] = seq; dummy_str[1] = ss;
+    return dummy_str;
 }
 
 
