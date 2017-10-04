@@ -30,7 +30,7 @@ PYBIND11_PLUGIN(primitives) {
             .def("get_i_code", &Residue::get_i_code)
             .def("get_uuid", &Residue::get_uuid)
             .def("get_str", &Residue::get_str)
-            .def(py::init<const char &, const int &, const char &, const char &, const Uuid &>());
+            .def(py::init<const char &, const int &, const char &, const char &, const util::Uuid &>());
 
     py::class_<Chain<Residue>, std::shared_ptr<Chain<Residue>>>(m, "Chain")
             .def(py::init<const ResidueOPs &>())
@@ -52,7 +52,7 @@ PYBIND11_PLUGIN(primitives) {
             .def("get_residue",
                  (ResidueOP const (StructureType::*)(int, char, char) const) &StructureType::get_residue)
             .def("get_residue",
-                 (ResidueOP const (StructureType::*)(Uuid const &) const) &StructureType::get_residue)
+                 (ResidueOP const (StructureType::*)(util::Uuid const &) const) &StructureType::get_residue)
             .def("get_res_index", &StructureType::get_res_index)
             .def("get_num_residues", &StructureType::get_num_residues)
             .def("get_num_chains", &StructureType::get_num_chains)
@@ -70,8 +70,9 @@ PYBIND11_PLUGIN(primitives) {
             .def("get_res1_uuid", &Basepair::get_res1_uuid)
             .def("get_res2_uuid", &Basepair::get_res2_uuid)
             .def("get_uuid", &Basepair::get_uuid)
-            .def(py::init<const Uuid &, const Uuid &, const Uuid &, BasepairType const &>());
+            .def(py::init<const util::Uuid &, const util::Uuid &, const util::Uuid &, BasepairType const &>());
 
+    typedef std::shared_ptr<StructureType> StructureOP;
     typedef RNAStructure<Basepair, StructureType, Chain<Residue>, Residue> RNAStructureType;
     py::class_<RNAStructureType, std::shared_ptr<RNAStructureType>>(m, "RNAStructure")
             .def("__iter__", [](const RNAStructureType & s) {
@@ -85,9 +86,9 @@ PYBIND11_PLUGIN(primitives) {
             .def("get_residue",
                  (ResidueOP const (RNAStructureType::*)(int, char, char) const) &RNAStructureType::get_residue)
             .def("get_residue",
-                 (ResidueOP const (RNAStructureType::*)(Uuid const &) const) &RNAStructureType::get_residue)*/
+                 (ResidueOP const (RNAStructureType::*)(util::Uuid const &) const) &RNAStructureType::get_residue)*/
             .def(py::init<const StructureOP &, const BasepairOPs &, const BasepairOPs &,
-                          const SimpleStringOPs &, const SimpleStringOP &>());
+                          const base::SimpleStringOPs &, const base::SimpleStringOP &>());
 
 
     py::register_exception<ResidueException>(m, "ResidueException");

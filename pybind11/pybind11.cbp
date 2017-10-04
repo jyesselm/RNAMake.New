@@ -5,7 +5,7 @@
 		<Option title="pybind11"/>
 		<Option makefile_is_custom="1"/>
 		<Option compiler="clang"/>
-		<Option virtualFolders="CMake Files\;CMake Files\pybind11\;CMake Files\pybind11\tools\;"/>
+		<Option virtualFolders="CMake Files\;CMake Files\pybind11\;CMake Files\pybind11\tools\;CMake Files\cmake\;CMake Files\cmake\build\;"/>
 		<Build>
 			<Target title="all">
 				<Option working_dir="/Users/jyesselm/projects/RNAMake.New/pybind11"/>
@@ -21,9 +21,6 @@
 		<Unit filename="/Users/jyesselm/projects/RNAMake.New/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\"/>
 		</Unit>
-		<Unit filename="/Users/jyesselm/projects/RNAMake.New/compiler.cmake">
-			<Option virtualFolder="CMake Files\"/>
-		</Unit>
 		<Unit filename="/Users/jyesselm/projects/RNAMake.New/pybind11/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\pybind11\"/>
 		</Unit>
@@ -41,6 +38,9 @@
 		</Unit>
 		<Unit filename="/Users/jyesselm/projects/RNAMake.New/pybind11/tools/FindPythonLibsNew.cmake">
 			<Option virtualFolder="CMake Files\pybind11\tools\"/>
+		</Unit>
+		<Unit filename="/Users/jyesselm/projects/RNAMake.New/cmake/build/compiler.cmake">
+			<Option virtualFolder="CMake Files\cmake\build\"/>
 		</Unit>
 	</Project>
 </CodeBlocks_project_file>

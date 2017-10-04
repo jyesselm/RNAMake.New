@@ -531,7 +531,7 @@ assign_end_id(
     return ss_id;
 }
 
-Strings
+/*Strings
 end_id_to_seq_and_db(String const & ss_id) {
     auto ss = String("");
     auto seq = String("");
@@ -556,7 +556,7 @@ end_id_to_seq_and_db(String const & ss_id) {
     auto dummy_str = Strings(2);
     dummy_str[0] = seq; dummy_str[1] = ss;
     return dummy_str;
-}
+}*/
 
 
 }

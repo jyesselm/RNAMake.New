@@ -12,8 +12,8 @@
 
 namespace py = pybind11;
 
-PYBIND11_PLUGIN(base_util) {
-    py::module m("base_util", "rnamake's most basic classes and functions");
+PYBIND11_PLUGIN(base) {
+    py::module m("base", "rnamake's most basic classes and functions");
 
     // SimpleString Class
     py::class_<base::SimpleString>(m, "SimpleString")

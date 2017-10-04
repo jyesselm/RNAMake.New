@@ -29,6 +29,7 @@ class ResidueUnittest(unittest.TestCase):
         new_r = NewRes('A', 1, 'A', ' ', Uuid())
         self.failUnless(new_r.unique() == 1)
 
+
 class ChainUnittest(unittest.TestCase):
 
     def setUp(self):
@@ -85,6 +86,7 @@ class StructureUnittest(unittest.TestCase):
         self.failUnless(self.s.get_num_residues() == 3)
         self.failUnless(self.s.get_sequence() == "AAA")
         self.failUnless(self.s.get_res_index(self.r1) == 0)
+
 
 class BasepairUnittest(unittest.TestCase):
     def setUp(self):

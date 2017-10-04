@@ -1,7 +1,7 @@
 import unittest
 import numpy as np
 
-from rnamake_new.base_util import *
+from rnamake_new.base import *
 
 
 class SimpleStringUnittest(unittest.TestCase):

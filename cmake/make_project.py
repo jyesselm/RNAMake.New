@@ -3,10 +3,10 @@ import fnmatch
 import argparse
 
 depends = {
-    'base' : '',
-    'math' : 'base',
-    'util' : 'math',
-    'primitives' : 'util'
+    'base' : [],
+    'math' : ['base'],
+    'util' : ['math'],
+    'primitives' : ['util']
 }
 
 libs = "base math util primitives"
@@ -71,8 +71,29 @@ def get_lib_file_declaration(lib):
     s += ")\n\n"
     return s
 
-def get_add_library_declaration(lib):
 
+def get_build_library_declaration(lib):
+    s  = "add_library(%s ${%s})\n" % (lib + "_lib", lib + "_files")
+    s += "target_link_libraries(%s" % (lib + "_lib")
+    for depend in depends[lib]:
+        s += " " + depend + "_lib "
+    s += " pybind11::module)\n\n"
+    return s
+
+def get_build_module_declaration(lib):
+    s  = "add_library(%s MODULE ${%s})\n" % (lib, lib + "_files")
+    s += "target_link_libraries(%s" % (lib)
+    for depend in depends[lib]:
+        s += " " + depend + "_lib "
+    s += " pybind11::module)\n\n"
+
+    """s += "add_custom_command(\n"
+    s += "\t TARGET " + lib + "_copy POST_BUILD COMMAND " + \
+         "bash -c \"cp lib" + lib + ".so " +\
+         base_dir + "/rnamake_new/" + lib + ".so\"\n"
+    s += ")\n\n"
+    """
+    return s
 
 
 def write_cmake_lists(path, args):
@@ -83,8 +104,8 @@ def write_cmake_lists(path, args):
     for lib in lib_paths:
         f.write(get_pretty_lib_name(lib))
         f.write(get_lib_file_declaration(lib))
-
-        break
+        f.write(get_build_library_declaration(lib))
+        f.write(get_build_module_declaration(lib))
 
     f.close()
 

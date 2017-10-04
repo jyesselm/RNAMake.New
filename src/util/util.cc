@@ -8,9 +8,8 @@
 //rnamake headers
 #include <util/uuid.h>
 
-namespace util {
-
 namespace py = pybind11;
+namespace util {
 
 PYBIND11_PLUGIN(util) {
     py::module m("util", "rnamake's utility classes");
