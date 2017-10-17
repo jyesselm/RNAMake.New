@@ -5,6 +5,8 @@
 #ifndef RNAMAKE_PRIMITIVES_STRUCTURE_H
 #define RNAMAKE_PRIMITIVES_STRUCTURE_H
 
+#include <sstream>
+
 #include "primitives/residue.h"
 #include "primitives/chain.h"
 
@@ -51,7 +53,7 @@ public: //res iterator
     const_iterator end() const { return residues_.end(); }
 
 public: //get_residue interface
-    ResidueOP const
+    ResidueOP const &
     get_residue(
             int num,
             char chain_id,
@@ -62,10 +64,13 @@ public: //get_residue interface
                 return r;
             }
         }
-        return ResidueOP(nullptr);
+
+        auto ss = std::stringstream();
+        ss << "cannot find residue with num: " << num << " chain id: " << chain_id << " and i_code";
+        throw StructureException(ss.str());
     }
 
-    ResidueOP const
+    ResidueOP const &
     get_residue(
             util::Uuid const & uuid) const {
 
@@ -73,12 +78,19 @@ public: //get_residue interface
             if (r->get_uuid() == uuid) { return r; }
         }
 
-        return ResidueOP(nullptr);
+        throw StructureException("cannot find residue by uuid");
     }
 
     ResidueOP const &
     get_residue(
             int index) const {
+
+        if(index >= residues_.size()) {
+            throw StructureException(
+                    "cannot get residue " + std::to_string(index) + " only " + std::to_string(residues_.size()) +
+                    " total residues");
+        }
+
         return residues_[index];
     }
 
@@ -93,6 +105,30 @@ public: //get_residue interface
     }
 
 public:
+    ChainOPs
+    get_chains() {
+        auto pos = 0;
+        auto res = ResidueOPs();
+        auto chains = ChainOPs();
+        auto i = 0;
+        for(auto const & r : residues_) {
+            if (chain_cuts_[pos] == i) {
+                auto c = std::make_shared<Chaintype>(res);
+                chains.push_back(c);
+                res = ResidueOPs{r};
+                pos += 1;
+            } else {
+                res.push_back(r);
+            }
+            i++;
+        }
+        if(res.size() > 0) {
+            auto c = std::make_shared<Chaintype>(res);
+            chains.push_back(c);
+        }
+        return chains;
+    }
+
     size_t
     get_num_residues() { return residues_.size(); }
 
@@ -124,6 +160,10 @@ protected:
     ResidueOPs residues_;
     Ints chain_cuts_;
 };
+
+typedef Structure<PrimitiveChain, PrimitiveResidue> PrimitiveStructure;
+typedef std::shared_ptr<PrimitiveStructure>         PrimitiveStructureOP;
+typedef std::vector<PrimitiveStructureOP>           PrimitiveStructureOPs;
 
 
 }

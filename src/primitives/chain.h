@@ -26,11 +26,11 @@ template <typename Restype>
 class Chain {
 public:
     typedef std::shared_ptr<Restype> ResidueOP;
-    typedef std::vector<ResidueOP>   ResidueOPs;
+    typedef std::vector<ResidueOP> ResidueOPs;
 
 public:
     inline
-    Chain(ResidueOPs const & residues):
+    Chain(ResidueOPs const & residues) :
             residues_(residues) {}
 
     virtual
@@ -41,10 +41,12 @@ public: //iterator
     typedef typename ResidueOPs::const_iterator const_iterator;
 
     iterator begin() { return residues_.begin(); }
-    iterator end()   { return residues_.end(); }
+
+    iterator end() { return residues_.end(); }
 
     const_iterator begin() const { return residues_.begin(); }
-    const_iterator end()   const { return residues_.end(); }
+
+    const_iterator end() const { return residues_.end(); }
 
 public:
     inline
@@ -85,7 +87,7 @@ public:
     int
     contain_res(ResidueOP const & r) {
         for (auto const & res : residues_) {
-            if(res == r) { return 1; }
+            if (res == r) { return 1; }
         }
         return 1;
     }
@@ -98,6 +100,9 @@ protected:
     ResidueOPs residues_;
 };
 
+typedef Chain<PrimitiveResidue>           PrimitiveChain;
+typedef std::shared_ptr<PrimitiveChain>   PrimitiveChainOP;
+typedef std::vector<PrimitiveChainOP>     PrimitiveChainOPs;
 
 
 }

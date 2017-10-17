@@ -23,40 +23,40 @@ PYBIND11_PLUGIN(primitives) {
     py::module m("primitives", "rnamake's primitive classes");
 
     // Uuid Class
-    py::class_<Residue, std::shared_ptr<Residue>>(m, "Residue")
-            .def("get_chain_id", &Residue::get_chain_id)
-            .def("get_name", &Residue::get_name)
-            .def("get_num", &Residue::get_num)
-            .def("get_i_code", &Residue::get_i_code)
-            .def("get_uuid", &Residue::get_uuid)
-            .def("get_str", &Residue::get_str)
+    py::class_<PrimitiveResidue, PrimitiveResidueOP>(m, "Residue")
+            .def("get_chain_id", &PrimitiveResidue::get_chain_id)
+            .def("get_name", &PrimitiveResidue::get_name)
+            .def("get_num", &PrimitiveResidue::get_num)
+            .def("get_i_code", &PrimitiveResidue::get_i_code)
+            .def("get_uuid", &PrimitiveResidue::get_uuid)
+            .def("get_str", &PrimitiveResidue::get_str)
             .def(py::init<const char &, const int &, const char &, const char &, const util::Uuid &>());
 
-    py::class_<Chain<Residue>, std::shared_ptr<Chain<Residue>>>(m, "Chain")
-            .def(py::init<const ResidueOPs &>())
-            .def("__iter__", [](const Chain<Residue> & c) { return py::make_iterator(c.begin(), c.end()); },
+    py::class_<PrimitiveChain, PrimitiveChainOP>(m, "Chain")
+            .def(py::init<const PrimitiveResidueOPs &>())
+            .def("__iter__", [](const PrimitiveChain & c) { return py::make_iterator(c.begin(), c.end()); },
             py::keep_alive<0, 1>())
-            .def("__len__", &Chain<Residue>::get_length)
-            .def("get_first", &Chain<Residue>::get_first)
-            .def("get_last",  &Chain<Residue>::get_last)
-            .def("get_residue", &Chain<Residue>::get_residue)
-            .def("get_length", &Chain<Residue>::get_length);
+            .def("__len__", &PrimitiveChain::get_length)
+            .def("get_first", &PrimitiveChain::get_first)
+            .def("get_last",  &PrimitiveChain::get_last)
+            .def("get_residue", &PrimitiveChain::get_residue)
+            .def("get_length", &PrimitiveChain::get_length);
 
-    typedef Structure<Chain<Residue>, Residue> StructureType;
-    py::class_<StructureType, std::shared_ptr<StructureType>>(m, "Structure")
+    py::class_<PrimitiveStructure, PrimitiveStructureOP>(m, "Structure")
             .def(py::init<const ResidueOPs &, const Ints &>())
-            .def("__iter__", [](const StructureType & s) {
+            .def("__iter__", [](const PrimitiveStructure & s) {
                      return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
             .def("get_residue",
-                 (ResidueOP const & (StructureType::*)(int) const) &StructureType::get_residue)
+                 (ResidueOP const & (PrimitiveStructure::*)(int) const) &PrimitiveStructure::get_residue)
             .def("get_residue",
-                 (ResidueOP const (StructureType::*)(int, char, char) const) &StructureType::get_residue)
+                 (ResidueOP const & (PrimitiveStructure::*)(int, char, char) const) &PrimitiveStructure::get_residue)
             .def("get_residue",
-                 (ResidueOP const (StructureType::*)(util::Uuid const &) const) &StructureType::get_residue)
-            .def("get_res_index", &StructureType::get_res_index)
-            .def("get_num_residues", &StructureType::get_num_residues)
-            .def("get_num_chains", &StructureType::get_num_chains)
-            .def("get_sequence", &StructureType::get_sequence);
+                 (ResidueOP const & (PrimitiveStructure::*)(util::Uuid const &) const) &PrimitiveStructure::get_residue)
+            .def("get_res_index", &PrimitiveStructure::get_res_index)
+            .def("get_num_residues", &PrimitiveStructure::get_num_residues)
+            .def("get_num_chains", &PrimitiveStructure::get_num_chains)
+            .def("get_sequence", &PrimitiveStructure::get_sequence)
+            .def("get_chains", &PrimitiveStructure::get_chains);
 
     py::enum_<BasepairType>(m, "BasepairType")
             .value("WC", BasepairType::WC)
@@ -67,34 +67,67 @@ PYBIND11_PLUGIN(primitives) {
     py::class_<Basepair, std::shared_ptr<Basepair>>(m, "Basepair")
             .def("get_bp_type", &Basepair::get_bp_type)
             .def("get_partner", &Basepair::get_partner)
+            .def("get_name", &Basepair::get_name)
             .def("get_res1_uuid", &Basepair::get_res1_uuid)
             .def("get_res2_uuid", &Basepair::get_res2_uuid)
             .def("get_uuid", &Basepair::get_uuid)
-            .def(py::init<const util::Uuid &, const util::Uuid &, const util::Uuid &, BasepairType const &>());
+            .def(py::init<const util::Uuid &, const util::Uuid &, const util::Uuid &,
+                    BasepairType const &, base::SimpleStringOP const &>());
 
-    typedef std::shared_ptr<StructureType> StructureOP;
-    typedef RNAStructure<Basepair, StructureType, Chain<Residue>, Residue> RNAStructureType;
-    py::class_<RNAStructureType, std::shared_ptr<RNAStructureType>>(m, "RNAStructure")
-            .def("__iter__", [](const RNAStructureType & s) {
+    py::class_<PrimitiveRNAStructure, PrimitiveRNAStructureOP>(m, "RNAStructure")
+            .def(py::init<const PrimitiveStructureOP &, const BasepairOPs &, const BasepairOPs &,
+                          const base::SimpleStringOPs &, const base::SimpleStringOP &>())
+            .def("__iter__", [](const PrimitiveRNAStructure & s) {
                 return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
-            .def("iter_basepairs", [](const RNAStructureType & s) {
+            .def("iter_basepairs", [](const PrimitiveRNAStructure & s) {
                 return py::make_iterator(s.bps_begin(), s.bps_end()); }, py::keep_alive<0, 1>())
-            .def("iter_ends", [](const RNAStructureType & s) {
+            .def("iter_ends", [](const PrimitiveRNAStructure & s) {
                 return py::make_iterator(s.ends_begin(), s.ends_end()); }, py::keep_alive<0, 1>())
-            /*.def("get_residue",
-                 (ResidueOP const & (RNAStructureType::*)(int) const) &RNAStructureType::get_residue)
             .def("get_residue",
-                 (ResidueOP const (RNAStructureType::*)(int, char, char) const) &RNAStructureType::get_residue)
+                 (ResidueOP const & (PrimitiveRNAStructure::*)(int) const) &PrimitiveRNAStructure::get_residue)
             .def("get_residue",
-                 (ResidueOP const (RNAStructureType::*)(util::Uuid const &) const) &RNAStructureType::get_residue)*/
-            .def(py::init<const StructureOP &, const BasepairOPs &, const BasepairOPs &,
-                          const base::SimpleStringOPs &, const base::SimpleStringOP &>());
+                 (ResidueOP const & (PrimitiveRNAStructure::*)(int, char, char) const) &PrimitiveRNAStructure::get_residue)
+            .def("get_residue",
+                 (ResidueOP const & (PrimitiveRNAStructure::*)(util::Uuid const &) const) &PrimitiveRNAStructure::get_residue)
+            .def("get_num_residues", &PrimitiveRNAStructure::get_num_residues)
+            .def("get_num_chains", &PrimitiveRNAStructure::get_num_chains)
+            .def("get_basepairs",
+                 (BasepairOPs (PrimitiveRNAStructure::*)(util::Uuid const &) const) &PrimitiveRNAStructure::get_basepairs)
+            .def("get_basepairs",
+                 (BasepairOPs (PrimitiveRNAStructure::*)(util::Uuid const &, util::Uuid const &) const) &PrimitiveRNAStructure::get_basepairs)
+            .def("get_basepairs",
+                 (BasepairOPs (PrimitiveRNAStructure::*)(String const &) const) &PrimitiveRNAStructure::get_basepairs)
+            .def("get_basepair",
+                 (BasepairOP (PrimitiveRNAStructure::*)(util::Uuid const &) const) &PrimitiveRNAStructure::get_basepair)
+            .def("get_basepair",
+                 (BasepairOP (PrimitiveRNAStructure::*)(util::Uuid const &, util::Uuid const &) const) &PrimitiveRNAStructure::get_basepair)
+            .def("get_basepair",
+                 (BasepairOP (PrimitiveRNAStructure::*)(String const &) const) &PrimitiveRNAStructure::get_basepair)
+            .def("get_basepair",
+                 (BasepairOP const & (PrimitiveRNAStructure::*)(int) const) &PrimitiveRNAStructure::get_basepair)
+            .def("get_end",
+                 (BasepairOP (PrimitiveRNAStructure::*)(util::Uuid const &) const) &PrimitiveRNAStructure::get_end)
+            .def("get_end",
+                 (BasepairOP (PrimitiveRNAStructure::*)(util::Uuid const &, util::Uuid const &) const) &PrimitiveRNAStructure::get_end)
+            .def("get_end",
+                 (BasepairOP (PrimitiveRNAStructure::*)(String const &) const) &PrimitiveRNAStructure::get_end)
+            .def("get_end",
+                 (BasepairOP (PrimitiveRNAStructure::*)(base::SimpleStringOP const &) const) &PrimitiveRNAStructure::get_end)
+            .def("get_end",
+                 (BasepairOP const & (PrimitiveRNAStructure::*)(int) const) &PrimitiveRNAStructure::get_end)
+            .def("get_end_id", &PrimitiveRNAStructure::get_end_id)
+            .def("get_end_index",
+                 (int (PrimitiveRNAStructure::*)(base::SimpleStringOP const &) const) &PrimitiveRNAStructure::get_end_index);
 
+
+    m.def("generate_bp_name", &generate_bp_name);
+    m.def("generate_end_id", &generate_end_id);
 
     py::register_exception<ResidueException>(m, "ResidueException");
     py::register_exception<ChainException>(m, "ChainException");
     py::register_exception<StructureException>(m, "StructureException");
     py::register_exception<BasepairException>(m, "BasepairException");
+    py::register_exception<RNAStructureException>(m, "RNAStructureException");
 
     return m.ptr();
 }

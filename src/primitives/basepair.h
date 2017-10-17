@@ -5,6 +5,7 @@
 #ifndef RNAMAKE_PRIMITIVES_BASEPAIR_H
 #define RNAMAKE_PRIMITIVES_BASEPAIR_H
 
+#include <base/simple_string.h>
 #include <util/uuid.h>
 //#include <util/x3dna.h>
 #include <primitives/residue.h>
@@ -37,11 +38,13 @@ public:
             util::Uuid const & res1_uuid,
             util::Uuid const & res2_uuid,
             util::Uuid const & uuid,
-            BasepairType const & bp_type):
+            BasepairType const & bp_type,
+            base::SimpleStringOP const & name):
             res1_uuid_(res1_uuid),
             res2_uuid_(res2_uuid),
             uuid_(uuid),
-            bp_type_(bp_type) {}
+            bp_type_(bp_type),
+            name_(name){}
 
     virtual
     ~Basepair() {}
@@ -83,6 +86,10 @@ public:
     get_uuid() { return uuid_; }
 
     inline
+    base::SimpleStringOP const &
+    get_name() { return name_; }
+
+    inline
     util::Uuid const &
     get_res1_uuid() const { return res1_uuid_; }
 
@@ -95,43 +102,20 @@ protected:
     util::Uuid uuid_;
     util::Uuid res1_uuid_, res2_uuid_;
     BasepairType bp_type_;
+    base::SimpleStringOP name_;
 };
 
-template <typename Restype>
 String
-calc_bp_name(std::vector<std::shared_ptr<Restype> > const & res) {
-    auto res1 = res[0];
-    auto res2 = res[1];
-
-    auto res1_name = String("");
-    auto res2_name = String("");
-
-    if(res1->i_code() == ' ') {
-        res1_name = res1->chain_id()+std::to_string(res1->num());
-    }
-    else {
-        res1_name = res1->chain_id()+std::to_string(res1->num())+res1->i_code();
-
-    }
-
-    if(res2->i_code() == ' ') {
-        res2_name = res2->chain_id()+std::to_string(res2->num());
-    }
-    else {
-        res2_name = res2->chain_id()+std::to_string(res2->num())+res2->i_code();
-    }
-
-    if(res1->chain_id() < res2->chain_id()) { return res1_name+"-"+res2_name; }
-    if(res2->chain_id() < res1->chain_id()) { return res2_name+"-"+res1_name; }
-
-    if(res1->num() < res2->num()) { return res1_name+"-"+res2_name; }
-    else                          { return res2_name+"-"+res1_name; }
-
-}
+generate_bp_name(
+        ResidueOP const &,
+        ResidueOP const &);
 
 typedef std::shared_ptr<Basepair> BasepairOP;
 typedef std::vector<BasepairOP>   BasepairOPs;
 
+typedef Basepair    PrimitiveBasepair;
+typedef BasepairOP  PrimitiveBasepairOP;
+typedef BasepairOPs PrimitiveBasepairOPs;
 
 /*template <typename Restype>
 Basepair::BasepairType

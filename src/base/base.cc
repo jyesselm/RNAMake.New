@@ -11,12 +11,13 @@
 #include <base/simple_string.h>
 
 namespace py = pybind11;
+namespace base {
 
 PYBIND11_PLUGIN(base) {
     py::module m("base", "rnamake's most basic classes and functions");
 
     // SimpleString Class
-    py::class_<base::SimpleString>(m, "SimpleString")
+    py::class_<SimpleString, std::shared_ptr<SimpleString>>(m, "SimpleString")
             .def(py::init<const String &>())
             .def("get_str", &base::SimpleString::get_str)
             .def(py::self == py::self)
@@ -24,4 +25,5 @@ PYBIND11_PLUGIN(base) {
 
     return m.ptr();
 
+}
 }

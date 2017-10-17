@@ -114,5 +114,9 @@ protected:
 typedef std::shared_ptr<Residue> ResidueOP;
 typedef std::vector<ResidueOP>   ResidueOPs;
 
+typedef Residue    PrimitiveResidue;
+typedef ResidueOP  PrimitiveResidueOP;
+typedef ResidueOPs PrimitiveResidueOPs;
+
 }
 #endif //PRIMITIVES_RESIDUE_H

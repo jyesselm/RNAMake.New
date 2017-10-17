@@ -21,6 +21,10 @@ class SimpleStringUnittest(unittest.TestCase):
         self.failUnless(s1 != s3)
         self.failUnless(s1 != s4)
 
+        s5 = SimpleString(s1.get_str())
+        self.failUnless(s1 == s5)
+
+
     def test_get_str(self):
         s1 = SimpleString("test")
         self.failUnless(s1.get_str() == "test")

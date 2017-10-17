@@ -3,6 +3,7 @@ import numpy as np
 
 from rnamake_new.util import *
 from rnamake_new.primitives import *
+from rnamake_new.base import *
 
 
 class NewRes(Residue):
@@ -13,7 +14,9 @@ class NewRes(Residue):
     def unique(self):
         return 1
 
+
 class ResidueUnittest(unittest.TestCase):
+
     def setUp(self):
         pass
 
@@ -46,7 +49,6 @@ class ChainUnittest(unittest.TestCase):
 
         with self.assertRaises(ChainException):
             c.get_first()
-
 
     def test_inherit(self):
         r1 = NewRes('A', 1, 'A', ' ', Uuid())
@@ -81,24 +83,153 @@ class StructureUnittest(unittest.TestCase):
         r2 = self.s.get_residue(0)
         self.failUnless(self.r1 == r2)
 
+        # all these should raise errors, no longer returning None if failed search
+        with self.assertRaises(StructureException):
+            self.s.get_residue(10)
+
+        with self.assertRaises(StructureException):
+            self.s.get_residue(Uuid())
+
+        with self.assertRaises(StructureException):
+            self.s.get_residue(1, 'A', 'B')
+
+        with self.assertRaises(StructureException):
+            self.s.get_residue(1, 'B', ' ')
+
     def test_getters(self):
         self.failUnless(self.s.get_num_chains() == 1)
         self.failUnless(self.s.get_num_residues() == 3)
         self.failUnless(self.s.get_sequence() == "AAA")
         self.failUnless(self.s.get_res_index(self.r1) == 0)
 
+    def test_multi_chains(self):
+        r1 = Residue('A', 1, 'A', ' ', Uuid())
+        r2 = Residue('U', 2, 'A', ' ', Uuid())
+        r3 = Residue('A', 3, 'B', ' ', Uuid())
+        r4 = Residue('U', 4, 'B', ' ', Uuid())
+        s = Structure([r1, r2, r3, r4], [2, 4])
+
+        self.failUnless(s.get_num_chains() == 2)
+        chains = s.get_chains()
+        self.failUnless(len(chains) == 2)
+        self.failUnless(chains[1].get_first() == r3)
+
 
 class BasepairUnittest(unittest.TestCase):
+
     def setUp(self):
         self.r1 = Residue('A', 1, 'A', ' ', Uuid())
         self.r2 = Residue('U', 2, 'A', ' ', Uuid())
+        name = generate_bp_name(self.r1, self.r2)
         self.bp = Basepair(self.r1.get_uuid(), self.r2.get_uuid(), Uuid(),
-                           BasepairType.WC)
+                           BasepairType.WC, SimpleString(name))
 
     def test_getters(self):
         self.failUnless(self.r1.get_uuid() == self.bp.get_res1_uuid())
         self.failUnless(self.r2.get_uuid() == self.bp.get_res2_uuid())
         self.failUnless(self.bp.get_bp_type() == BasepairType.WC)
+
+    def test_generate_bp_name(self):
+        r1 = Residue('A', 1, 'A', ' ', Uuid())
+        r2 = Residue('U', 2, 'A', ' ', Uuid())
+        name = generate_bp_name(r1, r2)
+        self.failUnless(name == 'A1-A2')
+
+        r1 = Residue('A', 2, 'A', ' ', Uuid())
+        r2 = Residue('U', 1, 'B', ' ', Uuid())
+        name = generate_bp_name(r1, r2)
+        self.failUnless(name == 'A2-B1'
+                        )
+        # not order dependent
+        name = generate_bp_name(r2, r1)
+        self.failUnless(name == 'A2-B1')
+
+        r1 = Residue('A', 99, 'A', ' ', Uuid())
+        r2 = Residue('U', 100, 'A', ' ', Uuid())
+        name = generate_bp_name(r1, r2)
+        self.failUnless(name == 'A99-A100')
+
+        r1 = Residue('A', 2, 'A', 'C', Uuid())
+        r2 = Residue('U', 1, 'B', ' ', Uuid())
+        name = generate_bp_name(r1, r2)
+        self.failUnless(name == 'A2C-B1')
+
+        # is dervived classes still okay?
+        r1 = NewRes('A', 2, 'A', 'C', Uuid())
+        r2 = NewRes('U', 1, 'B', ' ', Uuid())
+        name = generate_bp_name(r1, r2)
+        self.failUnless(name == 'A2C-B1')
+
+
+class RNAStructureUnittest(unittest.TestCase):
+
+    def setUp(self):
+        self.r1 = Residue('A', 1, 'A', ' ', Uuid())
+        self.r2 = Residue('U', 2, 'A', ' ', Uuid())
+        self.r3 = Residue('A', 3, 'B', ' ', Uuid())
+        self.r4 = Residue('U', 4, 'B', ' ', Uuid())
+
+        name1 = generate_bp_name(self.r1, self.r4)
+        name2 = generate_bp_name(self.r2, self.r3)
+
+        self.bp1 = Basepair(self.r1.get_uuid(), self.r4.get_uuid(), Uuid(),
+                           BasepairType.WC, SimpleString(name1))
+        self.bp2 = Basepair(self.r2.get_uuid(), self.r3.get_uuid(), Uuid(),
+                           BasepairType.WC, SimpleString(name2))
+
+        self.s = Structure([self.r1, self.r2, self.r3, self.r4], [2, 4])
+        bps = []
+        ends = [self.bp1, self.bp2]
+        end_ids = []
+        for end in ends:
+            end_ids.append(SimpleString(generate_end_id(self.s, bps, ends, end)))
+
+        self.rs = RNAStructure(self.s, bps, ends, end_ids, SimpleString("test"))
+
+    def test_generate_end_id(self):
+        bps = []
+        ends = [self.bp1, self.bp2]
+        end_ids = []
+        for end in ends:
+            end_ids.append(generate_end_id(self.s, bps, ends, end))
+
+        self.failUnless(end_ids[0] == 'AU_LL_AU_RR')
+
+    def test_creation(self):
+        self.failUnless(self.rs.get_num_chains() == 2)
+
+    def test_get_residue(self):
+        r = self.rs.get_residue(1, 'A', ' ')
+        self.failUnless(self.r1 == r)
+
+        r1 = self.rs.get_residue(r.get_uuid())
+        self.failUnless(self.r1 == r1)
+
+        # by internal position
+        r2 = self.rs.get_residue(0)
+        self.failUnless(self.r1 == r2)
+
+    def test_get_end(self):
+        # get by index
+        end = self.rs.get_end(0)
+        self.failUnless(end == self.bp1)
+
+        # triyng to get an end that does not exist
+        with self.assertRaises(RNAStructureException):
+            self.rs.get_end(2)
+
+        # get by name
+        name = self.bp1.get_name()
+        end = self.rs.get_end(name)
+        self.failUnless(end == self.bp1)
+
+        # trying to get with fake name
+
+
+
+        end2 = self.rs.get_end(self.bp1.get_uuid())
+        self.failUnless(end2 == self.bp1)
+
 
 
 
@@ -107,3 +238,48 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
