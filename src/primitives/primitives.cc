@@ -98,26 +98,36 @@ PYBIND11_PLUGIN(primitives) {
             .def("get_basepairs",
                  (BasepairOPs (PrimitiveRNAStructure::*)(String const &) const) &PrimitiveRNAStructure::get_basepairs)
             .def("get_basepair",
-                 (BasepairOP (PrimitiveRNAStructure::*)(util::Uuid const &) const) &PrimitiveRNAStructure::get_basepair)
+                 (BasepairOP const & (PrimitiveRNAStructure::*)(util::Uuid const &) const) &PrimitiveRNAStructure::get_basepair)
             .def("get_basepair",
-                 (BasepairOP (PrimitiveRNAStructure::*)(util::Uuid const &, util::Uuid const &) const) &PrimitiveRNAStructure::get_basepair)
+                 (BasepairOP const & (PrimitiveRNAStructure::*)(util::Uuid const &, util::Uuid const &) const) &PrimitiveRNAStructure::get_basepair)
             .def("get_basepair",
-                 (BasepairOP (PrimitiveRNAStructure::*)(String const &) const) &PrimitiveRNAStructure::get_basepair)
+                 (BasepairOP const & (PrimitiveRNAStructure::*)(String const &) const) &PrimitiveRNAStructure::get_basepair)
             .def("get_basepair",
                  (BasepairOP const & (PrimitiveRNAStructure::*)(int) const) &PrimitiveRNAStructure::get_basepair)
             .def("get_end",
-                 (BasepairOP (PrimitiveRNAStructure::*)(util::Uuid const &) const) &PrimitiveRNAStructure::get_end)
+                 (BasepairOP const & (PrimitiveRNAStructure::*)(util::Uuid const &) const) &PrimitiveRNAStructure::get_end)
             .def("get_end",
-                 (BasepairOP (PrimitiveRNAStructure::*)(util::Uuid const &, util::Uuid const &) const) &PrimitiveRNAStructure::get_end)
+                 (BasepairOP const & (PrimitiveRNAStructure::*)(util::Uuid const &, util::Uuid const &) const) &PrimitiveRNAStructure::get_end)
             .def("get_end",
-                 (BasepairOP (PrimitiveRNAStructure::*)(String const &) const) &PrimitiveRNAStructure::get_end)
+                 (BasepairOP const & (PrimitiveRNAStructure::*)(String const &) const) &PrimitiveRNAStructure::get_end)
             .def("get_end",
-                 (BasepairOP (PrimitiveRNAStructure::*)(base::SimpleStringOP const &) const) &PrimitiveRNAStructure::get_end)
+                 (BasepairOP const & (PrimitiveRNAStructure::*)(base::SimpleStringOP const &) const) &PrimitiveRNAStructure::get_end)
             .def("get_end",
                  (BasepairOP const & (PrimitiveRNAStructure::*)(int) const) &PrimitiveRNAStructure::get_end)
+            .def("get_end_by_id",
+                 (BasepairOP const & (PrimitiveRNAStructure::*)(String const &) const) &PrimitiveRNAStructure::get_end_by_id)
+            .def("get_end_by_id",
+                 (BasepairOP const & (PrimitiveRNAStructure::*)(base::SimpleStringOP const &) const) &PrimitiveRNAStructure::get_end_by_id)
             .def("get_end_id", &PrimitiveRNAStructure::get_end_id)
             .def("get_end_index",
-                 (int (PrimitiveRNAStructure::*)(base::SimpleStringOP const &) const) &PrimitiveRNAStructure::get_end_index);
+                 (int (PrimitiveRNAStructure::*)(base::SimpleStringOP const &) const) &PrimitiveRNAStructure::get_end_index)
+            .def("get_end_index",
+                 (int (PrimitiveRNAStructure::*)(String const &) const) &PrimitiveRNAStructure::get_end_index)
+            .def("get_bp_res", &PrimitiveRNAStructure::get_bp_res)
+            .def("get_num_basepairs", &PrimitiveRNAStructure::get_num_basepairs)
+            .def("get_num_ends", &PrimitiveRNAStructure::get_num_ends)
+            .def("get_name", &PrimitiveRNAStructure::get_name);
 
 
     m.def("generate_bp_name", &generate_bp_name);

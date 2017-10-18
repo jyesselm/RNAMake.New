@@ -6,10 +6,11 @@ depends = {
     'base' : [],
     'math' : ['base'],
     'util' : ['math'],
-    'primitives' : ['util']
+    'primitives' : ['util'],
+    'secondary_structure' : ['primitives']
 }
 
-libs = "base math util primitives"
+libs = "base math util primitives secondary_structure"
 all_lib_paths = libs.split()
 
 

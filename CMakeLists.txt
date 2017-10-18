@@ -88,3 +88,18 @@ target_link_libraries(primitives_lib util_lib  pybind11::module)
 add_library(primitives MODULE ${primitives_files})
 target_link_libraries(primitives util_lib  pybind11::module)
 
+###########################################################################
+# secondary_structure
+###########################################################################
+
+set(secondary_structure_files
+	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/residue.cc
+	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/secondary_structure.cc
+)
+
+add_library(secondary_structure_lib ${secondary_structure_files})
+target_link_libraries(secondary_structure_lib primitives_lib  pybind11::module)
+
+add_library(secondary_structure MODULE ${secondary_structure_files})
+target_link_libraries(secondary_structure primitives_lib  pybind11::module)
+

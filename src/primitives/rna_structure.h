@@ -47,12 +47,22 @@ public:
             BasepairOPs const & basepairs,
             BasepairOPs const & ends,
             base::SimpleStringOPs const & end_ids,
-            base::SimpleStringOP const & name) :
+            base::SimpleStringOP const & name):
             structure_(structure),
             basepairs_(basepairs),
             ends_(ends),
             end_ids_(end_ids),
-            name_(name) {}
+            name_(name) {
+
+        if(end_ids_.size() != ends_.size()) {
+            throw RNAStructureException(
+                    "RNAStructure must have the same number of ends as end_ids has " +
+                    std::to_string(ends_.size()) + " ends and " + std::to_string(end_ids.size()) +
+                    "end ids");
+        }
+
+
+    }
 
 protected:
     // let dervived classes fill in members
@@ -171,7 +181,7 @@ public: //get basepairs interface
 
 public: // get basepair interface  (single basepair!)
 
-    BasepairOP
+    BasepairOP const &
     get_basepair(util::Uuid const & bp_uuid) const {
         BasepairOPs bps;
         for (auto const & bp : basepairs_) {
@@ -182,11 +192,13 @@ public: // get basepair interface  (single basepair!)
         if (bps.size() > 1) {
             throw RNAStructureException("got more than one basepair matching this uuid");
         }
-        if (bps.size() == 0) { return bps[0]; }
-        else { return BasepairOP(nullptr); }
+        if (bps.size() == 1) { return bps[0]; }
+        else {
+            throw RNAStructureException("no basepairs matching this uuid");
+        }
     }
 
-    BasepairOP
+    BasepairOP const &
     get_basepair(
             util::Uuid const & uuid1,
             util::Uuid const & uuid2) const {
@@ -199,11 +211,13 @@ public: // get basepair interface  (single basepair!)
         if (bps.size() > 1) {
             throw RNAStructureException("got more than one basepair matching residue uuids");
         }
-        if (bps.size() == 0) { return bps[0]; }
-        else { return BasepairOP(nullptr); }
+        if (bps.size() == 1) { return bps[0]; }
+        else {
+            throw RNAStructureException("no basepair found matching residue uuids supplied");
+        }
     }
 
-    BasepairOP
+    BasepairOP const &
     get_basepair(String const & name) const {
         BasepairOPs bps;
         for (auto const & bp : basepairs_) {
@@ -213,19 +227,28 @@ public: // get basepair interface  (single basepair!)
         if (bps.size() > 1) {
             throw RNAStructureException("got more than one basepair matching this name: " + name);
         }
-        if (bps.size() == 0) { return bps[0]; }
-        else { return BasepairOP(nullptr); }
+        if (bps.size() == 1) { return bps[0]; }
+        else {
+            throw RNAStructureException("no basepair found matching residue uuids supplied");
+        }
 
     }
 
     inline
     BasepairOP const &
-    get_basepair(int index) const { return basepairs_[index]; }
+    get_basepair(int index) const {
+
+        if(index >= basepairs_.size()) {
+            throw RNAStructureException(
+                    "cannot get basepair " + std::to_string(index) + " only " + std::to_string(basepairs_.size()) +
+                    " total residues");
+        }
+        return basepairs_[index]; }
 
 
 public: // get end interace
 
-    BasepairOP
+    BasepairOP const &
     get_end(util::Uuid const & bp_uuid) const{
         BasepairOPs bps;
         for (auto const & bp : ends_) {
@@ -238,10 +261,12 @@ public: // get end interace
             throw RNAStructureException("got more than one basepair matching this uuid");
         }
         if (bps.size() == 1) { return bps[0]; }
-        else { return BasepairOP(nullptr); }
+        else {
+            throw RNAStructureException("no end found matching basepair uuid supplied");
+        }
     }
 
-    BasepairOP
+    BasepairOP const &
     get_end(
             util::Uuid const & uuid1,
             util::Uuid const & uuid2) const {
@@ -254,13 +279,16 @@ public: // get end interace
                 bp->get_res2_uuid() == uuid1) { bps.push_back(bp); }
         }
         if (bps.size() > 1) {
-            throw RNAStructureException("got more than one basepair matching residue uuids");
+            throw RNAStructureException("got more than one end matching residue uuids");
         }
-        if (bps.size() == 0) { return bps[0]; }
-        else { return BasepairOP(nullptr); }
+        if (bps.size() == 1) { return bps[0]; }
+        else {
+            throw RNAStructureException("no end found matching residue uuids supplied");
+
+        }
     }
 
-    BasepairOP
+    BasepairOP const &
     get_end(base::SimpleStringOP const & name) const {
         BasepairOPs bps;
         for (auto const & bp : ends_) {
@@ -276,20 +304,20 @@ public: // get end interace
         }
     }
 
-    BasepairOP
-    get_end(String const & end_id) const {
+    BasepairOP const &
+    get_end(String const & name) const {
         BasepairOPs bps;
-        int i = -1;
         for (auto const & bp : ends_) {
-            i++;
-            if (end_ids_[i]->get_str() == end_id) { bps.push_back(ends_[i]); }
+            if (bp->get_name()->get_str() == name) { bps.push_back(bp); }
         }
 
         if (bps.size() > 1) {
-            throw RNAStructureException("got more than one basepair matching this end_id: " + end_id);
+            throw RNAStructureException("got more than one basepair matching this name: " + name);
         }
-        if (bps.size() == 0) { return bps[0]; }
-        else { return BasepairOP(nullptr); }
+        if (bps.size() == 1) { return bps[0]; }
+        else {
+            throw RNAStructureException("cannot find end with name: " + name);
+        }
     }
 
     inline
@@ -303,11 +331,56 @@ public: // get end interace
         return ends_[index];
     }
 
+public: // get end by end id
+    // avoid confliction with getting by name ... not pretty
+    BasepairOP const &
+    get_end_by_id(String const & end_id) const {
+        BasepairOPs bps;
+        int i = -1;
+        for (auto const & bp : ends_) {
+            i++;
+            if (end_ids_[i]->get_str() == end_id) { bps.push_back(bp); }
+        }
+
+        if (bps.size() > 1) {
+            throw RNAStructureException("got more than one basepair matching this end_id: " + end_id);
+        }
+        if (bps.size() == 1) { return bps[0]; }
+        else {
+            throw RNAStructureException("cannot find end with end_id: " + end_id);
+        }
+    }
+
+    BasepairOP const &
+    get_end_by_id(base::SimpleStringOP const & end_id) const {
+        BasepairOPs bps;
+        int i = -1;
+        for (auto const & bp : ends_) {
+            i++;
+            if (end_ids_[i] == end_id) { bps.push_back(bp); }
+        }
+
+        if (bps.size() > 1) {
+            throw RNAStructureException("got more than one basepair matching this end_id: " + end_id->get_str());
+        }
+        if (bps.size() == 1) { return bps[0]; }
+        else {
+            throw RNAStructureException("cannot find end with end_id: " + end_id->get_str());
+        }
+    }
+
 public: // other getters
 
     inline
     base::SimpleStringOP const &
-    get_end_id(int index) const { return end_ids_[index]; }
+    get_end_id(int index) const {
+        if(index >= end_ids_.size()) {
+            throw RNAStructureException(
+                    "trying to get end_id: " + std::to_string(index) + " there are only " +
+                    std::to_string(end_ids_.size()));
+        }
+        return end_ids_[index];
+    }
 
     int
     get_end_index(base::SimpleStringOP const & name) const {
@@ -347,8 +420,8 @@ public: // other getters
     size_t
     get_num_ends() const{ return ends_.size(); }
 
-    base::SimpleString const &
-    get_name() { return *name_; }
+    base::SimpleStringOP const &
+    get_name() { return name_; }
 
 protected:
     std::shared_ptr<Structuretype> structure_;

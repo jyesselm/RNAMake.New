@@ -38,6 +38,19 @@ public:
             i_code_(i_code),
             uuid_(uuid) {}
 
+    inline
+    Residue(
+            Residue const & r):
+            name_(r.name_),
+            num_(r.num_),
+            chain_id_(r.chain_id_),
+            uuid_(r.uuid_),
+            i_code_(r.i_code_) {}
+
+
+    virtual
+    ~Residue() {}
+
 protected:
     // let derived class setup members
     Residue() {}
@@ -111,8 +124,7 @@ protected:
 
 };
 
-typedef std::shared_ptr<Residue> ResidueOP;
-typedef std::vector<ResidueOP>   ResidueOPs;
+
 
 typedef Residue    PrimitiveResidue;
 typedef ResidueOP  PrimitiveResidueOP;
