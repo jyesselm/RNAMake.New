@@ -93,6 +93,7 @@ target_link_libraries(primitives util_lib  pybind11::module)
 ###########################################################################
 
 set(secondary_structure_files
+	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/chain.cc
 	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/residue.cc
 	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/secondary_structure.cc
 )
