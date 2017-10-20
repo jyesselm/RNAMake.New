@@ -21,8 +21,15 @@ PYBIND11_PLUGIN(secondary_structure) {
             .def("get_num", &Residue::get_num)
             .def("get_i_code", &Residue::get_i_code)
             .def("get_uuid", &Residue::get_uuid)
-            //.def("get_str", &Residue::get_str)
+            .def("get_str", &Residue::get_str)
+            .def("get_dot_bracket", &Residue::get_dot_bracket)
+            .def("get_res_type", &Residue::get_res_type)
+            .def("set_name", &Residue::set_name)
+            .def(py::init<String>())
+            .def(py::init<Residue>())
             .def(py::init<char, char, int, char, char, util::Uuid>());
+
+    m.def("are_residues_equal", &are_residues_equal);
 
     return m.ptr();
 

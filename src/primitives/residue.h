@@ -52,6 +52,7 @@ public:
     ~Residue() {}
 
 protected:
+
     // let derived class setup members
     Residue() {}
 
@@ -83,22 +84,22 @@ public: //getters
     get_chain_id() { return chain_id_; }
 
     /**
-    * getter for the name of the residue, i.e. "A", "G" etc
-    */
+     * getter for the name of the residue, i.e. "A", "G" etc
+     */
     inline
     char
     get_name() { return name_; }
 
     /**
-    * getter for the residue num
-    */
+     * getter for the residue num
+     */
     inline
     int
     get_num() { return num_; }
 
     /**
-    * getter for the residue insertion code
-    */
+     * getter for the residue insertion code
+     */
     inline
     char
     get_i_code() { return i_code_; }
@@ -124,7 +125,8 @@ protected:
 
 };
 
-
+typedef std::shared_ptr<Residue> ResidueOP;
+typedef std::vector<ResidueOP> ResidueOPs;
 
 typedef Residue    PrimitiveResidue;
 typedef ResidueOP  PrimitiveResidueOP;
