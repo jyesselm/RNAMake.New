@@ -7,10 +7,12 @@ depends = {
     'math' : ['base'],
     'util' : ['math'],
     'primitives' : ['util'],
+    'data_structures' : ['util'],
     'secondary_structure' : ['primitives']
 }
 
-libs = "base math util primitives secondary_structure"
+#libs = "base math util primitives data_structures secondary_structure"
+libs = "base math util primitives data_structures"
 all_lib_paths = libs.split()
 
 
@@ -48,6 +50,18 @@ def get_cmake_lists_header():
     s += "set(PYBIND11_CPP_STANDARD -std=c++11)\n"
     s += "# requires pybind11 to be in local directory need to find workaround!\n"
     s += "add_subdirectory(pybind11/)\n\n"
+    s += "find_package(Boost)\n\n"
+    s += """if (Boost_FOUND)
+        set(Boost_USE_MULTITHREADED true)
+        set(Boost_USE_STATIC_LIBS true)
+        message(STATUS "Boost is ${BOOST_ROOT}")
+        message(STATUS "Boost directories found at ${Boost_INCLUDE_DIR}")
+        message(STATUS "Boost libraries found at ${Boost_LIBRARY_DIR}")
+        set(Boost_LIBRARY_DIR "${BOOST_ROOT}/stage64/lib")
+        include_directories(${Boost_INCLUDE_DIR})
+        elseif()
+        message("Boost NOT Found!")
+    endif()"""
     return s
 
 
@@ -73,6 +87,26 @@ def get_lib_file_declaration(lib):
     return s
 
 
+def get_unittests_apps_for_library(lib):
+    unittest_apps = []
+    abs_path = base_dir + "/unittests/" + lib + "/"
+
+    if not os.path.isdir(abs_path):
+        return ""
+
+    unittest_files = get_cc_files_in_dir(abs_path)
+
+    s = ""
+    for unit in unittest_files:
+        spl = unit.split(".")
+        prog_name = spl[0]
+
+        s += "add_executable(" + prog_name + " " + abs_path  + unit + ")\n"
+        s += "target_link_libraries(" + prog_name + " %s_lib)\n\n" % lib
+
+    return s
+
+
 def get_build_library_declaration(lib):
     s  = "add_library(%s ${%s})\n" % (lib + "_lib", lib + "_files")
     s += "target_link_libraries(%s" % (lib + "_lib")
@@ -80,6 +114,7 @@ def get_build_library_declaration(lib):
         s += " " + depend + "_lib "
     s += " pybind11::module)\n\n"
     return s
+
 
 def get_build_module_declaration(lib):
     s  = "add_library(%s MODULE ${%s})\n" % (lib, lib + "_files")
@@ -107,6 +142,7 @@ def write_cmake_lists(path, args):
         f.write(get_lib_file_declaration(lib))
         f.write(get_build_library_declaration(lib))
         f.write(get_build_module_declaration(lib))
+        f.write(get_unittests_apps_for_library(lib))
 
     f.close()
 

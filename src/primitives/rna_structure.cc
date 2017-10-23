@@ -5,7 +5,7 @@
 #include "rna_structure.h"
 
 namespace primitives {
-
+/*
 PrimitiveBasepairOP
 get_res_wc_or_gu_basepair(
         PrimitiveBasepairOPs const & basepairs,
@@ -177,6 +177,6 @@ generate_end_id(
 
     return ss_id;
 }
-
+*/
 }
 

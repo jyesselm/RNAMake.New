@@ -64,13 +64,13 @@ public:
     */
     inline
     bool
-    operator==(Residue & other) {
+    operator==(Residue const & other) const {
         return uuid_ == other.uuid_;
     }
 
     inline
     bool
-    operator!=(Residue & other) const {
+    operator!=(Residue const & other) const {
         return uuid_ != other.uuid_;
     }
 
@@ -81,28 +81,28 @@ public: //getters
      */
     inline
     char
-    get_chain_id() { return chain_id_; }
+    get_chain_id() const { return chain_id_; }
 
     /**
      * getter for the name of the residue, i.e. "A", "G" etc
      */
     inline
     char
-    get_name() { return name_; }
+    get_name() const { return name_; }
 
     /**
      * getter for the residue num
      */
     inline
     int
-    get_num() { return num_; }
+    get_num() const { return num_; }
 
     /**
      * getter for the residue insertion code
      */
     inline
     char
-    get_i_code() { return i_code_; }
+    get_i_code() const { return i_code_; }
 
     /**
     * getter for residue unique indentifier
@@ -125,12 +125,12 @@ protected:
 
 };
 
-typedef std::shared_ptr<Residue> ResidueOP;
-typedef std::vector<ResidueOP> ResidueOPs;
-
-typedef Residue    PrimitiveResidue;
-typedef ResidueOP  PrimitiveResidueOP;
-typedef ResidueOPs PrimitiveResidueOPs;
+typedef Residue                          PrimitiveResidue;
+typedef std::shared_ptr<Residue>         PrimitiveResidueOP;
+typedef std::vector<PrimitiveResidueOP>  PrimitiveResidueOPs;
+typedef std::shared_ptr<Residue const>   PrimitiveResidueCOP;
+typedef std::vector<PrimitiveResidueCOP> PrimitiveResidueCOPs;
+typedef std::vector<Residue>             PrimitiveResidues;
 
 }
 #endif //PRIMITIVES_RESIDUE_H

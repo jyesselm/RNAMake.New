@@ -14,6 +14,9 @@
 #include <vector>
 #include <map>
 
+typedef int Index;
+typedef bool Flag;
+
 using Ints = std::vector<int>;
 using Chars = std::vector<char>;
 using Shorts = std::vector<short>;
@@ -30,5 +33,7 @@ typedef std::map<String, String> StringStringMap;
 
 template<typename T>
 using   VectorUP = std::unique_ptr<std::vector<T> >;
+template<typename T>
+using   VectorOP = std::shared_ptr<std::vector<T> >;
 
 #endif

@@ -5,7 +5,12 @@
 #ifndef PRIMITIVES_CHAIN_H
 #define PRIMITIVES_CHAIN_H
 
-#include "primitives/residue.h"
+#include <memory>
+#include <boost/iterator/indirect_iterator.hpp>
+
+#include <base/string.h>
+#include <base/assertions.h>
+#include <primitives/residue.h>
 
 /*
  * Exception for chain
@@ -25,73 +30,81 @@ namespace primitives {
 template <typename Restype>
 class Chain {
 public:
-    typedef std::shared_ptr<Restype> ResidueOP;
-    typedef std::vector<ResidueOP> ResidueOPs;
+    typedef std::shared_ptr<Restype>       ResidueOP;
+    typedef std::shared_ptr<Restype const> ResidueCOP;
+    typedef std::vector<ResidueOP>         ResidueOPs;
 
 public:
     inline
-    Chain(ResidueOPs const & residues) :
-            residues_(residues) {}
+    Chain(
+            ResidueOPs const & residues):
+            residues_(residues) {
+
+        expects<ChainException>(
+                residues.size() > 0,
+                "chains must have at least one residue!");
+    }
+
+    inline
+    Chain(
+            Chain const & c) {
+        residues_ = ResidueOPs();
+        int i = 0;
+        for(auto const & r : c.residues_) {
+            residues_.push_back(std::make_shared<Restype>(*r));
+            i++;
+        }
+    }
+
+    inline
+    Chain(
+            String const & s) {
+        residues_ = ResidueOPs();
+        Strings spl = base::split_str_by_delimiter(s, ";");
+        for(auto const & r_str : spl) {
+            if (r_str.length() < 3) { continue; }
+            residues_.push_back(std::make_shared<Restype>(r_str));
+        }
+    }
 
     virtual
     ~Chain() {}
 
 public: //iterator
-    typedef typename ResidueOPs::iterator iterator;
-    typedef typename ResidueOPs::const_iterator const_iterator;
+    typedef boost::indirect_iterator< typename ResidueOPs::const_iterator, Restype const > const_iterator;
 
-    iterator begin() { return residues_.begin(); }
-
-    iterator end() { return residues_.end(); }
-
-    const_iterator begin() const { return residues_.begin(); }
-
-    const_iterator end() const { return residues_.end(); }
+    const_iterator begin() const noexcept { return residues_.begin(); }
+    const_iterator end() const noexcept   { return residues_.end(); }
 
 public:
     inline
-    int
+    size_t
     get_length() const {
         return (int) residues_.size();
     }
 
     inline
-    ResidueOP const &
-    get_first() {
-
-        if (residues_.size() == 0) {
-            throw ChainException("cannot call first there are no residues in chain");
-        }
-
-        return residues_[0];
-    }
+    ResidueCOP
+    get_first() const { return residues_[0]; }
 
     inline
-    ResidueOP const &
-    get_last() {
-
-        if (residues_.size() == 0) {
-            throw ChainException("cannot call last there are no residues in chain");
-        }
-
-        return residues_.back();
-    }
+    ResidueCOP
+    get_last() const { return residues_.back(); }
 
     inline
-    ResidueOP const &
-    get_residue(int index) {
+    ResidueCOP
+    get_residue(Index index) {
         return residues_[index];
     }
 
     inline
     int
-    contain_res(ResidueOP const & r) {
+    contain_res(Restype const & r) {
         for (auto const & res : residues_) {
-            if (res == r) { return 1; }
+            if (*res == r) { return 1; }
         }
         return 1;
     }
-
 
 protected:
     Chain() {}

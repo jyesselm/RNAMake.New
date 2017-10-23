@@ -17,45 +17,31 @@
 namespace secondary_structure {
 
 
-class Chain : public primitives::Chain<secondary_structure::Residue> {
+class Chain : public primitives::Chain<Residue> {
 public:
-    typedef primitives::Chain<secondary_structure::Residue> ParentClass;
+    typedef primitives::Chain<Residue> ParentClass;
 
 public:
     inline
     Chain(
-            ResidueOPs const & residues): ParentClass(residues) {}
+            Residues const & residues): ParentClass(residues) {}
 
     inline
     Chain(
-            Chain const & c) {
-        residues_ = ResidueOPs(c.residues_.size());
-        int i = 0;
-        for(auto const & r : c.residues_) {
-            residues_[i] = std::make_shared<Residue>(*r);
-            i++;
-        }
-    }
+            Chain const & c): ParentClass(c) {}
 
     inline
     Chain(
-            String const & s) {
-        residues_ = ResidueOPs();
-        Strings spl = base::split_str_by_delimiter(s, ";");
-        for(auto const & r_str : spl) {
-            if(r_str.length() < 3) { continue; }
-            auto r = std::make_shared<Residue>(r_str);
-            residues_.push_back(r);
-        }
-    }
+            String const & s): ParentClass(s) {}
+
 
     virtual
     ~Chain() {}
-    
+
 public:
     
-    typedef typename ResidueOPs::iterator iterator;
-    typedef typename ResidueOPs::const_iterator const_iterator;
+    typedef typename Residues::iterator iterator;
+    typedef typename Residues::const_iterator const_iterator;
     
     iterator begin() { return residues_.begin(); }
     iterator end()   { return residues_.end(); }

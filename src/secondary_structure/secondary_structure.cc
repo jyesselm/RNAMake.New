@@ -17,7 +17,7 @@ PYBIND11_PLUGIN(secondary_structure) {
     py::module m("secondary_structure", "rnamake's most basic classes and functions");
 
     // Residue Class
-    py::class_<Residue, ResidueOP>(m, "Residue")
+    py::class_<Residue>(m, "Residue")
             .def("get_chain_id", &Residue::get_chain_id)
             .def("get_name", &Residue::get_name)
             .def("get_num", &Residue::get_num)
@@ -31,8 +31,8 @@ PYBIND11_PLUGIN(secondary_structure) {
             .def(py::init<Residue>())
             .def(py::init<char, char, int, char, char, util::Uuid>());
 
-    py::class_<Chain, ChainOP>(m, "Chain")
-            .def(py::init<ResidueOPs const &>())
+    py::class_<Chain>(m, "Chain")
+            .def(py::init<Residues const &>())
             .def(py::init<Chain const &>())
             .def(py::init<String const &>())
             .def("__iter__", [](const Chain & c) { return py::make_iterator(c.begin(), c.end()); },

@@ -38,6 +38,13 @@ public:
             Ints const chain_cuts):
             residues_(res),
             chain_cuts_(chain_cuts) {}
+    inline
+    Structure(
+            Structure const & s) {
+
+    }
+
+
 
     virtual
     ~Structure() {}
@@ -115,7 +122,8 @@ public:
             if (chain_cuts_[pos] == i) {
                 auto c = std::make_shared<Chaintype>(res);
                 chains.push_back(c);
-                res = ResidueOPs{r};
+                res = ResidueOPs();
+                res.push_back(r);
                 pos += 1;
             } else {
                 res.push_back(r);

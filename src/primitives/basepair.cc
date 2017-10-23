@@ -18,8 +18,8 @@ Basepair::get_partner(util::Uuid const & r_uuid) {
 
 String
 generate_bp_name(
-        ResidueOP const & res1,
-        ResidueOP const & res2) {
+        PrimitiveResidueOP res1,
+        PrimitiveResidueOP res2) {
 
     auto res1_name = String("");
     auto res2_name = String("");

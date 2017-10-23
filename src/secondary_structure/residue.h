@@ -20,6 +20,7 @@
 #include <util/uuid.h>
 
 #include <primitives/residue.h>
+#include <secondary_structure/residue.fwd.h>
 
 namespace secondary_structure {
     
@@ -63,6 +64,11 @@ public:
     ~Residue() {}
 
 public:
+
+public:
+    inline
+    ResidueOP
+    get_copy() { return std::make_shared<Residue>(*this); }
 
     inline
     String
@@ -111,9 +117,6 @@ private:
     char dot_bracket_;
 
 };
-
-typedef std::shared_ptr<Residue> ResidueOP;
-typedef std::vector<ResidueOP> ResidueOPs;
 
 bool
 are_residues_equal(

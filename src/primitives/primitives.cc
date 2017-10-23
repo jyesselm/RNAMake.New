@@ -22,7 +22,7 @@ namespace py = pybind11;
 PYBIND11_PLUGIN(primitives) {
     py::module m("primitives", "rnamake's primitive classes");
 
-    // Uuid Class
+    // Residue Class
     py::class_<PrimitiveResidue, PrimitiveResidueOP>(m, "Residue")
             .def("get_chain_id", &PrimitiveResidue::get_chain_id)
             .def("get_name", &PrimitiveResidue::get_name)
@@ -30,11 +30,13 @@ PYBIND11_PLUGIN(primitives) {
             .def("get_i_code", &PrimitiveResidue::get_i_code)
             .def("get_uuid", &PrimitiveResidue::get_uuid)
             .def("get_str", &PrimitiveResidue::get_str)
-            .def(py::init<const char &, const int &, const char &, const char &, const util::Uuid &>());
+            .def(py::self == py::self)
+            .def(py::init<char, int, char, char, util::Uuid const &>());
 
-    py::class_<PrimitiveChain, PrimitiveChainOP>(m, "Chain")
-            .def(py::init<const PrimitiveResidueOPs &>())
-            .def("__iter__", [](const PrimitiveChain & c) { return py::make_iterator(c.begin(), c.end()); },
+   py::class_<PrimitiveChain, PrimitiveChainOP>(m, "Chain")
+            .def(py::init<PrimitiveResidueOPs const & >())
+            .def(py::init<PrimitiveChain const &>())
+            .def("__iter__", [](PrimitiveChain const & c) { return py::make_iterator(c.begin(), c.end()); },
             py::keep_alive<0, 1>())
             .def("__len__", &PrimitiveChain::get_length)
             .def("get_first", &PrimitiveChain::get_first)
@@ -42,16 +44,16 @@ PYBIND11_PLUGIN(primitives) {
             .def("get_residue", &PrimitiveChain::get_residue)
             .def("get_length", &PrimitiveChain::get_length);
 
-    py::class_<PrimitiveStructure, PrimitiveStructureOP>(m, "Structure")
-            .def(py::init<const ResidueOPs &, const Ints &>())
+    /*py::class_<PrimitiveStructure, PrimitiveStructureOP>(m, "Structure")
+            .def(py::init<const ResidueUPs &, const Ints &>())
             .def("__iter__", [](const PrimitiveStructure & s) {
                      return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
             .def("get_residue",
-                 (ResidueOP const & (PrimitiveStructure::*)(int) const) &PrimitiveStructure::get_residue)
+                 (Residue const & (PrimitiveStructure::*)(int) const) &PrimitiveStructure::get_residue)
             .def("get_residue",
-                 (ResidueOP const & (PrimitiveStructure::*)(int, char, char) const) &PrimitiveStructure::get_residue)
+                 (Residue const & (PrimitiveStructure::*)(int, char, char) const) &PrimitiveStructure::get_residue)
             .def("get_residue",
-                 (ResidueOP const & (PrimitiveStructure::*)(util::Uuid const &) const) &PrimitiveStructure::get_residue)
+                 (Residue const & (PrimitiveStructure::*)(util::Uuid const &) const) &PrimitiveStructure::get_residue)
             .def("get_res_index", &PrimitiveStructure::get_res_index)
             .def("get_num_residues", &PrimitiveStructure::get_num_residues)
             .def("get_num_chains", &PrimitiveStructure::get_num_chains)
@@ -132,7 +134,7 @@ PYBIND11_PLUGIN(primitives) {
 
     m.def("generate_bp_name", &generate_bp_name);
     m.def("generate_end_id", &generate_end_id);
-
+*/
     py::register_exception<ResidueException>(m, "ResidueException");
     py::register_exception<ChainException>(m, "ChainException");
     py::register_exception<StructureException>(m, "StructureException");

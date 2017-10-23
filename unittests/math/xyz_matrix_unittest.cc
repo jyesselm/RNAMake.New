@@ -1,6 +1,6 @@
 
 #include <iostream>
-#include "common.hpp"
+#include "../common.hpp"
 
 #include <base/file_io.h>
 #include <math/xyz_matrix.h>
@@ -29,8 +29,6 @@ TEST_CASE( "Test Matrix math ", "[XYZMatrix]" ) {
                               1.0, 1.0, 1.0);
     
         auto unit = m.get_unitarize();
-        std::cout << unit.get_str_readable() << std::endl;
-    
         REQUIRE(math::are_matrices_equal(org_m, unit));
         
     }

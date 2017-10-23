@@ -17,6 +17,7 @@
 /*
  * Exception for RNA Structure
  */
+
 class RNAStructureException : public std::runtime_error {
 public:
     /**
@@ -29,7 +30,7 @@ public:
 };
 
 namespace primitives {
-
+/*
 template<typename BPtype, typename Structuretype, typename Chaintype, typename Restype>
 class RNAStructure {
 public:// types
@@ -474,7 +475,7 @@ generate_end_id(
         PrimitiveBasepairOPs const &,
         PrimitiveBasepairOPs const &,
         PrimitiveBasepairOP  const &);
-
+*/
 /*Strings
 end_id_to_seq_and_db(String const & ss_id) {
     auto ss = String("");

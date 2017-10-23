@@ -30,7 +30,6 @@ namespace primitives {
 // NC : mismatched basepair (non-conical)
 enum BasepairType { WC, GU, NC};
 
-
 class Basepair {
 public:
     inline
@@ -105,17 +104,17 @@ protected:
     base::SimpleStringOP name_;
 };
 
-String
-generate_bp_name(
-        ResidueOP const &,
-        ResidueOP const &);
-
 typedef std::shared_ptr<Basepair> BasepairOP;
 typedef std::vector<BasepairOP>   BasepairOPs;
 
 typedef Basepair    PrimitiveBasepair;
 typedef BasepairOP  PrimitiveBasepairOP;
 typedef BasepairOPs PrimitiveBasepairOPs;
+
+String
+generate_bp_name(
+        PrimitiveResidueOP,
+        PrimitiveResidueOP);
 
 /*template <typename Restype>
 Basepair::BasepairType

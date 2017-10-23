@@ -20,7 +20,19 @@ set(PYBIND11_CPP_STANDARD -std=c++11)
 # requires pybind11 to be in local directory need to find workaround!
 add_subdirectory(pybind11/)
 
-###########################################################################
+find_package(Boost)
+
+if (Boost_FOUND)
+        set(Boost_USE_MULTITHREADED true)
+        set(Boost_USE_STATIC_LIBS true)
+        message(STATUS "Boost is ${BOOST_ROOT}")
+        message(STATUS "Boost directories found at ${Boost_INCLUDE_DIR}")
+        message(STATUS "Boost libraries found at ${Boost_LIBRARY_DIR}")
+        set(Boost_LIBRARY_DIR "${BOOST_ROOT}/stage64/lib")
+        include_directories(${Boost_INCLUDE_DIR})
+        elseif()
+        message("Boost NOT Found!")
+    endif()###########################################################################
 # base
 ###########################################################################
 
@@ -53,6 +65,9 @@ target_link_libraries(math_lib base_lib  pybind11::module)
 
 add_library(math MODULE ${math_files})
 target_link_libraries(math base_lib  pybind11::module)
+
+add_executable(xyz_matrix_unittest /Users/jyesselm/projects/RNAMake.New/unittests/math/xyz_matrix_unittest.cc)
+target_link_libraries(xyz_matrix_unittest math_lib)
 
 ###########################################################################
 # util
@@ -88,19 +103,24 @@ target_link_libraries(primitives_lib util_lib  pybind11::module)
 add_library(primitives MODULE ${primitives_files})
 target_link_libraries(primitives util_lib  pybind11::module)
 
+add_executable(primitives_unittest /Users/jyesselm/projects/RNAMake.New/unittests/primitives/primitives_unittest.cc)
+target_link_libraries(primitives_unittest primitives_lib)
+
 ###########################################################################
-# secondary_structure
+# data_structures
 ###########################################################################
 
-set(secondary_structure_files
-	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/chain.cc
-	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/residue.cc
-	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/secondary_structure.cc
+set(data_structures_files
+	/Users/jyesselm/projects/RNAMake.New/src/data_structures/data_structures.cc
+	/Users/jyesselm/projects/RNAMake.New/src/data_structures/graph.cc
 )
 
-add_library(secondary_structure_lib ${secondary_structure_files})
-target_link_libraries(secondary_structure_lib primitives_lib  pybind11::module)
+add_library(data_structures_lib ${data_structures_files})
+target_link_libraries(data_structures_lib util_lib  pybind11::module)
 
-add_library(secondary_structure MODULE ${secondary_structure_files})
-target_link_libraries(secondary_structure primitives_lib  pybind11::module)
+add_library(data_structures MODULE ${data_structures_files})
+target_link_libraries(data_structures util_lib  pybind11::module)
+
+add_executable(graph_unittest /Users/jyesselm/projects/RNAMake.New/unittests/data_structures/graph_unittest.cc)
+target_link_libraries(graph_unittest data_structures_lib)
 

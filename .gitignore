@@ -7,3 +7,5 @@
 *.ninja*
 CMakeCache.txt
 CMakeFiles
+
+cmake/build_clang
