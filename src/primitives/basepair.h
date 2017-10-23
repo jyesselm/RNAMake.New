@@ -55,12 +55,6 @@ public:
     */
     inline
     bool
-    operator==(Basepair & other) {
-        return uuid_ == other.uuid_;
-    }
-
-    inline
-    bool
     operator!=(Basepair & other) const {
         return uuid_ != other.uuid_;
     }
@@ -74,19 +68,19 @@ protected:
 
 public:
     util::Uuid const &
-    get_partner(util::Uuid const &);
+    get_partner(util::Uuid const &) const;
 
     inline
     BasepairType const &
-    get_bp_type() { return bp_type_; }
+    get_bp_type() const { return bp_type_; }
 
     inline
     util::Uuid const &
-    get_uuid() { return uuid_; }
+    get_uuid() const { return uuid_; }
 
     inline
     base::SimpleStringOP const &
-    get_name() { return name_; }
+    get_name() const { return name_; }
 
     inline
     util::Uuid const &
@@ -104,17 +98,16 @@ protected:
     base::SimpleStringOP name_;
 };
 
-typedef std::shared_ptr<Basepair> BasepairOP;
-typedef std::vector<BasepairOP>   BasepairOPs;
-
-typedef Basepair    PrimitiveBasepair;
-typedef BasepairOP  PrimitiveBasepairOP;
-typedef BasepairOPs PrimitiveBasepairOPs;
+typedef Basepair                                 PrimitiveBasepair;
+typedef std::shared_ptr<PrimitiveBasepair>       PrimitiveBasepairOP;
+typedef std::vector<PrimitiveBasepairOP>         PrimitiveBasepairOPs;
+typedef std::shared_ptr<PrimitiveBasepair const> PrimitiveBasepairCOP;
+typedef std::vector<PrimitiveBasepairCOP>        PrimitiveBasepairCOPs;
 
 String
 generate_bp_name(
-        PrimitiveResidueOP,
-        PrimitiveResidueOP);
+        PrimitiveResidueCOP,
+        PrimitiveResidueCOP);
 
 /*template <typename Restype>
 Basepair::BasepairType

@@ -140,10 +140,8 @@ public: //getters
     are_nodes_connected(
             Index n1,
             Index n2) {
-        expects<GraphException>(
-                edges_.find(n1) != edges_.end(),
-                "cannot find node of index: " + std::to_string(n1));
 
+        if(edges_.find(n1) == edges_.end()) { return false; }
         for(auto const & edge : edges_[n1]) {
             if(edge->node_i == n2 or edge->node_j == n2) { return true; }
         }
@@ -292,6 +290,45 @@ private:
 
 };
 
+
+template<typename DataType>
+class StaticEdgedGraph : public BaseGraph<DataType> {
+public:
+    typedef BaseGraph<DataType> BaseClass;
+
+public:
+    typedef std::shared_ptr<DataType> DataTypeOP;
+    typedef std::vector<DataTypeOP> DataTypeOPs;
+    typedef std::shared_ptr<DataType const> DataTypeCOP;
+    typedef std::vector<DataTypeCOP> DataTypeCOPs;
+    typedef std::shared_ptr<const Edge> EdgeCOP;
+    typedef std::vector<EdgeCOP> EdgeCOPs;
+
+public:
+    inline
+    StaticEdgedGraph() : BaseClass() {}
+
+public:
+
+    Index
+    add_node(
+            DataTypeOP d,
+            Size n_edges) {
+
+        this->nodes_[this->index_] = std::make_shared<DataType>(*d);
+        this->edges_[this->index_] = EdgeCOPs(n_edges);
+        this->index_ += 1;
+        //_rebuild_iter_list();
+        return this->index_-1;
+
+    }
+private:
+
+    void
+    _rebuild_iter_list(
+            Index start) {}
+
+};
 
 }
 

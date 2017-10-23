@@ -25,11 +25,15 @@ namespace primitives {
 template<typename Chaintype, typename Restype>
 class Structure {
 public:
-    typedef std::shared_ptr<Restype> ResidueOP;
-    typedef std::vector<ResidueOP> ResidueOPs;
+    typedef std::shared_ptr<Restype>         ResidueOP;
+    typedef std::shared_ptr<Restype const>   ResidueCOP;
+    typedef std::vector<ResidueOP>           ResidueOPs;
+    typedef std::vector<ResidueCOP>          ResidueCOPs;
 
-    typedef std::shared_ptr<Chaintype> ChainOP;
-    typedef std::vector<ChainOP> ChainOPs;
+    typedef std::shared_ptr<Chaintype>       ChainOP;
+    typedef std::vector<ChainOP>             ChainOPs;
+    typedef std::shared_ptr<Chaintype const> ChainCOP;
+    typedef std::vector<ChainCOP>            ChainCOPs;
 
 public:
     inline
@@ -44,23 +48,17 @@ public:
 
     }
 
-
-
     virtual
     ~Structure() {}
 
 public: //res iterator
-    typedef typename ResidueOPs::iterator iterator;
-    typedef typename ResidueOPs::const_iterator const_iterator;
-
-    iterator begin() { return residues_.begin(); }
-    iterator end() { return residues_.end(); }
+    typedef typename ResidueCOPs::const_iterator const_iterator;
 
     const_iterator begin() const { return residues_.begin(); }
     const_iterator end() const { return residues_.end(); }
 
 public: //get_residue interface
-    ResidueOP const &
+    ResidueCOP
     get_residue(
             int num,
             char chain_id,
@@ -77,7 +75,7 @@ public: //get_residue interface
         throw StructureException(ss.str());
     }
 
-    ResidueOP const &
+    ResidueCOP
     get_residue(
             util::Uuid const & uuid) const {
 
@@ -88,7 +86,7 @@ public: //get_residue interface
         throw StructureException("cannot find residue by uuid");
     }
 
-    ResidueOP const &
+    ResidueCOP
     get_residue(
             int index) const {
 
@@ -112,15 +110,15 @@ public: //get_residue interface
     }
 
 public:
-    ChainOPs
-    get_chains() {
+    ChainCOPs
+    get_chains() const {
         auto pos = 0;
         auto res = ResidueOPs();
-        auto chains = ChainOPs();
+        auto chains = ChainCOPs();
         auto i = 0;
         for(auto const & r : residues_) {
             if (chain_cuts_[pos] == i) {
-                auto c = std::make_shared<Chaintype>(res);
+                auto c = std::make_shared<Chaintype const>(res);
                 chains.push_back(c);
                 res = ResidueOPs();
                 res.push_back(r);
@@ -131,7 +129,7 @@ public:
             i++;
         }
         if(res.size() > 0) {
-            auto c = std::make_shared<Chaintype>(res);
+            auto c = std::make_shared<Chaintype const>(res);
             chains.push_back(c);
         }
         return chains;
@@ -173,6 +171,8 @@ typedef Structure<PrimitiveChain, PrimitiveResidue> PrimitiveStructure;
 typedef std::shared_ptr<PrimitiveStructure>         PrimitiveStructureOP;
 typedef std::vector<PrimitiveStructureOP>           PrimitiveStructureOPs;
 
+typedef std::shared_ptr<PrimitiveStructure const>    PrimitiveStructureCOP;
+typedef std::vector<PrimitiveStructureCOP>           PrimitiveStructureCOPs;
 
 }
 

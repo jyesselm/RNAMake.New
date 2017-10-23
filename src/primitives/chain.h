@@ -7,6 +7,8 @@
 
 #include <memory>
 #include <boost/iterator/indirect_iterator.hpp>
+#include <boost/iterator/iterator_adaptor.hpp>
+
 
 #include <base/string.h>
 #include <base/assertions.h>
@@ -33,6 +35,7 @@ public:
     typedef std::shared_ptr<Restype>       ResidueOP;
     typedef std::shared_ptr<Restype const> ResidueCOP;
     typedef std::vector<ResidueOP>         ResidueOPs;
+    typedef std::vector<ResidueCOP>        ResidueCOPs;
 
 public:
     inline
@@ -93,13 +96,13 @@ public:
 
     inline
     ResidueCOP
-    get_residue(Index index) {
+    get_residue(Index index) const {
         return residues_[index];
     }
 
     inline
     int
-    contain_res(Restype const & r) {
+    contain_res(Restype const & r) const {
         for (auto const & res : residues_) {
             if (*res == r) { return 1; }
         }
@@ -113,10 +116,11 @@ protected:
     ResidueOPs residues_;
 };
 
-typedef Chain<PrimitiveResidue>           PrimitiveChain;
-typedef std::shared_ptr<PrimitiveChain>   PrimitiveChainOP;
-typedef std::vector<PrimitiveChainOP>     PrimitiveChainOPs;
-
+typedef Chain<PrimitiveResidue>                 PrimitiveChain;
+typedef std::shared_ptr<PrimitiveChain>         PrimitiveChainOP;
+typedef std::vector<PrimitiveChainOP>           PrimitiveChainOPs;
+typedef std::shared_ptr<PrimitiveChain const>   PrimitiveChainCOP;
+typedef std::vector<PrimitiveChainCOP>          PrimitiveChainCOPs;
 
 }
 

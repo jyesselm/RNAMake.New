@@ -43,6 +43,23 @@ PYBIND11_PLUGIN(data_structures) {
             .def("add_node", (int (GraphType::*)(DataTypeOP)) &GraphType::add_node)
             .def("add_node", (int (GraphType::*)(DataTypeOP, Index)) &GraphType::add_node);
 
+    // StaticEdgedGraph Class
+    typedef StaticEdgedGraph<DataType> StaticEdgedGraphType;
+    py::class_<StaticEdgedGraphType, std::shared_ptr<StaticEdgedGraphType> >(m, "StaticEdgedGraph")
+            .def(py::init<>())
+            .def("__len__", &StaticEdgedGraphType::get_num_nodes)
+            .def("__iter__", [](StaticEdgedGraphType const & g) { return py::make_iterator(g.begin(), g.end()); },
+                 py::keep_alive<0, 1>())
+            //.def("change_transverse_start", &StaticEdgedGraphType::change_transverse_start)
+            .def("get_edges", &StaticEdgedGraphType::get_edges)
+            .def("get_num_edges", &StaticEdgedGraphType::get_num_edges)
+            .def("get_num_nodes", &StaticEdgedGraphType::get_num_nodes)
+            .def("are_nodes_connected", &StaticEdgedGraphType::are_nodes_connected)
+            .def("get_node", &StaticEdgedGraphType::get_node)
+            .def("add_node", (int (StaticEdgedGraphType::*)(DataTypeOP)) &StaticEdgedGraphType::add_node)
+            .def("add_node", (int (StaticEdgedGraphType::*)(DataTypeOP, Index)) &StaticEdgedGraphType::add_node);
+
+
     return m.ptr();
 
 }

@@ -5,12 +5,12 @@
 #include "rna_structure.h"
 
 namespace primitives {
-/*
-PrimitiveBasepairOP
+
+PrimitiveBasepairCOP
 get_res_wc_or_gu_basepair(
-        PrimitiveBasepairOPs const & basepairs,
-        PrimitiveBasepairOPs const & ends,
-        PrimitiveResidueOP const & r) {
+        PrimitiveBasepairCOPs const & basepairs,
+        PrimitiveBasepairCOPs const & ends,
+        PrimitiveResidueCOP r) {
 
     for(auto const & bp : basepairs) {
         if((bp->get_res1_uuid() == r->get_uuid() ||
@@ -32,12 +32,12 @@ get_res_wc_or_gu_basepair(
 
 String
 generate_end_id(
-        PrimitiveStructureOP const & s,
-        PrimitiveBasepairOPs const & bps,
-        PrimitiveBasepairOPs const & ends,
-        PrimitiveBasepairOP  const & end) {
+        PrimitiveStructureCOP s,
+        PrimitiveBasepairCOPs const & bps,
+        PrimitiveBasepairCOPs const & ends,
+        PrimitiveBasepairCOP  end) {
 
-    auto open_chains = PrimitiveChainOPs();
+    auto open_chains = PrimitiveChainCOPs();
     auto chains = s->get_chains();
     for(auto const & c : chains) {
         if(c->get_first()->get_uuid() == end->get_res1_uuid() ||
@@ -51,21 +51,21 @@ generate_end_id(
         throw std::runtime_error("could not find chain to start with");
     }
 
-    auto seen_res    = std::map<PrimitiveResidueOP, int>();
-    auto seen_bps    = std::map<PrimitiveBasepairOP, int>();
-    auto seen_chains = std::map<PrimitiveChainOP, int>();
+    auto seen_res    = std::map<PrimitiveResidueCOP, int>();
+    auto seen_bps    = std::map<PrimitiveBasepairCOP, int>();
+    auto seen_chains = std::map<PrimitiveChainCOP, int>();
     seen_chains[open_chains[0]] = 1;
 
-    auto saved_bp = PrimitiveBasepairOP();
-    auto bp = PrimitiveBasepairOP();
+    auto saved_bp = PrimitiveBasepairCOP();
+    auto bp = PrimitiveBasepairCOP();
     auto ss_chains = std::vector<Strings>();
     auto seq = String("");
     auto ss = String("");
     auto dot_bracket = ' ';
 
-    auto best_chains = PrimitiveChainOPs();
-    auto best_chain = PrimitiveChainOP();
-    auto c = PrimitiveChainOP();
+    auto best_chains = PrimitiveChainCOPs();
+    auto best_chain = PrimitiveChainCOP();
+    auto c = PrimitiveChainCOP();
     auto best_score = 0;
     auto score = 0;
     auto pos = 0;
@@ -74,8 +74,8 @@ generate_end_id(
         c = open_chains[0];
         open_chains.erase(open_chains.begin());
 
-        for(auto const & r: *c) {
-            dot_bracket = '.';
+        for(auto const & r : *c) {
+            /*dot_bracket = '.';
             bp = get_res_wc_or_gu_basepair(bps, ends, r);
             if(bp != nullptr && bp->get_bp_type() != BasepairType::NC) {
                 saved_bp = bp;
@@ -98,16 +98,16 @@ generate_end_id(
             }
             ss += dot_bracket;
             seq += r->get_name();
-            if(saved_bp != nullptr ) { seen_bps[saved_bp] = 1; }
+            if(saved_bp != nullptr ) { seen_bps[saved_bp] = 1; }*/
         }
 
-        auto dummy_str = Strings(2);
+        /*auto dummy_str = Strings(2);
         dummy_str[0] = seq; dummy_str[1] = ss;
         ss_chains.push_back(dummy_str);
         ss = "";
         seq = "";
         best_score = -1;
-        best_chains = PrimitiveChainOPs();
+        best_chains = PrimitiveChainCOPs();
         for(auto const & c : chains) {
             if(seen_chains.find(c) != seen_chains.end()) { continue; }
             score = 0;
@@ -172,11 +172,12 @@ generate_end_id(
             }
         }
         if(i != ss_chain.size()-1) { ss_id += "_"; }
-        i++;
+        i++;*/
     }
 
-    return ss_id;
+    return String("");
+    //return ss_id;
 }
-*/
+
 }
 

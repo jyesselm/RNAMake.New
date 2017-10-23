@@ -15,6 +15,7 @@
 #include <map>
 
 typedef int Index;
+typedef int Size;
 typedef bool Flag;
 
 using Ints = std::vector<int>;

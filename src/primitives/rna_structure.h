@@ -30,17 +30,26 @@ public:
 };
 
 namespace primitives {
-/*
+
 template<typename BPtype, typename Structuretype, typename Chaintype, typename Restype>
 class RNAStructure {
 public:// types
-    typedef std::shared_ptr<BPtype> BasepairOP;
-    typedef std::vector<BasepairOP> BasepairOPs;
-    typedef std::shared_ptr<Structuretype> StructureOP;
-    typedef std::shared_ptr<Chaintype> ChainOP;
-    typedef std::vector<ChainOP> ChainOPs;
-    typedef std::shared_ptr<Restype> ResidueOP;
-    typedef std::vector<ResidueOP> ResidueOPs;
+    typedef std::shared_ptr<Restype>         ResidueOP;
+    typedef std::shared_ptr<Restype const>   ResidueCOP;
+    typedef std::vector<ResidueOP>           ResidueOPs;
+    typedef std::vector<ResidueCOP>          ResidueCOPs;
+
+    typedef std::shared_ptr<Chaintype>       ChainOP;
+    typedef std::vector<ChainOP>             ChainOPs;
+    typedef std::shared_ptr<Chaintype const> ChainCOP;
+    typedef std::vector<ChainCOP>            ChainCOPs;
+
+    typedef std::shared_ptr<BPtype>          BasepairOP;
+    typedef std::vector<BasepairOP>          BasepairOPs;
+    typedef std::shared_ptr<BPtype const>    BasepairCOP;
+    typedef std::vector<BasepairCOP>         BasepairCOPs;
+
+    typedef std::shared_ptr<Structuretype>   StructureOP;
 
 public:
     RNAStructure(
@@ -71,29 +80,18 @@ protected:
 
 public: //iterators
     // residue iterator
-    typedef typename ResidueOPs::iterator iterator;
-    typedef typename ResidueOPs::const_iterator const_iterator;
-
-    iterator begin() { return structure_->begin(); }
-    iterator end() { return structure_->end(); }
+    typedef typename ResidueCOPs::const_iterator const_iterator;
 
     const_iterator begin() const { return structure_->begin(); }
     const_iterator end() const { return structure_->end(); }
 
     // basepair iterator
-    typedef typename BasepairOPs::iterator bp_iterator;
-    typedef typename BasepairOPs::const_iterator const_bp_iterator;
-
-    bp_iterator bp_begin() { return basepairs_.begin(); }
-    bp_iterator bp_end() { return basepairs_.end(); }
+    typedef typename BasepairCOPs::const_iterator const_bp_iterator;
 
     const_bp_iterator bps_begin() const { return basepairs_.begin(); }
     const_bp_iterator bps_end() const { return basepairs_.end(); }
 
     // end iterator
-    bp_iterator ends_begin() { return ends_.begin(); }
-    bp_iterator ends_end() { return ends_.end(); }
-
     const_bp_iterator ends_begin() const { return ends_.begin(); }
     const_bp_iterator ends_end() const { return ends_.end(); }
 
@@ -103,7 +101,7 @@ public: //structure wrappers
     get_sequence() { return structure_->sequence(); }
 
     inline
-    ResidueOP const &
+    ResidueCOP
     get_residue(
             int num,
             char chain_id,
@@ -111,13 +109,13 @@ public: //structure wrappers
         return structure_->get_residue(num, chain_id, i_code); }
 
     inline
-    ResidueOP const &
+    ResidueCOP
     get_residue(
             util::Uuid const & uuid) const {
         return structure_->get_residue(uuid); }
 
     inline
-    ResidueOP const &
+    ResidueCOP
     get_residue(
             int index) const {
         return structure_->get_residue(index); }
@@ -132,7 +130,7 @@ public: //structure wrappers
 
 public: //get basepairs interface
 
-    BasepairOPs
+    BasepairCOPs
     get_basepairs(util::Uuid const & bp_uuid) const {
         BasepairOPs bps;
         for (auto const & bp : basepairs_) {
@@ -149,7 +147,7 @@ public: //get basepairs interface
         return bps;
     }
 
-    BasepairOPs
+    BasepairCOPs
     get_basepairs(
             util::Uuid const & uuid1,
             util::Uuid const & uuid2) const {
@@ -167,7 +165,7 @@ public: //get basepairs interface
         return bps;
     }
 
-    BasepairOPs
+    BasepairCOPs
     get_basepairs(
             String const & name) const {
         auto bps = BasepairOPs();
@@ -182,7 +180,7 @@ public: //get basepairs interface
 
 public: // get basepair interface  (single basepair!)
 
-    BasepairOP const &
+    BasepairCOP
     get_basepair(util::Uuid const & bp_uuid) const {
         BasepairOPs bps;
         for (auto const & bp : basepairs_) {
@@ -199,7 +197,7 @@ public: // get basepair interface  (single basepair!)
         }
     }
 
-    BasepairOP const &
+    BasepairCOP
     get_basepair(
             util::Uuid const & uuid1,
             util::Uuid const & uuid2) const {
@@ -218,7 +216,7 @@ public: // get basepair interface  (single basepair!)
         }
     }
 
-    BasepairOP const &
+    BasepairCOP
     get_basepair(String const & name) const {
         BasepairOPs bps;
         for (auto const & bp : basepairs_) {
@@ -236,7 +234,7 @@ public: // get basepair interface  (single basepair!)
     }
 
     inline
-    BasepairOP const &
+    BasepairCOP
     get_basepair(int index) const {
 
         if(index >= basepairs_.size()) {
@@ -249,7 +247,7 @@ public: // get basepair interface  (single basepair!)
 
 public: // get end interace
 
-    BasepairOP const &
+    BasepairCOP
     get_end(util::Uuid const & bp_uuid) const{
         BasepairOPs bps;
         for (auto const & bp : ends_) {
@@ -267,7 +265,7 @@ public: // get end interace
         }
     }
 
-    BasepairOP const &
+    BasepairCOP
     get_end(
             util::Uuid const & uuid1,
             util::Uuid const & uuid2) const {
@@ -289,7 +287,7 @@ public: // get end interace
         }
     }
 
-    BasepairOP const &
+    BasepairCOP
     get_end(base::SimpleStringOP const & name) const {
         BasepairOPs bps;
         for (auto const & bp : ends_) {
@@ -305,7 +303,7 @@ public: // get end interace
         }
     }
 
-    BasepairOP const &
+    BasepairCOP
     get_end(String const & name) const {
         BasepairOPs bps;
         for (auto const & bp : ends_) {
@@ -322,7 +320,7 @@ public: // get end interace
     }
 
     inline
-    BasepairOP const &
+    BasepairCOP
     get_end(int index) const {
         if(index >= ends_.size()) {
             throw RNAStructureException(
@@ -334,7 +332,7 @@ public: // get end interace
 
 public: // get end by end id
     // avoid confliction with getting by name ... not pretty
-    BasepairOP const &
+    BasepairCOP
     get_end_by_id(String const & end_id) const {
         BasepairOPs bps;
         int i = -1;
@@ -352,7 +350,7 @@ public: // get end by end id
         }
     }
 
-    BasepairOP const &
+    BasepairCOP
     get_end_by_id(base::SimpleStringOP const & end_id) const {
         BasepairOPs bps;
         int i = -1;
@@ -407,9 +405,9 @@ public: // other getters
 
     }
 
-    ResidueOPs
+    ResidueCOPs
     get_bp_res(BPtype const & bp) const {
-        auto res = ResidueOPs(2);
+        auto res = ResidueCOPs(2);
         res[0] = get_residue(bp.get_res1_uuid());
         res[1] = get_residue(bp.get_res2_uuid());
         return res;
@@ -463,19 +461,19 @@ ends_from_basepairs(
 
 }
 
-PrimitiveBasepairOP
+PrimitiveBasepairCOP
 get_res_wc_or_gu_basepair(
-        PrimitiveBasepairOPs const &,
-        PrimitiveBasepairOPs const &,
-        PrimitiveResidueOP const &);
+        PrimitiveBasepairCOPs const &,
+        PrimitiveBasepairCOPs const &,
+        PrimitiveResidueCOP);
 
 String
 generate_end_id(
-        PrimitiveStructureOP const &,
-        PrimitiveBasepairOPs const &,
-        PrimitiveBasepairOPs const &,
-        PrimitiveBasepairOP  const &);
-*/
+        PrimitiveStructureCOP,
+        PrimitiveBasepairCOPs const &,
+        PrimitiveBasepairCOPs const &,
+        PrimitiveBasepairCOP);
+
 /*Strings
 end_id_to_seq_and_db(String const & ss_id) {
     auto ss = String("");

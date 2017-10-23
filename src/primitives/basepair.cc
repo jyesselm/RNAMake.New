@@ -8,7 +8,7 @@
 namespace primitives {
 
 util::Uuid const &
-Basepair::get_partner(util::Uuid const & r_uuid) {
+Basepair::get_partner(util::Uuid const & r_uuid) const {
     if     (r_uuid == res1_uuid_) { return res2_uuid_; }
     else if(r_uuid == res2_uuid_) { return res1_uuid_; }
     else {
@@ -18,8 +18,8 @@ Basepair::get_partner(util::Uuid const & r_uuid) {
 
 String
 generate_bp_name(
-        PrimitiveResidueOP res1,
-        PrimitiveResidueOP res2) {
+        PrimitiveResidueCOP res1,
+        PrimitiveResidueCOP res2) {
 
     auto res1_name = String("");
     auto res2_name = String("");

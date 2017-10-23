@@ -103,6 +103,9 @@ target_link_libraries(primitives_lib util_lib  pybind11::module)
 add_library(primitives MODULE ${primitives_files})
 target_link_libraries(primitives util_lib  pybind11::module)
 
+add_executable(iterator_adaptor_unittest /Users/jyesselm/projects/RNAMake.New/unittests/primitives/iterator_adaptor_unittest.cc)
+target_link_libraries(iterator_adaptor_unittest primitives_lib)
+
 add_executable(primitives_unittest /Users/jyesselm/projects/RNAMake.New/unittests/primitives/primitives_unittest.cc)
 target_link_libraries(primitives_unittest primitives_lib)
 
