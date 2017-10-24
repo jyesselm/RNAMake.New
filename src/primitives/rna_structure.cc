@@ -5,7 +5,7 @@
 #include "rna_structure.h"
 
 namespace primitives {
-
+/*
 PrimitiveBasepairCOP
 get_res_wc_or_gu_basepair(
         PrimitiveBasepairCOPs const & basepairs,
@@ -66,6 +66,7 @@ generate_end_id(
     auto best_chains = PrimitiveChainCOPs();
     auto best_chain = PrimitiveChainCOP();
     auto c = PrimitiveChainCOP();
+    auto r = PrimitiveResidueCOP();
     auto best_score = 0;
     auto score = 0;
     auto pos = 0;
@@ -74,8 +75,9 @@ generate_end_id(
         c = open_chains[0];
         open_chains.erase(open_chains.begin());
 
-        for(auto const & r : *c) {
-            /*dot_bracket = '.';
+        for(auto i = 0; i < c->get_length(); i++) {
+            r = c->get_residue(i);
+            dot_bracket = '.';
             bp = get_res_wc_or_gu_basepair(bps, ends, r);
             if(bp != nullptr && bp->get_bp_type() != BasepairType::NC) {
                 saved_bp = bp;
@@ -98,10 +100,10 @@ generate_end_id(
             }
             ss += dot_bracket;
             seq += r->get_name();
-            if(saved_bp != nullptr ) { seen_bps[saved_bp] = 1; }*/
+            if(saved_bp != nullptr ) { seen_bps[saved_bp] = 1; }
         }
 
-        /*auto dummy_str = Strings(2);
+        auto dummy_str = Strings(2);
         dummy_str[0] = seq; dummy_str[1] = ss;
         ss_chains.push_back(dummy_str);
         ss = "";
@@ -172,12 +174,12 @@ generate_end_id(
             }
         }
         if(i != ss_chain.size()-1) { ss_id += "_"; }
-        i++;*/
+        i++;
     }
 
     return String("");
     //return ss_id;
-}
+}*/
 
 }
 

@@ -3,10 +3,10 @@
 
 
 #include <primitives/residue.h>
-#include <primitives/basepair.h>
+//#include <primitives/basepair.h>
 #include <primitives/chain.h>
 
-class AltChain {
+/*class AltChain {
 public:
     AltChain(
             primitives::PrimitiveResidueOPs const & residues):
@@ -87,4 +87,4 @@ int main(int argc, char *argv[] ) {
     auto result2 = run_simple_chain(res);
     auto result = result1 + result2;
 
-}
+}*/

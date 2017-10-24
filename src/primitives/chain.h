@@ -32,15 +32,11 @@ namespace primitives {
 template <typename Restype>
 class Chain {
 public:
-    typedef std::shared_ptr<Restype>       ResidueOP;
-    typedef std::shared_ptr<Restype const> ResidueCOP;
-    typedef std::vector<ResidueOP>         ResidueOPs;
-    typedef std::vector<ResidueCOP>        ResidueCOPs;
-
+    typedef std::vector<Restype>       Residues;
 public:
     inline
     Chain(
-            ResidueOPs const & residues):
+            Residues const & residues):
             residues_(residues) {
 
         expects<ChainException>(
@@ -51,10 +47,10 @@ public:
     inline
     Chain(
             Chain const & c) {
-        residues_ = ResidueOPs();
+        residues_ = Residues();
         int i = 0;
         for(auto const & r : c.residues_) {
-            residues_.push_back(std::make_shared<Restype>(*r));
+            residues_.push_back(Restype(r));
             i++;
         }
     }
@@ -62,11 +58,11 @@ public:
     inline
     Chain(
             String const & s) {
-        residues_ = ResidueOPs();
+        residues_ = Residues();
         Strings spl = base::split_str_by_delimiter(s, ";");
         for(auto const & r_str : spl) {
             if (r_str.length() < 3) { continue; }
-            residues_.push_back(std::make_shared<Restype>(r_str));
+            residues_.push_back(Restype(r_str));
         }
     }
 
@@ -74,7 +70,7 @@ public:
     ~Chain() {}
 
 public: //iterator
-    typedef boost::indirect_iterator< typename ResidueOPs::const_iterator, Restype const > const_iterator;
+    typedef typename Residues::const_iterator const_iterator;
 
     const_iterator begin() const noexcept { return residues_.begin(); }
     const_iterator end() const noexcept   { return residues_.end(); }
@@ -87,15 +83,15 @@ public:
     }
 
     inline
-    ResidueCOP
+    Restype const &
     get_first() const { return residues_[0]; }
 
     inline
-    ResidueCOP
+    Restype const &
     get_last() const { return residues_.back(); }
 
     inline
-    ResidueCOP
+    Restype const &
     get_residue(Index index) const {
         return residues_[index];
     }
@@ -104,7 +100,7 @@ public:
     int
     contain_res(Restype const & r) const {
         for (auto const & res : residues_) {
-            if (*res == r) { return 1; }
+            if (res == r) { return 1; }
         }
         return 1;
     }
@@ -113,14 +109,11 @@ protected:
     Chain() {}
 
 protected:
-    ResidueOPs residues_;
+    Residues residues_;
 };
 
 typedef Chain<PrimitiveResidue>                 PrimitiveChain;
-typedef std::shared_ptr<PrimitiveChain>         PrimitiveChainOP;
-typedef std::vector<PrimitiveChainOP>           PrimitiveChainOPs;
-typedef std::shared_ptr<PrimitiveChain const>   PrimitiveChainCOP;
-typedef std::vector<PrimitiveChainCOP>          PrimitiveChainCOPs;
+typedef std::vector<PrimitiveChain>             PrimitiveChains;
 
 }
 

@@ -98,16 +98,40 @@ protected:
     base::SimpleStringOP name_;
 };
 
-typedef Basepair                                 PrimitiveBasepair;
-typedef std::shared_ptr<PrimitiveBasepair>       PrimitiveBasepairOP;
-typedef std::vector<PrimitiveBasepairOP>         PrimitiveBasepairOPs;
-typedef std::shared_ptr<PrimitiveBasepair const> PrimitiveBasepairCOP;
-typedef std::vector<PrimitiveBasepairCOP>        PrimitiveBasepairCOPs;
+typedef Basepair                             PrimitiveBasepair;
+typedef std::vector<PrimitiveBasepair>       PrimitiveBasepairs;
 
+
+template<typename Restype>
 String
 generate_bp_name(
-        PrimitiveResidueCOP,
-        PrimitiveResidueCOP);
+        Restype const & res1,
+        Restype const & res2) {
+
+    auto res1_name = String("");
+    auto res2_name = String("");
+
+    if (res1.get_i_code() == ' ') {
+        res1_name = res1.get_chain_id() + std::to_string(res1.get_num());
+    } else {
+        res1_name = res1.get_chain_id() + std::to_string(res1.get_num()) + res1.get_i_code();
+
+    }
+
+    if (res2.get_i_code() == ' ') {
+        res2_name = res2.get_chain_id() + std::to_string(res2.get_num());
+    } else {
+        res2_name = res2.get_chain_id() + std::to_string(res2.get_num()) + res2.get_i_code();
+    }
+
+    if (res1.get_chain_id() < res2.get_chain_id()) { return res1_name + "-" + res2_name; }
+    if (res2.get_chain_id() < res1.get_chain_id()) { return res2_name + "-" + res1_name; }
+
+    if (res1.get_num() < res2.get_num()) { return res1_name + "-" + res2_name; }
+    else { return res2_name + "-" + res1_name; }
+
+}
+
 
 /*template <typename Restype>
 Basepair::BasepairType

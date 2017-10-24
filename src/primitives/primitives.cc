@@ -23,7 +23,7 @@ PYBIND11_PLUGIN(primitives) {
     py::module m("primitives", "rnamake's primitive classes");
 
     // Residue Class
-    py::class_<PrimitiveResidue, PrimitiveResidueOP>(m, "Residue")
+    py::class_<PrimitiveResidue>(m, "Residue")
             .def("get_chain_id", &PrimitiveResidue::get_chain_id)
             .def("get_name", &PrimitiveResidue::get_name)
             .def("get_num", &PrimitiveResidue::get_num)
@@ -33,8 +33,8 @@ PYBIND11_PLUGIN(primitives) {
             .def(py::self == py::self)
             .def(py::init<char, int, char, char, util::Uuid const &>());
 
-   py::class_<PrimitiveChain, PrimitiveChainOP>(m, "Chain")
-            .def(py::init<PrimitiveResidueOPs const & >())
+    py::class_<PrimitiveChain>(m, "Chain")
+            .def(py::init<PrimitiveResidues const & >())
             .def(py::init<PrimitiveChain const &>())
             .def("__iter__", [](PrimitiveChain const & c) { return py::make_iterator(c.begin(), c.end()); },
             py::keep_alive<0, 1>())
@@ -44,12 +44,20 @@ PYBIND11_PLUGIN(primitives) {
             .def("get_residue", &PrimitiveChain::get_residue)
             .def("get_length", &PrimitiveChain::get_length);
 
-    /*py::class_<PrimitiveStructure, PrimitiveStructureOP>(m, "Structure")
-            .def(py::init<const ResidueUPs &, const Ints &>())
+    typedef base::VectorContainer<PrimitiveChain> Chains;
+    py::class_<Chains, std::shared_ptr<Chains>>(m, "Chains")
+            .def(py::init<std::vector<PrimitiveChain> const &>())
+            .def("__len__", &Chains::size)
+            .def("size", &Chains::size)
+            .def("__getitem__", &Chains::operator[]);
+
+
+    py::class_<PrimitiveStructure>(m, "Structure")
+            .def(py::init<PrimitiveResidues const &, Cutpoints const &>())
             .def("__iter__", [](const PrimitiveStructure & s) {
                      return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
             .def("get_residue",
-                 (Residue const & (PrimitiveStructure::*)(int) const) &PrimitiveStructure::get_residue)
+                 (Residue const & (PrimitiveStructure::*)(Index) const) &PrimitiveStructure::get_residue)
             .def("get_residue",
                  (Residue const & (PrimitiveStructure::*)(int, char, char) const) &PrimitiveStructure::get_residue)
             .def("get_residue",
@@ -58,9 +66,9 @@ PYBIND11_PLUGIN(primitives) {
             .def("get_num_residues", &PrimitiveStructure::get_num_residues)
             .def("get_num_chains", &PrimitiveStructure::get_num_chains)
             .def("get_sequence", &PrimitiveStructure::get_sequence)
-            .def("get_chains", &PrimitiveStructure::get_chains);
+            .def("get_chains", &PrimitiveStructure::get_chains, py::return_value_policy::reference);
 
-    py::enum_<BasepairType>(m, "BasepairType")
+    /*py::enum_<BasepairType>(m, "BasepairType")
             .value("WC", BasepairType::WC)
             .value("GU", BasepairType::GU)
             .value("NC", BasepairType::NC)

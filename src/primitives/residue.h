@@ -126,10 +126,6 @@ protected:
 };
 
 typedef Residue                          PrimitiveResidue;
-typedef std::shared_ptr<Residue>         PrimitiveResidueOP;
-typedef std::vector<PrimitiveResidueOP>  PrimitiveResidueOPs;
-typedef std::shared_ptr<Residue const>   PrimitiveResidueCOP;
-typedef std::vector<PrimitiveResidueCOP> PrimitiveResidueCOPs;
 typedef std::vector<Residue>             PrimitiveResidues;
 
 }

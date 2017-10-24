@@ -6,9 +6,11 @@
 #define RNAMAKE_PRIMITIVES_STRUCTURE_H
 
 #include <sstream>
+#include <memory>
 
-#include "primitives/residue.h"
-#include "primitives/chain.h"
+#include <base/vector_container.h>
+#include <primitives/residue.h>
+#include <primitives/chain.h>
 
 class StructureException : public std::runtime_error {
 public:
@@ -22,26 +24,30 @@ public:
 
 namespace primitives {
 
+
+// wrapper to avoid doing std::shared_ptr<std::vector<T>> since pybind11 wont allow this
+
 template<typename Chaintype, typename Restype>
 class Structure {
 public:
-    typedef std::shared_ptr<Restype>         ResidueOP;
-    typedef std::shared_ptr<Restype const>   ResidueCOP;
-    typedef std::vector<ResidueOP>           ResidueOPs;
-    typedef std::vector<ResidueCOP>          ResidueCOPs;
+    typedef std::vector<Restype>                          Residues;
+    //typedef std::vector<Chaintype>                        Chains;
+    //typedef std::shared_ptr<std::vector<Chaintype> >      ChainsOP;
+    typedef base::VectorContainer<Chaintype>              Chains;
+    typedef base::VectorContainerOP<Chaintype>            ChainsOP;
 
-    typedef std::shared_ptr<Chaintype>       ChainOP;
-    typedef std::vector<ChainOP>             ChainOPs;
-    typedef std::shared_ptr<Chaintype const> ChainCOP;
-    typedef std::vector<ChainCOP>            ChainCOPs;
 
 public:
     inline
     Structure(
-            ResidueOPs const & res,
-            Ints const chain_cuts):
+            Residues const & res,
+            Cutpoints const cut_points):
             residues_(res),
-            chain_cuts_(chain_cuts) {}
+            cut_points_(cut_points) {
+
+
+
+    }
     inline
     Structure(
             Structure const & s) {
@@ -52,20 +58,20 @@ public:
     ~Structure() {}
 
 public: //res iterator
-    typedef typename ResidueCOPs::const_iterator const_iterator;
+    typedef typename Residues::const_iterator const_iterator;
 
     const_iterator begin() const { return residues_.begin(); }
     const_iterator end() const { return residues_.end(); }
 
 public: //get_residue interface
-    ResidueCOP
+    Restype const &
     get_residue(
             int num,
             char chain_id,
             char i_code) const{
 
         for (auto const & r : residues_) {
-            if (num == r->get_num() && chain_id == r->get_chain_id() && i_code == r->get_i_code()) {
+            if (num == r.get_num() && chain_id == r.get_chain_id() && i_code == r.get_i_code()) {
                 return r;
             }
         }
@@ -75,53 +81,52 @@ public: //get_residue interface
         throw StructureException(ss.str());
     }
 
-    ResidueCOP
+    Restype const &
     get_residue(
             util::Uuid const & uuid) const {
 
         for (auto const & r : residues_) {
-            if (r->get_uuid() == uuid) { return r; }
+            if (r.get_uuid() == uuid) { return r; }
         }
 
         throw StructureException("cannot find residue by uuid");
     }
 
-    ResidueCOP
+    Restype const &
     get_residue(
-            int index) const {
+            Index index) const {
 
-        if(index >= residues_.size()) {
-            throw StructureException(
-                    "cannot get residue " + std::to_string(index) + " only " + std::to_string(residues_.size()) +
-                    " total residues");
-        }
+        expects<StructureException>(
+                index < residues_.size(),
+                "cannot get residue " + std::to_string(index) + " only " + std::to_string(residues_.size()) +
+                " total residues");
 
         return residues_[index];
     }
 
     int
-    get_res_index(ResidueOP const & res) {
+    get_res_index(
+            Restype const & res) {
         int i = -1;
         for (auto const & r : residues_) {
             i++;
             if (r == res) { return i; }
         }
-        throw StructureException("cannot find index for res: " + std::to_string(res->get_num()));
+        throw StructureException("cannot find index for res: " + std::to_string(res.get_num()));
     }
 
 public:
-    ChainCOPs
+    ChainsOP
     get_chains() const {
         auto pos = 0;
-        auto res = ResidueOPs();
-        auto chains = ChainCOPs();
+        auto res = Residues();
+        auto chains = std::vector<Chaintype>();
         auto i = 0;
         for(auto const & r : residues_) {
-            if (chain_cuts_[pos] == i) {
-                auto c = std::make_shared<Chaintype const>(res);
+            if (cut_points_[pos] == i) {
+                auto c = Chaintype(res);
                 chains.push_back(c);
-                res = ResidueOPs();
-                res.push_back(r);
+                res = Residues{r};
                 pos += 1;
             } else {
                 res.push_back(r);
@@ -129,17 +134,17 @@ public:
             i++;
         }
         if(res.size() > 0) {
-            auto c = std::make_shared<Chaintype const>(res);
+            auto c = Chaintype(res);
             chains.push_back(c);
         }
-        return chains;
+        return std::make_shared<Chains>(chains);
     }
 
     size_t
     get_num_residues() { return residues_.size(); }
 
     size_t
-    get_num_chains() { return chain_cuts_.size(); }
+    get_num_chains() { return cut_points_.size(); }
 
     String
     get_sequence() {
@@ -148,11 +153,11 @@ public:
         auto pos = 0;
         for(auto const & r : residues_) {
             i++;
-            if(chain_cuts_[pos] == i) {
+            if(cut_points_[pos] == i) {
                 seq += "&";
                 pos++;
             }
-            seq += r->get_name();
+            seq += r.get_name();
         }
         return seq;
     }
@@ -163,16 +168,12 @@ protected:
 
 protected:
 
-    ResidueOPs residues_;
-    Ints chain_cuts_;
+    Residues residues_;
+    Cutpoints cut_points_;
 };
 
 typedef Structure<PrimitiveChain, PrimitiveResidue> PrimitiveStructure;
-typedef std::shared_ptr<PrimitiveStructure>         PrimitiveStructureOP;
-typedef std::vector<PrimitiveStructureOP>           PrimitiveStructureOPs;
 
-typedef std::shared_ptr<PrimitiveStructure const>    PrimitiveStructureCOP;
-typedef std::vector<PrimitiveStructureCOP>           PrimitiveStructureCOPs;
 
 }
 

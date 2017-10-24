@@ -8,6 +8,8 @@
 #include <exception>
 #include <memory>
 
+#include <base/types.h>
+
 template <typename exception>
 void
 expects(
