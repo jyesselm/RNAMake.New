@@ -40,11 +40,18 @@ PYBIND11_PLUGIN(data_structures) {
             .def("get_num_nodes", &GraphType::get_num_nodes)
             .def("are_nodes_connected", &GraphType::are_nodes_connected)
             .def("get_node", &GraphType::get_node)
-            .def("add_node", (int (GraphType::*)(DataTypeOP)) &GraphType::add_node)
-            .def("add_node", (int (GraphType::*)(DataTypeOP, Index)) &GraphType::add_node);
+            .def("add_node", (int (GraphType::*)(DataType const &)) &GraphType::add_node)
+            .def("add_node", (int (GraphType::*)(DataType const &, Index)) &GraphType::add_node);
+
+    /*typedef primitives::PrimitiveChain DataType1;
+    typedef std::shared_ptr<DataType1> DataTypeOP1;
+    typedef Graph<DataType1> GraphType1;
+    py::class_<GraphType1, std::shared_ptr<GraphType1> >(m, "Graph")
+            .def(py::init<>())
+            .def("__len__", &GraphType1::get_num_nodes);*/
 
     // StaticEdgedGraph Class
-    typedef StaticEdgedGraph<DataType> StaticEdgedGraphType;
+    /*typedef StaticEdgedGraph<DataType> StaticEdgedGraphType;
     py::class_<StaticEdgedGraphType, std::shared_ptr<StaticEdgedGraphType> >(m, "StaticEdgedGraph")
             .def(py::init<>())
             .def("__len__", &StaticEdgedGraphType::get_num_nodes)
@@ -58,7 +65,7 @@ PYBIND11_PLUGIN(data_structures) {
             .def("get_node", &StaticEdgedGraphType::get_node)
             .def("add_node", (int (StaticEdgedGraphType::*)(DataTypeOP)) &StaticEdgedGraphType::add_node)
             .def("add_node", (int (StaticEdgedGraphType::*)(DataTypeOP, Index)) &StaticEdgedGraphType::add_node);
-
+    */
 
     return m.ptr();
 

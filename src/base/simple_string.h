@@ -86,6 +86,9 @@ operator<<(std::ostream &, SimpleString const &);
 typedef std::shared_ptr<SimpleString> SimpleStringOP;
 typedef std::vector<SimpleStringOP> SimpleStringOPs;
 
+typedef std::shared_ptr<SimpleString const> SimpleStringCOP;
+typedef std::vector<SimpleStringCOP> SimpleStringCOPs;
+
 }
 
 #endif //TEST_SIMPLE_STRING_H

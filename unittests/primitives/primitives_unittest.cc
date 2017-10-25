@@ -77,17 +77,24 @@ TEST_CASE( "Test Primitive Classes ", "[Primitives]" ) {
     }
 
     //Structure
+    SECTION("test copy") {
+        auto r1 = NewRes('A', 1, 'A', ' ', util::Uuid());
+        auto r2 = NewRes('A', 2, 'A', ' ', util::Uuid());
+        auto res = std::vector<NewRes>{r1, r2};
+        auto s = Structure(res, Cutpoints{2});
+        auto s2 = Structure(s);
+
+    }
+
     SECTION("test get chains") {
         auto r1 = NewRes('A', 1, 'A', ' ', util::Uuid());
         auto r2 = NewRes('A', 2, 'A', ' ', util::Uuid());
         auto res = std::vector<NewRes>{r1, r2};
 
         auto s = Structure(res, Cutpoints{2});
-        /*auto chains = s.get_chains();
+        auto chains = s.get_chains();
         REQUIRE(chains->size() == 1);
         REQUIRE(r1 == chains->at(0).get_first());
-        delete chains;
-         */
 
     }
 

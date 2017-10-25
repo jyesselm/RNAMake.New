@@ -25,6 +25,13 @@ namespace primitives {
 
 class Residue {
 public:
+    /**
+     * constructor for Residue class
+     * @param   name        residue name (A, G, C, T)
+     * @param   num         residue num
+     * @param   chain_id    what chain does this residue belong to ("A", "B")
+     * @param   uuid        residue unique indentifier
+     */
     inline
     Residue(
             char name,
@@ -38,6 +45,10 @@ public:
             i_code_(i_code),
             uuid_(uuid) {}
 
+    /**
+      * copy construtor for residue class
+      * @param  r   residue to be copied from
+      */
     inline
     Residue(
             Residue const & r):
@@ -47,14 +58,14 @@ public:
             uuid_(r.uuid_),
             i_code_(r.i_code_) {}
 
+    // let derived class setup members
+    Residue() {}
 
     virtual
     ~Residue() {}
 
 protected:
 
-    // let derived class setup members
-    Residue() {}
 
 public:
 

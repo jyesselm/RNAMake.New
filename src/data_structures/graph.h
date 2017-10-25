@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <queue>
+#include <functional>
 
 #include <boost/iterator/indirect_iterator.hpp>
 
@@ -65,34 +66,31 @@ struct Edge {
 template<typename DataType>
 class BaseGraph {
 public:
-    typedef std::shared_ptr<DataType>       DataTypeOP;
-    typedef std::shared_ptr<DataType const> DataTypeCOP;
-    typedef std::vector<DataTypeOP>         DataTypeOPs;
-    typedef std::vector<DataTypeCOP>        DataTypeCOPs;
+    typedef std::vector<DataType>        DataTypes;
+    typedef std::vector<DataType*>       DataTypeRPs;
+    typedef std::vector<Edge>            Edges;
+    typedef std::map<Index, DataType>    DataTypeMap;
+    typedef std::map<Index, Edges>       EdgesMap;
 
-    typedef std::map<Index, DataTypeOP>     DataTypeOPMap;
-    typedef std::shared_ptr<const Edge>     EdgeCOP;
-    typedef std::vector<EdgeCOP>               EdgeCOPs;
-    typedef std::map<Index, EdgeCOPs>       EdgeCOPMap;
 
 public:
     inline
     BaseGraph():
-            nodes_(DataTypeOPMap()),
-            edges_(EdgeCOPMap()),
+            nodes_(DataTypeMap()),
+            edges_(EdgesMap()),
             index_(0),
-            iter_list_(DataTypeCOPs()),
+            iter_list_(DataTypeRPs()),
             rebuild_list_(0),
             transverse_start_(-1) {}
 
     ~BaseGraph() {}
 
 public:
-
-    typedef boost::indirect_iterator< typename DataTypeCOPs::const_iterator, DataType const > const_iterator;
+    typedef boost::indirect_iterator< typename DataTypeRPs::const_iterator, DataType const > const_iterator;
 
     const_iterator begin() const noexcept { return iter_list_.begin(); }
     const_iterator end() const noexcept   { return iter_list_.end(); }
+
 
 public:
 
@@ -111,7 +109,7 @@ public: //getters
     size_t
     get_num_nodes() { return nodes_.size(); }
 
-    EdgeCOPs const &
+    Edges const &
     get_edges(
             Index index) {
         expects<GraphException>(
@@ -127,7 +125,7 @@ public: //getters
         return edges_[index].size();
     }
 
-    DataTypeCOP
+    DataType const &
     get_node(
             Index index) {
         expects<GraphException>(
@@ -143,7 +141,7 @@ public: //getters
 
         if(edges_.find(n1) == edges_.end()) { return false; }
         for(auto const & edge : edges_[n1]) {
-            if(edge->node_i == n2 or edge->node_j == n2) { return true; }
+            if(edge.node_i == n2 or edge.node_j == n2) { return true; }
         }
         return false;
     }
@@ -154,9 +152,9 @@ private:
     _rebuild_iter_list(int) = 0;
 
 protected:
-    DataTypeOPMap nodes_;
-    EdgeCOPMap edges_;
-    DataTypeCOPs iter_list_;
+    DataTypeMap nodes_;
+    EdgesMap edges_;
+    DataTypeRPs iter_list_;
     Flag rebuild_list_;
     Index index_, transverse_start_;
 
@@ -168,12 +166,9 @@ public:
     typedef BaseGraph<DataType> BaseClass;
 
 public:
-    typedef std::shared_ptr<DataType>       DataTypeOP;
-    typedef std::vector<DataTypeOP>         DataTypeOPs;
-    typedef std::shared_ptr<DataType const> DataTypeCOP;
-    typedef std::vector<DataTypeCOP>        DataTypeCOPs;
-    typedef std::shared_ptr<const Edge>     EdgeCOP;
-    typedef std::vector<EdgeCOP>            EdgeCOPs;
+    typedef std::vector<DataType>       DataTypes;
+    typedef std::vector<DataType*>      DataTypeRPs;
+    typedef std::vector<Edge>           Edges;
 
 public:
     inline
@@ -182,9 +177,10 @@ public:
 public:
     Index
     add_node(
-            DataTypeOP d) {
+            DataType const & d) {
 
-        this->nodes_[this->index_] = std::make_shared<DataType>(*d);
+        //copies
+        this->nodes_[this->index_] = d;
         this->index_ += 1;
         _rebuild_iter_list();
         return this->index_-1;
@@ -193,7 +189,7 @@ public:
 
     Index
     add_node(
-            DataTypeOP d,
+            DataType const & d,
             Index parent_index) {
 
         // parent should exist
@@ -204,15 +200,13 @@ public:
 
         auto n_index = add_node(d);
         auto num_of_parent_edges = this->get_num_edges(parent_index);
-        auto edge = std::make_shared<Edge const>(parent_index, n_index, num_of_parent_edges, 0);
+        auto edge = Edge(parent_index, n_index, num_of_parent_edges, 0);
         if(num_of_parent_edges == 0) {
-            this->edges_[parent_index] = EdgeCOPs();
+            this->edges_[parent_index] = Edges();
         }
-        this->edges_[n_index] = EdgeCOPs();
+        this->edges_[n_index] = Edges();
         this->edges_[parent_index].push_back(edge);
         this->edges_[n_index].push_back(edge);
-        _rebuild_iter_list();
-
         return n_index;
 
     }
@@ -240,7 +234,7 @@ private:
 
         auto open = std::queue<Index>();
         auto seen = std::map<Index, int>();
-        this->iter_list_ = DataTypeCOPs();
+        this->iter_list_.resize(0);
 
         auto get_neighbors = [&](
                 Index index,
@@ -249,9 +243,9 @@ private:
             if(this->get_num_edges(index) == 0) { return neighbors; }
             auto edges = this->get_edges(index);
             for(auto const & e : edges) {
-                if(cur_seen.find(e->partner(index)) == cur_seen.end()) {
-                    neighbors.push_back(e->partner(index));
-                    cur_seen[e->partner(index)] = 1;
+                if(cur_seen.find(e.partner(index)) == cur_seen.end()) {
+                    neighbors.push_back(e.partner(index));
+                    cur_seen[e.partner(index)] = 1;
                 }
             }
             return neighbors;
@@ -263,7 +257,7 @@ private:
         while(open.size() > 0) {
             auto current = open.front();
             open.pop();
-            this->iter_list_.push_back(this->get_node(current));
+            this->iter_list_.push_back(&this->nodes_[current]);
             auto neighbors = get_neighbors(current, seen);
             for(auto const & n : neighbors) { open.push(n); }
         }
@@ -278,19 +272,17 @@ private:
             while(open.size() > 0) {
                 auto current = open.front();
                 open.pop();
-                this->iter_list_.push_back(this->get_node(current));
+                this->iter_list_.push_back(&this->nodes_[current]);
                 auto neighbors = get_neighbors(current, seen);
                 for(auto const & n : neighbors) { open.push(n); }
             }
         }
 
-
-
     }
 
 };
 
-
+/*
 template<typename DataType>
 class StaticEdgedGraph : public BaseGraph<DataType> {
 public:
@@ -329,6 +321,7 @@ private:
             Index start) {}
 
 };
+ */
 
 }
 

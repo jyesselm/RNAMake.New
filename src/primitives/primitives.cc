@@ -47,10 +47,11 @@ PYBIND11_PLUGIN(primitives) {
     typedef base::VectorContainer<PrimitiveChain> Chains;
     py::class_<Chains, std::shared_ptr<Chains>>(m, "Chains")
             .def(py::init<std::vector<PrimitiveChain> const &>())
+            .def("__iter__", []( Chains const & c) {
+                return py::make_iterator(c.begin(), c.end()); }, py::keep_alive<0, 1>())
             .def("__len__", &Chains::size)
             .def("size", &Chains::size)
             .def("__getitem__", &Chains::operator[]);
-
 
     py::class_<PrimitiveStructure>(m, "Structure")
             .def(py::init<PrimitiveResidues const &, Cutpoints const &>())

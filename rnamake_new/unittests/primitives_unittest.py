@@ -184,7 +184,7 @@ class RNAStructureUnittest(unittest.TestCase):
         self.bp2 = Basepair(self.r3.get_uuid(), self.r4.get_uuid(), Uuid(),
                            BasepairType.WC, SimpleString(name2))
         self.bp3 = Basepair(self.r2.get_uuid(), self.r5.get_uuid(), Uuid(),
-                           BasepairType.WC, SimpleString(name2))
+                           BasepairType.WC, SimpleString(name3))
 
         self.s = Structure([self.r1, self.r2, self.r3,
                             self.r4, self.r5, self.r6], [3, 6])

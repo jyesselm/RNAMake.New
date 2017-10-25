@@ -31,8 +31,6 @@ template<typename Chaintype, typename Restype>
 class Structure {
 public:
     typedef std::vector<Restype>                          Residues;
-    //typedef std::vector<Chaintype>                        Chains;
-    //typedef std::shared_ptr<std::vector<Chaintype> >      ChainsOP;
     typedef base::VectorContainer<Chaintype>              Chains;
     typedef base::VectorContainerOP<Chaintype>            ChainsOP;
 
@@ -45,14 +43,16 @@ public:
             residues_(res),
             cut_points_(cut_points) {
 
-
+        expects<StructureException>(
+                residues_.size() > 0 && cut_points_.size() > 0,
+                "structures must contain at least one residue and one cutpoint");
 
     }
     inline
     Structure(
-            Structure const & s) {
-
-    }
+            Structure const & s):
+            residues_(s.residues_),
+            cut_points_(s.cut_points_) {}
 
     virtual
     ~Structure() {}

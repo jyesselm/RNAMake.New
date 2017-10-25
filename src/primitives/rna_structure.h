@@ -12,6 +12,7 @@
 #include <base/assertions.h>
 #include <base/string.h>
 #include <base/simple_string.h>
+#include <base/vector_container.h>
 #include <util/uuid.h>
 #include <primitives/structure.h>
 #include <primitives/basepair.h>
@@ -37,10 +38,10 @@ template<typename BPtype, typename Structuretype, typename Chaintype, typename R
 class RNAStructure {
 public:// types
 
-    typedef std::vector<Restype>  Residues;
-    typedef VectorUP<Restype>     ResiduesUP;
-    typedef std::vector<BPtype>   Basepairs;
-    typedef VectorUP<BPtype>      BasepairsUP;
+    typedef std::vector<Restype>                 Residues;
+    typedef base::VectorContainerOP<Restype>     ResiduesOP;
+    typedef std::vector<BPtype>                  Basepairs;
+    typedef base::VectorContainerOP<Restype>     BasepairsOP;
 
 
 public:
@@ -48,8 +49,8 @@ public:
             Structuretype const & structure,
             Basepairs const & basepairs,
             Basepairs const & ends,
-            base::SimpleStringOPs const & end_ids,
-            base::SimpleStringOP const & name):
+            base::SimpleStringCOPs const & end_ids,
+            base::SimpleStringCOP const & name):
             structure_(structure),
             basepairs_(basepairs),
             ends_(ends),
@@ -119,54 +120,59 @@ public: //structure wrappers
 
 public: //get basepairs interface
 
-    BasepairsUP
+    BasepairsOP
     get_basepairs(
             util::Uuid const & bp_uuid) const {
-        auto bps = std::unique_ptr<Basepairs>(new Basepairs());
+        auto bps =Basepairs();
         for (auto const & bp : basepairs_) {
-            if (bp.get_uuid() == bp_uuid) { bps->push_back(bp); }
+            if (bp.get_uuid() == bp_uuid) { bps.push_back(bp); }
             if (bp.get_res1_uuid() == bp_uuid ||
-                bp.get_res2_uuid() == bp_uuid) { bps->push_back(bp); }
+                bp.get_res2_uuid() == bp_uuid) { bps.push_back(bp); }
 
         }
 
-        if(bps->size() == 0) {
+        if(bps.size() == 0) {
             throw RNAStructureException("could not find any basepairs with this uuid for residues or basepairs");
         }
 
-        return bps;
+        return std::make_shared<base::VectorContainer<BPtype>>(bps);
     }
 
-    BasepairsUP
+    BasepairsOP
     get_basepairs(
             util::Uuid const & uuid1,
             util::Uuid const & uuid2) const {
 
-        auto bps = std::unique_ptr<Basepairs>(new Basepairs());
+        auto bps = Basepairs();
         for (auto const & bp : basepairs_) {
-            if (bp.get_res1_uuid() == uuid1 && bp.get_res2_uuid() == uuid2) { bps->push_back(bp); }
-            if (bp.get_res1_uuid() == uuid2 && bp.get_res2_uuid() == uuid1) { bps->push_back(bp); }
+            if (bp.get_res1_uuid() == uuid1 && bp.get_res2_uuid() == uuid2) { bps.push_back(bp); }
+            if (bp.get_res1_uuid() == uuid2 && bp.get_res2_uuid() == uuid1) { bps.push_back(bp); }
         }
 
-        if(bps->size() == 0) {
+        if(bps.size() == 0) {
             throw RNAStructureException("could not find any basepairs with these two uuids");
         }
 
-        return bps;
+        return std::make_shared<base::VectorContainer<BPtype>>(bps);
     }
 
-    BasepairsUP
+    BasepairsOP
     get_basepairs(
             String const & name) const {
-        auto bps = std::unique_ptr<Basepairs>(new Basepairs());
+        auto bps = Basepairs();
         for (auto const & bp : basepairs_) {
-            if (name == bp.get_name()->get_str()) { bps->push_back(bp); return bps; }
+            if (name == bp.get_name()->get_str()) {
+                bps.push_back(bp);
+            }
         }
 
-        throw RNAStructureException("could not find basepair with name " + name);
+        if(bps.size() == 0) {
+            throw RNAStructureException("could not find any basepairs with this name: " + name);
+        }
+
+        return std::make_shared<base::VectorContainer<BPtype>>(bps);
 
     }
-
 
 public: // get basepair interface  (single basepair!)
 
@@ -238,7 +244,8 @@ public: // get basepair interface  (single basepair!)
 public: // get end interace
 
     BasepairType const &
-    get_end(util::Uuid const & bp_uuid) const{
+    get_end(
+            util::Uuid const & bp_uuid) const{
         auto bps = Basepairs();
         for (auto const & bp : ends_) {
             if (bp.get_uuid() == bp_uuid) { bps.push_back(bp); }
@@ -279,7 +286,7 @@ public: // get end interace
 
     BasepairType const &
     get_end(
-            base::SimpleStringOP const & name) const {
+            base::SimpleStringCOP name) const {
         auto bps = Basepairs();
         for (auto const & bp : ends_) {
             if (bp.get_name() == name) { bps.push_back(bp); }
@@ -347,7 +354,7 @@ public: // get end by end id
 
     BasepairType const &
     get_end_by_id(
-            base::SimpleStringOP const & end_id) const {
+            base::SimpleStringCOP end_id) const {
         auto bps = Basepairs();
         int i = -1;
         for (auto const & bp : ends_) {
@@ -367,7 +374,7 @@ public: // get end by end id
 public: // other getters
 
     inline
-    base::SimpleStringOP const &
+    base::SimpleStringCOP
     get_end_id(
             Index index) const {
         if(index >= end_ids_.size()) {
@@ -380,7 +387,7 @@ public: // other getters
 
     int
     get_end_index(
-            base::SimpleStringOP const & name) const {
+            base::SimpleStringCOP name) const {
         auto bp = get_end(name);
         if(bp == nullptr) { throw RNAStructureException("cannot find end with name: " + name->get_str()); }
         int i = 0;
@@ -404,13 +411,13 @@ public: // other getters
 
     }
 
-    ResiduesUP
+    ResiduesOP
     get_bp_res(
             BPtype const & bp) const {
-        auto res = ResiduesUP(new Residues(2));
+        auto res = Residues(2);
         res[0] = get_residue(bp.get_res1_uuid());
         res[1] = get_residue(bp.get_res2_uuid());
-        return res;
+        return std::make_shared<base::VectorContainer<Restype>>(res);
     }
 
     size_t
@@ -419,15 +426,15 @@ public: // other getters
     size_t
     get_num_ends() const{ return ends_.size(); }
 
-    base::SimpleStringOP const &
+    base::SimpleStringCOP
     get_name() { return name_; }
 
 protected:
     Structuretype structure_;
     std::vector<BPtype> basepairs_;
     std::vector<BPtype> ends_;
-    base::SimpleStringOPs end_ids_;
-    base::SimpleStringOP name_;
+    base::SimpleStringCOPs end_ids_;
+    base::SimpleStringCOP name_;
 
 };
 
@@ -460,21 +467,187 @@ ends_from_basepairs(
 
 }
 
-/*
-PrimitiveBasepairCOP
-get_res_wc_or_gu_basepair(
-        PrimitiveBasepairCOPs const &,
-        PrimitiveBasepairCOPs const &,
-        PrimitiveResidueCOP);
 
+template<typename BPtype, typename Restype>
+BPtype const *
+get_res_wc_or_gu_basepair(
+        std::vector<BPtype> const & basepairs,
+        std::vector<BPtype> const & ends,
+        Restype const & r) {
+
+    for(auto const & bp : basepairs) {
+        if((bp.get_res1_uuid() == r.get_uuid() ||
+            bp.get_res2_uuid() == r.get_uuid()) &&
+           bp.get_bp_type() != BasepairType::NC) {
+            return &bp;
+        }
+    }
+
+    for(auto const & bp : ends) {
+        if((bp.get_res1_uuid() == r.get_uuid() ||
+            bp.get_res2_uuid() == r.get_uuid()) &&
+           bp.get_bp_type() != BasepairType::NC) {
+            return &bp;
+        }
+    }
+
+    return nullptr;
+
+}
+
+
+template<typename Structuretype, typename Chaintype, typename BPtype, typename Restype>
 String
 generate_end_id(
-        PrimitiveStructureCOP,
-        PrimitiveBasepairCOPs const &,
-        PrimitiveBasepairCOPs const &,
-        PrimitiveBasepairCOP);
+        Structuretype const & s,
+        std::vector<BPtype> const & bps,
+        std::vector<BPtype> const & ends,
+        BPtype const & end) {
 
-*/
+    auto open_chains = std::vector<Chaintype const *>();
+    auto chains = s.get_chains();
+    for(auto const & c : *chains) {
+        if(c.get_first().get_uuid() == end.get_res1_uuid() ||
+           c.get_first().get_uuid() == end.get_res2_uuid()) {
+            open_chains.push_back(&c);
+            break;
+        }
+    }
+
+    if(open_chains.size() == 0) {
+        throw std::runtime_error("could not find chain to start with");
+    }
+
+    auto seen_res    = std::map<Restype const *, int>();
+    auto seen_bps    = std::map<BPtype const *, int>();
+    auto seen_chains = std::map<Chaintype const *, int>();
+    seen_chains[open_chains[0]] = 1;
+
+    BPtype const * saved_bp = nullptr;
+    BPtype const * bp = nullptr;
+    auto ss_chains = std::vector<Strings>();
+    auto seq = String("");
+    auto ss = String("");
+    auto dot_bracket = ' ';
+
+    auto best_chains = std::vector<Chaintype const *>();
+    Chaintype const * best_chain;
+    Chaintype const * c = nullptr;
+    auto best_score = 0;
+    auto score = 0;
+    auto pos = 0;
+
+    while( open_chains.size() > 0) {
+        c = open_chains[0];
+        open_chains.erase(open_chains.begin());
+
+        for (auto const & r : *c) {
+            dot_bracket = '.';
+            bp = get_res_wc_or_gu_basepair(bps, ends, r);
+            if (bp != nullptr && bp->get_bp_type() != BasepairType::NC) {
+                saved_bp = bp;
+                auto partner_res_uuid = bp->get_partner(r.get_uuid());
+                auto partner_res = s.get_residue(partner_res_uuid);
+                if (seen_bps.find(bp) == seen_bps.end() &&
+                    seen_res.find(&r) == seen_res.end() &&
+                    seen_res.find(&partner_res) == seen_res.end()) {
+                    seen_res[&r] = 1;
+                    dot_bracket = '(';
+                } else if (seen_res.find(&partner_res) != seen_res.end()) {
+                    if (seen_res[&partner_res] > 1) { dot_bracket = '.'; }
+                    else {
+                        dot_bracket = ')';
+                        seen_res[&r] = 1;
+                        seen_res[&partner_res] += 1;
+                    }
+                }
+            }
+            ss += dot_bracket;
+            seq += r.get_name();
+            if (saved_bp != nullptr) { seen_bps[saved_bp] = 1; }
+        }
+
+        auto dummy_str = Strings(2);
+        dummy_str[0] = seq; dummy_str[1] = ss;
+        ss_chains.push_back(dummy_str);
+        ss = "";
+        seq = "";
+        best_score = -1;
+        best_chains = std::vector<Chaintype const *>();
+        for(auto const & c : *chains) {
+            if(seen_chains.find(&c) != seen_chains.end()) { continue; }
+            score = 0;
+            for(auto const & r : c) {
+                bp = get_res_wc_or_gu_basepair(bps, ends, r);
+                if(bp != nullptr && seen_bps.find(bp) == seen_bps.end()) { score += 1; }
+            }
+            if(score > best_score) { best_score = score; }
+        }
+
+        for(auto const & c: *chains) {
+            if(seen_chains.find(&c) != seen_chains.end()) { continue; }
+            score = 0;
+            for(auto const & r : c) {
+                bp = get_res_wc_or_gu_basepair(bps, ends, r);
+                if(bp != nullptr && seen_bps.find(bp) == seen_bps.end()) { score += 1; }
+            }
+            if(score == best_score) { best_chains.push_back(&c);  }
+        }
+
+        best_chain = nullptr;
+        best_score = 1000;
+        for(auto const & c: best_chains) {
+            auto i = -1;
+            pos = 1000;
+            for(auto const & r : *c) {
+                i++;
+                bp = get_res_wc_or_gu_basepair(bps, ends, r);
+                if(bp != nullptr && seen_bps.find(bp) != seen_bps.end()) {
+                    pos = i;
+                    break;
+                }
+            }
+            if(pos < best_score) {
+                best_score = pos;
+                best_chain = c;
+            }
+        }
+
+        if(best_chain == nullptr) { break; }
+        seen_chains[best_chain] = 1;
+        open_chains.push_back(best_chain);
+    }
+
+    auto ss_id = String("");
+    auto i = 0;
+    for(auto const & ss_chain : ss_chains) {
+        ss_id += ss_chain[0] + "_";
+        for(auto const & e : ss_chain[1]) {
+            if     (e == '(') {
+                ss_id += "L";
+            }
+            else if(e == ')') {
+                ss_id += "R";
+            }
+            else if(e == '.') {
+                ss_id += "U";
+            }
+            else {
+                throw RNAStructureException(
+                        "unexpected symbol in dot bracket notation: " + std::to_string(e));
+            }
+        }
+        if(i != ss_chain.size()-1) { ss_id += "_"; }
+        i++;
+    }
+
+    return ss_id;
+
+};
+
+
+
+
 /*Strings
 end_id_to_seq_and_db(String const & ss_id) {
     auto ss = String("");

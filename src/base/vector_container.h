@@ -22,10 +22,22 @@ public:
             std::vector <T> const & vec) :
             vec_(std::move(vec)) {}
 
+    ~VectorContainer(){}
+
 public:
     inline
     size_t
     size() { return vec_.size(); }
+
+public:
+    typedef typename std::vector<T>::const_iterator const_iterator;
+
+    const_iterator
+    begin() const noexcept { return vec_.begin(); }
+
+    const_iterator
+    end() const noexcept   { return vec_.end(); }
+
 
 public:
 
@@ -38,7 +50,14 @@ public:
         return vec_[i];
     }
 
-
+    inline
+    T const &
+    at(Index i) const {
+        expects<std::runtime_error>(
+                i < vec_.size(),
+                "cannot get element: " + std::to_string(i) + " it is out of range");
+        return vec_[i];
+    }
 
 private:
     std::vector<T> vec_;

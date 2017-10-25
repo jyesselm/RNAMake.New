@@ -98,12 +98,15 @@ class GraphUnittest(unittest.TestCase):
         self.failUnless(g.are_nodes_connected(0, 1))
         self.failUnless(g.are_nodes_connected(2, 1) == 0)
 
+    def test_second_binding(self):
+        pass
+
 class StaticEdgedGraphUnittest(unittest.TestCase):
     def setUp(self):
         pass
 
-    def test_creation(self):
-        g = StaticEdgedGraph()
+    #def test_creation(self):
+    #    g = StaticEdgedGraph()
 
 def main():
     unittest.main()
