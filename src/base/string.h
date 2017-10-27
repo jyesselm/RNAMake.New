@@ -47,6 +47,13 @@ String & rtrim(
 String & trim(
         String & s);
 
+bool
+is_char_in_string(
+        char,
+        String const &);
+
+
+
 }
 
 #endif /* defined(__RNAMake__string__) */

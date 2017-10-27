@@ -130,3 +130,22 @@ target_link_libraries(data_structures util_lib  pybind11::module)
 add_executable(graph_unittest /Users/jyesselm/projects/RNAMake.New/unittests/data_structures/graph_unittest.cc)
 target_link_libraries(graph_unittest data_structures_lib)
 
+###########################################################################
+# secondary_structure
+###########################################################################
+
+set(secondary_structure_files
+	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/basepair.cc
+	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/chain.cc
+	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/residue.cc
+	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/rna_structure.cc
+	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/secondary_structure.cc
+	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/structure.cc
+)
+
+add_library(secondary_structure_lib ${secondary_structure_files})
+target_link_libraries(secondary_structure_lib primitives_lib  pybind11::module)
+
+add_library(secondary_structure MODULE ${secondary_structure_files})
+target_link_libraries(secondary_structure primitives_lib  pybind11::module)
+

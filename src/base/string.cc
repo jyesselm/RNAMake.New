@@ -88,14 +88,12 @@ is_number(
 
 /**
  * @brief Left Trim
- *
  * Trims whitespace from the left end of the provided String
- *
  * @param[out] s The String to trim
- *
  * @return The modified String&
  */
-String & ltrim(String & s) {
+String & ltrim(
+        String & s) {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(),
                                     std::ptr_fun<int, int>(std::isgraph)));
     return s;
@@ -103,14 +101,12 @@ String & ltrim(String & s) {
 
 /**
  * @brief Right Trim
- *
  * Trims whitespace from the right end of the provided String
- *
  * @param[out] s The String to trim
- *
  * @return The modified String&
  */
-String & rtrim(String & s) {
+String & rtrim(
+        String & s) {
     s.erase(std::find_if(s.rbegin(), s.rend(),
                          std::ptr_fun<int, int>(std::isgraph)).base(), s.end());
     return s;
@@ -118,15 +114,23 @@ String & rtrim(String & s) {
 
 /**
  * @brief Trim
- *
  * Trims whitespace from both ends of the provided String
- *
  * @param[out] s The String to trim
- *
  * @return The modified String&
  */
-String & trim(String & s) {
+String & trim(
+        String & s) {
     return ltrim(rtrim(s));
+}
+
+
+bool
+is_char_in_string(
+        char c,
+        String const & s) {
+    int pos = s.find(c);
+    if(pos == std::string::npos) { return false; }
+    else                         { return true; }
 }
 
 }

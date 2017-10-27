@@ -16,7 +16,6 @@
 
 namespace secondary_structure {
 
-
 class Chain : public primitives::Chain<Residue> {
 public:
     typedef primitives::Chain<Residue> ParentClass;
@@ -39,40 +38,73 @@ public:
     ~Chain() {}
 
 public:
-    
-    typedef typename Residues::iterator iterator;
-    typedef typename Residues::const_iterator const_iterator;
-    
-    iterator begin() { return residues_.begin(); }
-    iterator end()   { return residues_.end(); }
-    
-    const_iterator begin() const { return residues_.begin(); }
-    const_iterator end()   const { return residues_.end(); }
-    
+    inline
+    bool
+    operator == (
+            Chain const & c) const {
+        if(residues_.size() != c.residues_.size()) { return false; }
+
+        for(int i = 0; i < c.get_length(); i++) {
+            if(residues_[i] != c.residues_[i]) { return false; }
+        }
+        return true;
+    }
+
+    inline
+    bool
+    operator != (
+            Chain const & c) const {
+        return !(*this == c);
+    }
+
+public:
+    bool
+    is_equal(
+            Chain const & c,
+            bool check_uuid = true) const {
+
+        if(residues_.size() != c.residues_.size()) { return false; }
+
+        for(int i = 0; i < c.get_length(); i++) {
+            if(residues_[i].is_equal(c.residues_[i]), check_uuid) { return false; }
+        }
+        return true;
+    }
+
+
 public:
 
     inline
     String
-    get_dot_bracket() {
+    get_dot_bracket() const {
         auto db = String("");
-        for(auto const & r : residues_) { db += r->get_dot_bracket(); }
+        for(auto const & r : residues_) { db += r.get_dot_bracket(); }
         return db;
     }
 
     inline
     String
-    get_sequence() {
+    get_sequence() const {
         auto seq = String("");
-        for(auto const & r : residues_) { seq += r->get_name(); }
+        for(auto const & r : residues_) { seq += r.get_name(); }
         return seq;
     }
 
     inline
     String
-    get_str() {
+    get_str() const {
         auto s = String("");
-        for (auto const & r : residues_) { s += r->get_str() + ";"; }
+        for (auto const & r : residues_) { s += r.get_str() + ";"; }
         return s;
+    }
+
+public:
+    inline
+    void
+    set_residue_name(
+            Index residue_index,
+            char name) {
+        residues_[residue_index].set_name(name);
     }
 
 };
@@ -80,11 +112,6 @@ public:
 typedef std::shared_ptr<Chain> ChainOP;
 typedef std::vector<ChainOP>   ChainOPs;
 
-bool
-are_chains_equal(
-        ChainOP const & c1,
-        ChainOP const & c2,
-        bool check_uuid = true);
     
     
 } //secondary structure

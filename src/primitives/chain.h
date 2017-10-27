@@ -69,6 +69,7 @@ public:
     virtual
     ~Chain() {}
 
+
 public: //iterator
     typedef typename Residues::const_iterator const_iterator;
 

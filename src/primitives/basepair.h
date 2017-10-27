@@ -38,12 +38,32 @@ public:
             util::Uuid const & res2_uuid,
             util::Uuid const & uuid,
             BasepairType const & bp_type,
-            base::SimpleStringOP const & name):
+            base::SimpleStringCOP const & name):
             res1_uuid_(res1_uuid),
             res2_uuid_(res2_uuid),
             uuid_(uuid),
             bp_type_(bp_type),
             name_(name){}
+
+    inline
+    Basepair(
+            Basepair const & bp):
+            res1_uuid_(bp.res1_uuid_),
+            res2_uuid_(bp.res2_uuid_),
+            uuid_(bp.uuid_),
+            bp_type_(bp.bp_type_),
+            name_(bp.name_) {}
+
+    inline
+    Basepair(
+            util::Uuid const & res1_uuid,
+            util::Uuid const & res2_uuid,
+            util::Uuid const & uuid):
+            res1_uuid_(res1_uuid),
+            res2_uuid_(res2_uuid),
+            uuid_(uuid),
+            bp_type_(BasepairType::NC),
+            name_(base::SimpleStringOP(nullptr)) {}
 
     virtual
     ~Basepair() {}
@@ -53,18 +73,18 @@ public:
     * equal operator checks whether the unique indentifier is the same
     * @param other another basepair to check if its the same
     */
+
     inline
     bool
-    operator!=(Basepair & other) const {
-        return uuid_ != other.uuid_;
+    operator==(Basepair const & other) const {
+        return uuid_ == other.uuid_;
     }
 
-protected:
     inline
-    Basepair():
-            res1_uuid_(util::Uuid()),
-            res2_uuid_(util::Uuid()),
-            uuid_(util::Uuid()) {}
+    bool
+    operator!=(Basepair const & other) const {
+        return uuid_ != other.uuid_;
+    }
 
 public:
     util::Uuid const &
@@ -79,7 +99,7 @@ public:
     get_uuid() const { return uuid_; }
 
     inline
-    base::SimpleStringOP const &
+    base::SimpleStringCOP
     get_name() const { return name_; }
 
     inline
@@ -95,7 +115,7 @@ protected:
     util::Uuid uuid_;
     util::Uuid res1_uuid_, res2_uuid_;
     BasepairType bp_type_;
-    base::SimpleStringOP name_;
+    base::SimpleStringCOP name_;
 };
 
 typedef Basepair                             PrimitiveBasepair;

@@ -65,14 +65,46 @@ public:
 
 public:
 
-public:
     inline
-    ResidueOP
-    get_copy() { return std::make_shared<Residue>(*this); }
+    bool
+    operator == (
+            Residue const & r) const {
+        if(name_ != r.name_) { return false; }
+        if(dot_bracket_ != r.dot_bracket_) { return false; }
+        if(num_ != r.num_) { return false; }
+        if(chain_id_ != r.chain_id_) { return false; }
+        if(i_code_ != r.i_code_) { return false; }
+        if(uuid_ != r.uuid_) { return false; }
+        return true;
+    }
 
     inline
+    bool
+    operator != (
+            Residue const & r) const {
+        return !(*this == r);
+    }
+
+public:
+    inline
+    bool
+    is_equal(
+            Residue const & r,
+            bool check_uuid = true) const {
+        if(name_ != r.name_) { return false; }
+        if(dot_bracket_ != r.dot_bracket_) { return false; }
+        if(num_ != r.num_) { return false; }
+        if(chain_id_ != r.chain_id_) { return false; }
+        if(i_code_ != r.i_code_) { return false; }
+        if(check_uuid && uuid_ != r.uuid_) { return false; }
+        return true;
+    }
+
+
+public:
+    inline
     String
-    get_str() {
+    get_str() const {
         std::stringstream ss;
         ss << name_ << "," << dot_bracket_ << "," << num_ << "," << chain_id_ << "," << i_code_;
         return ss.str();
@@ -80,12 +112,12 @@ public:
 
 public: //getters
     inline
-    char const &
-    get_dot_bracket() { return dot_bracket_; }
+    char
+    get_dot_bracket() const { return dot_bracket_; }
 
     inline
     int
-    get_res_type() { return res_type_; }
+    get_res_type() const { return res_type_; }
 
 public: //setters
 
@@ -118,12 +150,6 @@ private:
 
 };
 
-bool
-are_residues_equal(
-        ResidueOP const & r1,
-        ResidueOP const & r2,
-        bool check_uuid = true);
-    
 /*struct res_less_than_key {
     inline
     bool
@@ -132,6 +158,7 @@ are_residues_equal(
     }
 };*/
 
+typedef std::vector<Residue> Residues;
     
 } //secondary_structure
 

@@ -34,21 +34,20 @@ public:
 
     inline
     bool
-    operator==(Uuid const & uuid) {
-        return id_ == uuid.id_;
-    }
-
-    inline
-    bool
     operator!=(Uuid const & uuid) const {
         return id_ != uuid.id_;
     }
 
+    inline
+    bool
+    operator <(Uuid const & uuid) const {
+        return id_ < uuid.id_;
+    }
 
     inline
     bool
-    operator!=(Uuid & uuid) {
-        return id_ != uuid.id_;
+    operator >(Uuid const & uuid) const {
+        return id_ > uuid.id_;
     }
 
 

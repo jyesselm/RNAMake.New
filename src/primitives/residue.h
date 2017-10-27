@@ -66,7 +66,6 @@ public:
 
 protected:
 
-
 public:
 
     /**
@@ -122,7 +121,7 @@ public: //getters
     util::Uuid const &
     get_uuid() const { return uuid_; }
 
-    inline
+    virtual
     String
     get_str() const { return String(""); }
 

@@ -54,6 +54,21 @@ public:
             residues_(s.residues_),
             cut_points_(s.cut_points_) {}
 
+
+    inline
+    Structure(
+            String const & s) {
+
+        auto spl = base::split_str_by_delimiter(s, ";");
+        for(Index i = 0; i < spl.size()-1; i++) {
+            residues_.push_back(Restype(spl[i]));
+        }
+        auto cut_point_spl = base::split_str_by_delimiter(spl.back(), " ");
+        for(auto const & cut_point_s : cut_point_spl) {
+            cut_points_.push_back(std::stoi(cut_point_s));
+        }
+    }
+
     virtual
     ~Structure() {}
 
@@ -106,7 +121,7 @@ public: //get_residue interface
 
     int
     get_res_index(
-            Restype const & res) {
+            Restype const & res) const {
         int i = -1;
         for (auto const & r : residues_) {
             i++;
@@ -141,13 +156,13 @@ public:
     }
 
     size_t
-    get_num_residues() { return residues_.size(); }
+    get_num_residues() const { return residues_.size(); }
 
     size_t
-    get_num_chains() { return cut_points_.size(); }
+    get_num_chains() const { return cut_points_.size(); }
 
     String
-    get_sequence() {
+    get_sequence() const {
         auto i = -1;
         auto seq = String("");
         auto pos = 0;
