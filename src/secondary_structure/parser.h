@@ -100,7 +100,7 @@ public:
     ~Parser() {}
 
 public:
-    RNAStructureOP
+    RNAStructureUP
     parse_to_rna_structure(
             String const &,
             String const &);
@@ -108,7 +108,7 @@ public:
 private:
     void
     parse_structure_to_chain_graph(
-            StructureOP);
+            Structure const &);
 
 
     Index
@@ -120,8 +120,6 @@ private:
             return chain_graph_.add_chain(res, ChainStructureType::UNPAIRED);
         }
         else               {
-            //auto & partner_r = s->get_residue(bp.get_res1_uuid());
-            //auto parent_pos =
             return chain_graph_.add_chain(res, ChainStructureType::UNPAIRED, parent_node_index);
         }
     }
@@ -131,10 +129,10 @@ private:
             Residue const * r,
             Index parent_node_index,
             Index residue_index,
-            StructureOP s,
+            Structure const & s,
             bool start_of_chain) {
         auto partner_index = _get_parentheses_pair(residue_index, s);
-        auto & partner = s->get_residue(partner_index);
+        auto & partner = s.get_residue(partner_index);
         auto name = primitives::generate_bp_name<Residue>(*r, partner);
 
         // create new basepair from pair
@@ -155,12 +153,12 @@ private:
     int
     _get_parentheses_pair(
             Index start_pos,
-            StructureOP s) {
+            Structure const & s) {
 
         auto current_pos = -1;
         auto start = false;
         auto parentheses_count = 0;
-        for(auto const & r : *s) {
+        for(auto const & r : s) {
             current_pos++;
             if(current_pos == start_pos) { start = true; }
             if(!start) { continue; }
@@ -189,7 +187,7 @@ private:
         }
     }
 
-    RNAStructureOP
+    RNAStructureUP
     _generate_rna_structure(
             Structure const & s);
 

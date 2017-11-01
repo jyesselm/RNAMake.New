@@ -111,7 +111,6 @@ class StructureUnittest(unittest.TestCase):
 
         r1 = self.s.get_residue(r.get_uuid())
         self.failUnless(self.r1 == r1)
-        print r1
 
         # by internal position
         r2 = self.s.get_residue(0)
@@ -145,7 +144,6 @@ class StructureUnittest(unittest.TestCase):
         # invalid characters
         with self.assertRaises(StructureException):
             get_structure_from_secondary_structure("KAG&CUC", "(((&)))")
-
 
 
 class BasepairUnittest(unittest.TestCase):

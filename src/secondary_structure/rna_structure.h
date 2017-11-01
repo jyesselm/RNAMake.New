@@ -141,6 +141,7 @@ private:
 };
 
 typedef std::shared_ptr<RNAStructure> RNAStructureOP;
+typedef std::unique_ptr<RNAStructure> RNAStructureUP;
 
 }
 

@@ -23,7 +23,7 @@ PYBIND11_PLUGIN(primitives) {
     py::module m("primitives", "rnamake's primitive classes");
 
     // Residue Class
-    py::class_<PrimitiveResidue>(m, "Residue")
+    py::class_<PrimitiveResidue, std::shared_ptr<PrimitiveResidue>>(m, "Residue")
             .def("get_chain_id", &PrimitiveResidue::get_chain_id)
             .def("get_name", &PrimitiveResidue::get_name)
             .def("get_num", &PrimitiveResidue::get_num)

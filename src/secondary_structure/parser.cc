@@ -2,31 +2,32 @@
 // Created by Joseph Yesselman on 10/27/17.
 //
 
+#include <base/unique_ptr.h>
 #include <secondary_structure/parser.h>
 
 namespace secondary_structure {
 
-RNAStructureOP
+RNAStructureUP
 Parser::parse_to_rna_structure(
         String const & sequence,
         String const & dot_bracket) {
 
     auto s = get_structure_from_secondary_structure(sequence, dot_bracket);
-    parse_structure_to_chain_graph(s);
+    parse_structure_to_chain_graph(*s);
 
     return _generate_rna_structure(*s);
 }
 
 void
 Parser::parse_structure_to_chain_graph(
-        StructureOP s) {
+        Structure const & s) {
 
     auto current_residues = std::vector<Residue const *>();
     auto residue_pos = -1;
     auto last_index = -1;
-    for(auto const & r: *s) {
+    for(auto const & r: s) {
         residue_pos++;
-        auto start_of_chain = s->is_residue_start_of_chain(r);
+        auto start_of_chain = s.is_residue_start_of_chain(r);
         if     (r.get_dot_bracket() == '.') {
             current_residues.push_back(&r);
         }
@@ -49,7 +50,7 @@ Parser::parse_structure_to_chain_graph(
                                                     ChainStructureType::PAIRED);
             }
             auto & bp = _get_existing_basepair(r);
-            auto & partner_r = s->get_residue(bp.get_res1_uuid());
+            auto & partner_r = s.get_residue(bp.get_res1_uuid());
             auto partner_node_index = chain_graph_.get_index_of_residue(partner_r);
             chain_graph_.pair_nodes(partner_node_index, last_index);
         }
@@ -58,7 +59,7 @@ Parser::parse_structure_to_chain_graph(
 
 }
 
-RNAStructureOP
+RNAStructureUP
 Parser::_generate_rna_structure(
         Structure const & s) {
     auto current_basepairs = Basepairs();
@@ -99,7 +100,7 @@ Parser::_generate_rna_structure(
         end_ids.push_back(std::make_shared<base::SimpleString const>(end_id));
     }
     auto name = std::make_shared<base::SimpleString const>("from_secondary_structure");
-    auto rs = std::make_shared<RNAStructure>(s, current_basepairs, ends, end_ids, name);
+    auto rs = base:: make_unique<RNAStructure>(s, current_basepairs, ends, end_ids, name);
     return rs;
 
 }

@@ -86,10 +86,10 @@ public:
     };
 
 public:
-    typedef std::vector<DataType>        DataTypes;
+    typedef std::shared_ptr<DataType>    DataTypeOP; //hate using shared_ptr, but unique_ptr wont allow me to use maps
     typedef std::vector<Node>            Nodes;
     typedef std::vector<Edge const *>    Edges;
-    typedef std::map<Index, DataType>    DataTypeMap;
+    typedef std::map<Index, DataTypeOP>  DataTypeOPMap;
     typedef std::map<Index, Edges>       EdgesMap;
 
     typedef base::VectorContainer<Edge>  EdgeVC;
@@ -99,7 +99,7 @@ public:
 public:
     inline
     BaseGraph():
-            nodes_(DataTypeMap()),
+            nodes_(DataTypeOPMap()),
             edges_(EdgesMap()),
             index_(0),
             iter_list_(Nodes()),
@@ -148,13 +148,13 @@ public: //getters
         return edges_[index].size();
     }
 
-    DataType const &
+    DataType const *
     get_node(
             Index index) {
         expects<GraphException>(
                 nodes_.find(index) != nodes_.end(),
                 "cannot find node of index: " + std::to_string(index));
-        return nodes_[index];
+        return nodes_[index].get();
     }
 
     bool
@@ -175,7 +175,7 @@ private:
     _rebuild_iter_list(int) = 0;
 
 protected:
-    DataTypeMap nodes_;
+    DataTypeOPMap nodes_;
     EdgesMap edges_;
     Nodes iter_list_;
     Flag rebuild_list_;
@@ -189,6 +189,8 @@ public:
     typedef BaseGraph<DataType> BaseClass;
 
 public:
+    typedef std::unique_ptr<DataType>   DataTypeUP;
+    typedef std::shared_ptr<DataType>   DataTypeOP;
     typedef std::vector<DataType>       DataTypes;
     typedef std::vector<DataType*>      DataTypeRPs;
     typedef std::vector<Edge const *>   Edges;
@@ -204,9 +206,8 @@ public:
 public:
     Index
     add_node(
-            DataType const & d) {
+            DataTypeOP d) {
 
-        //copies
         this->nodes_[this->index_] = d;
         this->index_ += 1;
         _rebuild_iter_list();
@@ -216,7 +217,7 @@ public:
 
     Index
     add_node(
-            DataType const & d,
+            DataTypeOP d,
             Index parent_index) {
 
         // parent should exist
@@ -225,7 +226,7 @@ public:
                 "cannot add node to graph, parent with index: " + std::to_string(parent_index) +
                 " does not exist");
 
-        auto n_index = add_node(d);
+        auto n_index = add_node(std::move(d));
         auto num_of_parent_edges = this->get_num_edges(parent_index);
         auto edge = new Edge(parent_index, n_index, num_of_parent_edges, 0);
         if(num_of_parent_edges == 0) {
@@ -287,7 +288,7 @@ private:
             auto current = open.front();
             open.pop();
             this->iter_list_[pos].index = current;
-            this->iter_list_[pos].data = &(this->nodes_.find(current)->second);
+            this->iter_list_[pos].data = this->nodes_.find(current)->second.get();
             pos++;
             auto neighbors = get_neighbors(current, seen);
             for(auto const & n : neighbors) { open.push(n); }
@@ -304,7 +305,7 @@ private:
                 auto current = open.front();
                 open.pop();
                 this->iter_list_[pos].index = current;
-                this->iter_list_[pos].data = &(this->nodes_.find(current)->second);
+                this->iter_list_[pos].data = this->nodes_.find(current)->second.get();
                 pos++;
                 auto neighbors = get_neighbors(current, seen);
                 for(auto const & n : neighbors) { open.push(n); }
@@ -322,9 +323,9 @@ public:
     typedef BaseGraph<DataType> BaseClass;
 
 public:
-    typedef std::vector<DataType>       DataTypes;
-    typedef std::vector<DataType*>      DataTypeRPs;
-    typedef std::vector<Edge const *>   Edges;
+    typedef std::vector<DataType> DataTypes;
+    typedef std::vector<DataType *> DataTypeRPs;
+    typedef std::vector<Edge const *> Edges;
 
 public:
     inline
@@ -334,10 +335,10 @@ public:
         // delete dynamically allocated edges
         // make sure not to delete memory twice since there are two pointers for each Edge
         auto seen = std::map<Edge const *, int>();
-        for(auto & kv : this->edges_) {
-            for(auto & e : kv.second) {
-                if(e != nullptr) {
-                    if(seen.find(e) != seen.end()) { continue; }
+        for (auto & kv : this->edges_) {
+            for (auto & e : kv.second) {
+                if (e != nullptr) {
+                    if (seen.find(e) != seen.end()) { continue; }
                     seen[e] = 1;
                     delete e;
                 }
@@ -345,7 +346,8 @@ public:
         }
     }
 
-public:
+};
+/*public:
     bool
     edge_index_empty(
             Index ni,
@@ -510,7 +512,7 @@ private:
     }
 
 
-};
+};*/
 
 
 }

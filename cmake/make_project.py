@@ -11,8 +11,8 @@ depends = {
     'secondary_structure' : ['primitives']
 }
 
-libs = "base math util primitives data_structures secondary_structure"
-#libs = "base math util primitives data_structures"
+#libs = "base math util primitives data_structures secondary_structure"
+libs = "base math util primitives data_structures"
 all_lib_paths = libs.split()
 
 
@@ -23,6 +23,8 @@ base_dir = "/".join(spl[:-2])
 
 def parse_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument('-no_unittests', action="store_true")
+    parser.add_argument('-last_ta', action="store_true")
 
     args = parser.parse_args()
 
@@ -142,7 +144,8 @@ def write_cmake_lists(path, args):
         f.write(get_lib_file_declaration(lib))
         f.write(get_build_library_declaration(lib))
         f.write(get_build_module_declaration(lib))
-        f.write(get_unittests_apps_for_library(lib))
+        if not args.no_unittests:
+            f.write(get_unittests_apps_for_library(lib))
 
     f.close()
 

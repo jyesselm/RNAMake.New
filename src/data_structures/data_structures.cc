@@ -26,22 +26,27 @@ PYBIND11_PLUGIN(data_structures) {
             .def_readonly("edge_j", &Edge::edge_j);
 
     // Graph Class
-    /*typedef primitives::Residue DataType;
+    typedef primitives::Residue DataType;
     typedef std::shared_ptr<DataType> DataTypeOP;
-    typedef Graph<DataType> GraphType;
-    py::class_<GraphType, std::shared_ptr<GraphType> >(m, "Graph")
+    typedef Graph<DataType> ResidueGraph;
+    py::class_<ResidueGraph, std::shared_ptr<ResidueGraph> >(m, "ResidueGraph")
             .def(py::init<>())
-            .def("__len__", &GraphType::get_num_nodes)
-            .def("__iter__", [](GraphType const & g) { return py::make_iterator(g.begin(), g.end()); },
+            .def("__len__", &ResidueGraph::get_num_nodes)
+            .def("__iter__", [](ResidueGraph const & g) { return py::make_iterator(g.begin(), g.end()); },
                  py::keep_alive<0, 1>())
-            .def("change_transverse_start", &GraphType::change_transverse_start)
-            .def("get_edges", &GraphType::get_edges)
-            .def("get_num_edges", &GraphType::get_num_edges)
-            .def("get_num_nodes", &GraphType::get_num_nodes)
-            .def("are_nodes_connected", &GraphType::are_nodes_connected)
-            .def("get_node", &GraphType::get_node)
-            .def("add_node", (int (GraphType::*)(DataType const &)) &GraphType::add_node)
-            .def("add_node", (int (GraphType::*)(DataType const &, Index)) &GraphType::add_node);*/
+            .def("change_transverse_start", &ResidueGraph::change_transverse_start)
+            .def("get_edges", &ResidueGraph::get_edges)
+            .def("get_num_edges", &ResidueGraph::get_num_edges)
+            .def("get_num_nodes", &ResidueGraph::get_num_nodes)
+            .def("are_nodes_connected", &ResidueGraph::are_nodes_connected)
+            .def("get_node", &ResidueGraph::get_node)
+            .def("add_node", (int (ResidueGraph::*)(DataTypeOP)) &ResidueGraph::add_node)
+            .def("add_node", (int (ResidueGraph::*)(DataTypeOP, Index)) &ResidueGraph::add_node);
+
+    py::class_<ResidueGraph::Node, std::shared_ptr<ResidueGraph::Node> >(m, "ResidueGraphNode")
+            .def(py::init<Index, DataType const *>())
+            .def_readonly("index", &ResidueGraph::Node::index)
+            .def_readonly("data", &ResidueGraph::Node::data);
 
     /*typedef primitives::PrimitiveChain DataType1;
     typedef std::shared_ptr<DataType1> DataTypeOP1;
