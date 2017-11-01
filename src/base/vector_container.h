@@ -59,6 +59,11 @@ public:
         return vec_[i];
     }
 
+public:
+    inline
+    std::vector<T> const &
+    get_data() { return vec_; }
+
 private:
     std::vector<T> vec_;
 

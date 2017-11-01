@@ -26,6 +26,9 @@ namespace secondary_structure {
     
 class Residue : public primitives::Residue {
 public:
+    //inline
+    //Residue()  {}
+
     inline
     Residue(
             char name,

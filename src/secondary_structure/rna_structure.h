@@ -140,6 +140,8 @@ private:
 
 };
 
+typedef std::shared_ptr<RNAStructure> RNAStructureOP;
+
 }
 
 

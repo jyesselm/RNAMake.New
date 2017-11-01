@@ -168,12 +168,12 @@ class BasepairUnittest(unittest.TestCase):
 class RNAStructureUnittest(unittest.TestCase):
 
     def setUp(self):
-        self.r1 = Residue('A', 1, 'A', ' ', Uuid())
-        self.r2 = Residue('G', 2, 'A', ' ', Uuid())
-        self.r3 = Residue('U', 3, 'A', ' ', Uuid())
-        self.r4 = Residue('A', 4, 'B', ' ', Uuid())
-        self.r5 = Residue('C', 5, 'B', ' ', Uuid())
-        self.r6 = Residue('U', 6, 'B', ' ', Uuid())
+        self.r1 = Residue('A', 1, 'A', ' ', Uuid()) # 0
+        self.r2 = Residue('G', 2, 'A', ' ', Uuid()) # 1
+        self.r3 = Residue('U', 3, 'A', ' ', Uuid()) # 2
+        self.r4 = Residue('A', 4, 'B', ' ', Uuid()) # 3
+        self.r5 = Residue('C', 5, 'B', ' ', Uuid()) # 4
+        self.r6 = Residue('U', 6, 'B', ' ', Uuid()) # 5
 
         name1 = generate_bp_name(self.r1, self.r6)
         name2 = generate_bp_name(self.r3, self.r4)
@@ -190,6 +190,7 @@ class RNAStructureUnittest(unittest.TestCase):
                             self.r4, self.r5, self.r6], [3, 6])
         bps = [self.bp3]
         ends = [self.bp1, self.bp2]
+        self.all_bps = [self.bp1, self.bp2, self.bp3]
         self.end_ids = []
         for end in ends:
             self.end_ids.append(SimpleString(generate_end_id(self.s, bps, ends, end)))
@@ -325,6 +326,11 @@ class RNAStructureUnittest(unittest.TestCase):
 
         with self.assertRaises(RNAStructureException):
             self.rs.get_end_id(3)
+
+    def test_ends_from_basepairs(self):
+        ends = get_ends_from_basepairs(self.s, self.all_bps)
+        ends = ends.get_data()
+
 
 
 def main():

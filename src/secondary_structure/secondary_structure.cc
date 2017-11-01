@@ -81,7 +81,7 @@ PYBIND11_PLUGIN(secondary_structure) {
             .def(py::self != py::self)
             .def("get_str", &Structure::get_str);
 
-    py::class_<Basepair>(m, "Basepair")
+    py::class_<Basepair,  std::shared_ptr<Basepair>>(m, "Basepair")
             .def("get_bp_type", &Basepair::get_bp_type)
             .def("get_partner", &Basepair::get_partner)
             .def("get_name", &Basepair::get_name)

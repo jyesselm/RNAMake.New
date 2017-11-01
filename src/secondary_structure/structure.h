@@ -115,7 +115,6 @@ public: //getters
         return seq;
     }
 
-
 public: //setters
     void
     set_sequence(

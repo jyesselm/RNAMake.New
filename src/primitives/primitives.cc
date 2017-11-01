@@ -70,6 +70,7 @@ PYBIND11_PLUGIN(primitives) {
         return py::make_iterator(c.begin(), c.end()); }, py::keep_alive<0, 1>())
             .def("__len__", &Basepairs::size)
             .def("size", &Basepairs::size)
+            .def("get_data", &Basepairs::get_data)
             .def("__getitem__", &Basepairs::operator[]);
 
     py::class_<PrimitiveStructure>(m, "Structure")
@@ -105,7 +106,7 @@ PYBIND11_PLUGIN(primitives) {
             .def(py::init<const util::Uuid &, const util::Uuid &, const util::Uuid &,
                     BasepairType const &, base::SimpleStringOP const &>());
 
-    /*py::class_<PrimitiveRNAStructure, PrimitiveRNAStructureOP>(m, "RNAStructure")
+    py::class_<PrimitiveRNAStructure, PrimitiveRNAStructureOP>(m, "RNAStructure")
             .def(py::init<PrimitiveStructure const &, PrimitiveBasepairs const &, PrimitiveBasepairs const &,
                            base::SimpleStringCOPs const &, base::SimpleStringCOP const &>())
             .def("__iter__", [](const PrimitiveRNAStructure & s) {
@@ -158,11 +159,12 @@ PYBIND11_PLUGIN(primitives) {
             .def("get_bp_res", &PrimitiveRNAStructure::get_bp_res)
             .def("get_num_basepairs", &PrimitiveRNAStructure::get_num_basepairs)
             .def("get_num_ends", &PrimitiveRNAStructure::get_num_ends)
-            .def("get_name", &PrimitiveRNAStructure::get_name);*/
+            .def("get_name", &PrimitiveRNAStructure::get_name);
 
 
     m.def("generate_bp_name", &generate_bp_name<PrimitiveResidue>);
     m.def("generate_end_id", &generate_end_id<PrimitiveStructure, PrimitiveChain, PrimitiveBasepair, PrimitiveResidue>);
+    m.def("get_ends_from_basepairs", &get_ends_from_basepairs<PrimitiveBasepair, PrimitiveStructure>);
 
     py::register_exception<ResidueException>(m, "ResidueException");
     py::register_exception<ChainException>(m, "ChainException");

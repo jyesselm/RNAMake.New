@@ -456,30 +456,31 @@ typedef std::shared_ptr<PrimitiveRNAStructure> PrimitiveRNAStructureOP;
 
 
 template<typename BPtype, typename Structuretype>
-std::vector<std::shared_ptr<BPtype> >
-ends_from_basepairs(
+base::VectorContainerOP<BPtype>
+get_ends_from_basepairs(
         Structuretype const & s,
-        std::vector<std::shared_ptr<BPtype> > const & bps) {
+        std::vector<BPtype> const & bps) {
     auto chain_end_uuids = std::vector<util::Uuid>();
-    for(auto const & c : s.get_chains()) {
-        chain_end_uuids.push_back(c->first()->uuid());
-        if(c->length() > 1) {
-            chain_end_uuids.push_back(c->last()->uuid());
-        }
+    for(auto const & r : s) {
+        if     (s.is_residue_start_of_chain(r)) { chain_end_uuids.push_back(r.get_uuid()); }
+        else if(s.is_residue_end_of_chain(r))   { chain_end_uuids.push_back(r.get_uuid()); }
     }
 
-    auto ends = std::vector<std::shared_ptr<BPtype> >();
+    auto ends = std::vector<BPtype>();
     for(auto const & bp : bps) {
-        if(bp->bp_type() == BasepairType::NC) { continue; }
-        if(std::find(chain_end_uuids.begin(), chain_end_uuids.end(), bp->res1_uuid()) == chain_end_uuids.end())  { continue; }
-        if(std::find(chain_end_uuids.begin(), chain_end_uuids.end(), bp->res2_uuid()) == chain_end_uuids.end())  { continue; }
+        if(bp.get_bp_type() == BasepairType::NC) { continue; }
+        if(std::find(chain_end_uuids.begin(), chain_end_uuids.end(), bp.get_res1_uuid()) == chain_end_uuids.end())  {
+            continue;
+        }
+        if(std::find(chain_end_uuids.begin(), chain_end_uuids.end(), bp.get_res2_uuid()) == chain_end_uuids.end())  {
+            continue;
+        }
         ends.push_back(bp);
     }
 
-    return ends;
+    return std::make_shared<base::VectorContainer<BPtype>>(ends);
 
 }
-
 
 template<typename BPtype, typename Restype>
 BPtype const *

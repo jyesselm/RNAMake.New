@@ -118,7 +118,9 @@ target_link_libraries(primitives_unittest primitives_lib)
 
 set(data_structures_files
 	/Users/jyesselm/projects/RNAMake.New/src/data_structures/data_structures.cc
+	/Users/jyesselm/projects/RNAMake.New/src/data_structures/directed_graph.cc
 	/Users/jyesselm/projects/RNAMake.New/src/data_structures/graph.cc
+	/Users/jyesselm/projects/RNAMake.New/src/data_structures/rna_structure_type_graph.cc
 )
 
 add_library(data_structures_lib ${data_structures_files})
@@ -137,6 +139,7 @@ target_link_libraries(graph_unittest data_structures_lib)
 set(secondary_structure_files
 	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/basepair.cc
 	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/chain.cc
+	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/parser.cc
 	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/residue.cc
 	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/rna_structure.cc
 	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/secondary_structure.cc
@@ -148,4 +151,10 @@ target_link_libraries(secondary_structure_lib primitives_lib  pybind11::module)
 
 add_library(secondary_structure MODULE ${secondary_structure_files})
 target_link_libraries(secondary_structure primitives_lib  pybind11::module)
+
+add_executable(parser_unittest /Users/jyesselm/projects/RNAMake.New/unittests/secondary_structure/parser_unittest.cc)
+target_link_libraries(parser_unittest secondary_structure_lib)
+
+add_executable(ss_rna_structure_graph_unittest /Users/jyesselm/projects/RNAMake.New/unittests/secondary_structure/ss_rna_structure_graph_unittest.cc)
+target_link_libraries(ss_rna_structure_graph_unittest secondary_structure_lib)
 

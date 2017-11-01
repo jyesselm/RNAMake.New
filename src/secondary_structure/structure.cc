@@ -23,7 +23,7 @@ get_structure_from_secondary_structure(
     auto residues = Residues();
     auto cut_points = Cutpoints();
     auto res_num = 1;
-    auto ci = 1;
+    auto ci = 0;
     auto chain_ids = String("ABCDEFGHIJKLMNOPQRSTUVWXZ");
     auto valid_seq = String("AGUCTN&+-");
     auto valid_ss  = String("[{(.)}]");

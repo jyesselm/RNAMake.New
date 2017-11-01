@@ -26,7 +26,7 @@ PYBIND11_PLUGIN(data_structures) {
             .def_readonly("edge_j", &Edge::edge_j);
 
     // Graph Class
-    typedef primitives::Residue DataType;
+    /*typedef primitives::Residue DataType;
     typedef std::shared_ptr<DataType> DataTypeOP;
     typedef Graph<DataType> GraphType;
     py::class_<GraphType, std::shared_ptr<GraphType> >(m, "Graph")
@@ -41,7 +41,7 @@ PYBIND11_PLUGIN(data_structures) {
             .def("are_nodes_connected", &GraphType::are_nodes_connected)
             .def("get_node", &GraphType::get_node)
             .def("add_node", (int (GraphType::*)(DataType const &)) &GraphType::add_node)
-            .def("add_node", (int (GraphType::*)(DataType const &, Index)) &GraphType::add_node);
+            .def("add_node", (int (GraphType::*)(DataType const &, Index)) &GraphType::add_node);*/
 
     /*typedef primitives::PrimitiveChain DataType1;
     typedef std::shared_ptr<DataType1> DataTypeOP1;

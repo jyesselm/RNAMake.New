@@ -177,6 +177,29 @@ public:
         return seq;
     }
 
+    bool
+    is_residue_start_of_chain(
+            Restype const & r) const {
+        auto res_index = get_res_index(r);
+        if(res_index == 0 ) { return true; }
+        for(auto const c : cut_points_) {
+            if(res_index == c) { return true; }
+        }
+        return false;
+
+    }
+
+    bool
+    is_residue_end_of_chain(
+            Restype const & r) const {
+        auto res_index = get_res_index(r);
+        for(auto const c : cut_points_) {
+            if(res_index == c-1) { return true; }
+        }
+        return false;
+    }
+
+
 
 protected:
     Structure() {}
