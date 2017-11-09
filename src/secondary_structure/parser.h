@@ -8,6 +8,7 @@
 #include <data_structures/graph.h>
 #include <secondary_structure/residue.h>
 #include <secondary_structure/rna_structure.h>
+#include <secondary_structure/rna_segment.h>
 
 namespace secondary_structure {
 
@@ -17,6 +18,13 @@ enum EdgeConnectionType { PARENT, CHILD, PAIR };
 struct ChainGraphNode {
     std::vector<Residue const *> residues;
     ChainStructureType type;
+
+    inline
+    ChainGraphNode(
+            std::vector<Residue const *> nresidues,
+            ChainStructureType ntype):
+            residues(nresidues),
+            type(ntype) {}
 
 };
 
@@ -41,7 +49,7 @@ public:
             std::vector<Residue const *> const & residues,
             ChainStructureType type) {
 
-        auto node = ChainGraphNode{ residues, type};
+        auto node = std::make_shared<ChainGraphNode>(residues, type);
         // always three connections points
         // 0: parent connection, 1: child connection, 2:
         return graph_.add_node(node, 3);
@@ -53,7 +61,7 @@ public:
             std::vector<Residue const *> const & residues,
             ChainStructureType type,
             Index parent_index) {
-        auto node = ChainGraphNode{ residues, type};
+        auto node = std::make_shared<ChainGraphNode>(residues, type);
         return graph_.add_node(node, 3, parent_index,
                                EdgeConnectionType::CHILD, EdgeConnectionType::PARENT);
 
@@ -75,10 +83,10 @@ public:
             Index n_i,
             Index n_j) {
         expects<data_structures::GraphException>(
-                (graph_.get_node(n_i).type == ChainStructureType::PAIRED &&
-                 graph_.get_node(n_j).type == ChainStructureType::PAIRED) ||
-                (graph_.get_node(n_i).type == ChainStructureType::TERTIARY &&
-                 graph_.get_node(n_j).type == ChainStructureType::TERTIARY),
+                (graph_.get_node(n_i)->type == ChainStructureType::PAIRED &&
+                 graph_.get_node(n_j)->type == ChainStructureType::PAIRED) ||
+                (graph_.get_node(n_i)->type == ChainStructureType::TERTIARY &&
+                 graph_.get_node(n_j)->type == ChainStructureType::TERTIARY),
                 "must be same type and cannot be unpaired");
         graph_.add_edge(n_i, n_j, EdgeConnectionType::PAIR, EdgeConnectionType::PAIR);
     }
@@ -100,15 +108,20 @@ public:
     ~Parser() {}
 
 public:
-    RNAStructureUP
+    RNAStructureOP
     parse_to_rna_structure(
+            String const &,
+            String const &);
+
+    RNASegmentOP
+    parse_to_rna_segment(
             String const &,
             String const &);
 
 private:
     void
     parse_structure_to_chain_graph(
-            Structure const &);
+             Structure const &);
 
 
     Index
@@ -187,9 +200,11 @@ private:
         }
     }
 
-    RNAStructureUP
+    RNAStructureOP
     _generate_rna_structure(
             Structure const & s);
+
+
 
 private:
     ChainGraph chain_graph_;

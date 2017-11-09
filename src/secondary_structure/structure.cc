@@ -39,6 +39,7 @@ get_structure_from_secondary_structure(
 
             residues.push_back(Residue(sequence[i], dot_bracket[i], res_num,
                                        chain_ids[ci], res_insertion_code, util::Uuid()));
+            res_num += 1;
         }
         else {
             expects<StructureException>(
@@ -48,6 +49,7 @@ get_structure_from_secondary_structure(
             cut_points.push_back((int)residues.size());
             ci += 1;
             if(ci == chain_ids.length()-1) { ci = 0; }
+            res_num = 1;
 
         }
     }

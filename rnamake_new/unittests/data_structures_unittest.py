@@ -54,6 +54,7 @@ class GraphUnittest(unittest.TestCase):
         #self.failUnless(len(res) == len(g))
         #self.failUnless(res[0] == r2)
 
+
     """
     def test_iter_2(self):
         g = Graph()
@@ -109,8 +110,81 @@ class StaticEdgedGraphUnittest(unittest.TestCase):
     #def test_creation(self):
     #    g = StaticEdgedGraph()
 
+class DirectedGraphUnittest(unittest.TestCase):
+    def setUp(self):
+        self.r1 = primitives.Residue('A', 1, 'A', ' ', Uuid())
+        self.r2 = primitives.Residue('A', 2, 'A', ' ', Uuid())
+        self.r3 = primitives.Residue('A', 3, 'A', ' ', Uuid())
+        self.r4 = primitives.Residue('A', 4, 'A', ' ', Uuid())
+
+    def test_creation(self):
+        dg = ResidueDirectedGraph()
+        dg.add_node(self.r1, 2)
+        dg.add_node(self.r2, 2, 0, 0, 0)
+        dg.add_node(self.r3, 2, 0, 1, 0)
+        dg.add_node(self.r4, 2)
+
+        self.failUnless(dg.has_parent(0) == False)
+        self.failUnless(dg.get_parent_index(1) == 0)
+        self.failUnless(dg.get_parent_index(2) == 0)
+
+        self.failUnless(len(dg.get_all_edges()) == 2)
+
+        self.failUnless(dg.are_nodes_connected(0, 1) == True)
+        self.failUnless(dg.are_nodes_connected(1, 2) == False)
+
+        expected_indexes = [0, 1, 2, 3]
+        indexes = []
+        for n in dg:
+            indexes.append(n.index)
+        self.failUnless(expected_indexes == indexes)
+
+        #self.failUnless(len(dg.get_roots()) == 2)
+
+
+
 def main():
     unittest.main()
 
 if __name__ == '__main__':
     main()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -66,7 +66,7 @@ struct Edge {
 
     Index
     end_index(
-            Index index) {
+            Index index) const {
         expects<GraphException>(
                 index == node_i || index == node_j,
                 "cannot call end_index if not a node in this edge");
@@ -130,31 +130,31 @@ public:
 
 public: //getters
     size_t
-    get_num_nodes() { return nodes_.size(); }
+    get_num_nodes() const { return nodes_.size(); }
 
     Edges const &
     get_edges(
-            Index index) {
+            Index index) const {
         expects<GraphException>(
                 edges_.find(index) != edges_.end(),
                 "this node has no edges : " + std::to_string(index));
-        return edges_[index];
+        return edges_.find(index)->second;
     }
 
     size_t
     get_num_edges(
-            Index index) {
+            Index index) const {
         if(edges_.find(index) == edges_.end()) { return 0; }
-        return edges_[index].size();
+        return edges_.find(index)->second.size();
     }
 
     DataType const *
     get_node(
-            Index index) {
+            Index index) const {
         expects<GraphException>(
                 nodes_.find(index) != nodes_.end(),
                 "cannot find node of index: " + std::to_string(index));
-        return nodes_[index].get();
+        return nodes_.find(index)->second.get();
     }
 
     bool
@@ -164,6 +164,7 @@ public: //getters
 
         if(edges_.find(n1) == edges_.end()) { return false; }
         for(auto const & edge : edges_[n1]) {
+            if(edge == nullptr) { continue; }
             if(edge->node_i == n2 or edge->node_j == n2) { return true; }
         }
         return false;
@@ -189,7 +190,6 @@ public:
     typedef BaseGraph<DataType> BaseClass;
 
 public:
-    typedef std::unique_ptr<DataType>   DataTypeUP;
     typedef std::shared_ptr<DataType>   DataTypeOP;
     typedef std::vector<DataType>       DataTypes;
     typedef std::vector<DataType*>      DataTypeRPs;
@@ -323,9 +323,10 @@ public:
     typedef BaseGraph<DataType> BaseClass;
 
 public:
-    typedef std::vector<DataType> DataTypes;
-    typedef std::vector<DataType *> DataTypeRPs;
-    typedef std::vector<Edge const *> Edges;
+    typedef std::shared_ptr<DataType>   DataTypeOP;
+    typedef std::vector<DataType>       DataTypes;
+    typedef std::vector<DataType*>      DataTypeRPs;
+    typedef std::vector<Edge const *>   Edges;
 
 public:
     inline
@@ -346,21 +347,20 @@ public:
         }
     }
 
-};
-/*public:
+public:
     bool
     edge_index_empty(
             Index ni,
-            Index ei) {
+            Index ei) const {
 
 
         expects<GraphException>(
                 this->edges_.find(ni) != this->edges_.end() &&
-                this->edges_[ni].size() > ei,
+                this->edges_.find(ni)->second.size() > ei,
                 "node has fewer edges then requested one");
 
-        if(this->edges_[ni][ei] == nullptr) { return true;  }
-        else                                { return false; }
+        if(this->edges_.find(ni)->second[ei] == nullptr) { return true;  }
+        else                                             { return false; }
 
     }
 
@@ -368,7 +368,7 @@ public:
 
     Index
     add_node(
-            DataType const & d,
+            DataTypeOP d,
             Size n_edges) {
 
         this->nodes_[this->index_] = d;
@@ -380,7 +380,7 @@ public:
 
     Index
     add_node(
-            DataType const & d,
+            DataTypeOP d,
             Size n_edges,
             Index parent_index,
             Index parent_end_index,
@@ -485,7 +485,7 @@ private:
             auto current = open.front();
             open.pop();
             this->iter_list_[pos].index = current;
-            this->iter_list_[pos].data = &(this->nodes_.find(current)->second);
+            this->iter_list_[pos].data = this->nodes_.find(current)->second.get();
             pos++;
             auto neighbors = get_neighbors(current, seen);
             for(auto const & n : neighbors) { open.push(n); }
@@ -502,7 +502,7 @@ private:
                 auto current = open.front();
                 open.pop();
                 this->iter_list_[pos].index = current;
-                this->iter_list_[pos].data = &(this->nodes_.find(current)->second);
+                this->iter_list_[pos].data = this->nodes_.find(current)->second.get();
                 pos++;
                 auto neighbors = get_neighbors(current, seen);
                 for(auto const & n : neighbors) { open.push(n); }
@@ -510,9 +510,7 @@ private:
         }
 
     }
-
-
-};*/
+};
 
 
 }

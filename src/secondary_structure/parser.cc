@@ -7,15 +7,28 @@
 
 namespace secondary_structure {
 
-RNAStructureUP
+RNAStructureOP
 Parser::parse_to_rna_structure(
         String const & sequence,
         String const & dot_bracket) {
+
+    // make sure things are reset
+    basepairs_ = Basepairs();
+    tc_basepairs_ = Basepairs();
 
     auto s = get_structure_from_secondary_structure(sequence, dot_bracket);
     parse_structure_to_chain_graph(*s);
 
     return _generate_rna_structure(*s);
+}
+
+RNASegmentOP
+Parser::parse_to_rna_segment(
+        String const & sequence,
+        String const & dot_bracket) {
+    auto rs = parse_to_rna_structure(sequence, dot_bracket);
+    return std::make_shared<RNASegment>(*rs, util::RNASegmentType::SEGMENT, false, 0);
+
 }
 
 void
@@ -59,7 +72,7 @@ Parser::parse_structure_to_chain_graph(
 
 }
 
-RNAStructureUP
+RNAStructureOP
 Parser::_generate_rna_structure(
         Structure const & s) {
     auto current_basepairs = Basepairs();
@@ -100,7 +113,7 @@ Parser::_generate_rna_structure(
         end_ids.push_back(std::make_shared<base::SimpleString const>(end_id));
     }
     auto name = std::make_shared<base::SimpleString const>("from_secondary_structure");
-    auto rs = base:: make_unique<RNAStructure>(s, current_basepairs, ends, end_ids, name);
+    auto rs = std::make_shared<RNAStructure>(s, current_basepairs, ends, end_ids, name);
     return rs;
 
 }

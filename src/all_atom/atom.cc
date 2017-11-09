@@ -11,6 +11,8 @@
 //#include "math/numerical.h"
 #include "all_atom/atom.h"
 
+namespace all_atom {
+
 String
 Atom::to_str() {
     return name_ + " " + coords_.get_str();
@@ -18,16 +20,16 @@ Atom::to_str() {
 
 String
 Atom::to_pdb_str(
-    int acount) {
+        int acount) {
 
-    char buffer [200];
+    char buffer[200];
     std::sprintf(buffer, "ATOM %6d  P   C   A   1 %11.3f%8.3f%8.3f  1.00 62.18           P\n",
                  acount, coords_.get_x(), coords_.get_y(), coords_.get_z());
     return String(buffer);
 
 }
 
-
+}
 
 /*
 bool

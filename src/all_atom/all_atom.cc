@@ -3,6 +3,7 @@
 
 #include <all_atom/atom.h>
 
+namespace all_atom {
 namespace py = pybind11;
 
 PYBIND11_PLUGIN(all_atom) {
@@ -13,4 +14,5 @@ PYBIND11_PLUGIN(all_atom) {
             .def("get_name", &Atom::get_name);
 
     return m.ptr();
+}
 }

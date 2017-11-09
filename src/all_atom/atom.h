@@ -6,9 +6,11 @@
 //#include <math/transform.h>
 
 //RNAMake Headers
-#include "base/types.h"
-#include "math/xyz_vector.h"
-//#include "math/xyz_matrix.h"
+#include <base/types.h>
+#include <math/xyz_vector.h>
+#include <math/xyz_matrix.h>
+
+namespace all_atom {
 
 /**
  * Stores atomic information from pdb file, design is to be extremely
@@ -27,7 +29,7 @@
 
 class Atom {
 public:
-  
+
     /**
      * Standard constructor for Atom object.
      * @param   name    name of atom
@@ -35,12 +37,11 @@ public:
      */
     inline
     Atom(
-        String const & name,
-        math::Point const & coords):
-    name_ ( name ),
-    coords_ ( coords )
-    {}
-    
+            String const & name,
+            math::Point const & coords) :
+            name_(name),
+            coords_(coords) {}
+
     /**
      * Construction from String, used in reading data from files
      * @param   s   string generated from to_str()
@@ -55,26 +56,25 @@ public:
      */
     inline
     Atom(
-        String const & s) {
-        
+            String const & s) {
+
         auto spl = base::split_str_by_delimiter(s, " ");
-        name_   = spl[0];
+        name_ = spl[0];
         coords_ = math::Point(std::stof(spl[1]), std::stof(spl[2]), std::stof(spl[3]));
     }
-    
+
     /**
      * Copy constructor
      * @param   a   atom object to from
      */
     inline
     Atom(
-         Atom const & a):
-    name_(a.name_),
-    coords_(a.coords_)
-    {}
-    
+            Atom const & a) :
+            name_(a.name_),
+            coords_(a.coords_) {}
+
 public:
-    
+
     /**
      * Strigifies atom object
      * @code
@@ -85,7 +85,7 @@ public:
      * @endcode
      */
     String to_str();
-    
+
     /**
      * Strigifies atom into PDB format
      * @param   acount  the number of the atom, default=1
@@ -106,32 +106,34 @@ public:
 
     }
 
-    /*inline
+    inline
     void
-    transform(Transform const & t) {
-        coords_ = dot_vector(t.rotation().transpose(), coords_);
-        coords_ = coords_ + t.translation();
+    transform(
+            math::Matrix const & r,
+            math::Vector const & t,
+            math::Point & dummy) {
+        math::dot_vector(r, coords_, dummy);
+        coords_ = dummy + t;
     }
 
     inline
     void
-    fast_transform(
-            Matrix const & r,
-            Vector const & t,
-            Point & dummy) {
-        dot_vector(r, coords_, dummy);
+    transform(
+            math::Matrix const & r,
+            math::Vector const & t) {
+        auto dummy = math::dot_vector(r, coords_);
         coords_ = dummy + t;
-    }*/
-    
+    }
+
 public: //accessors
-    
+
     /**
      * Accessor for name_
      */
     inline
     String const &
     get_name() const { return name_; }
-    
+
     /**
      * Accessor for coords_
      */
@@ -144,12 +146,12 @@ private:
      * private variable of name of atom
      */
     String name_;
-    
+
     /**
      * private variable of 3D coordinates of atom
      */
     math::Point coords_;
-    
+
 };
 
 /**
@@ -174,5 +176,7 @@ are_atom_vectors_equal(
         AtomOPs const &,
         float tol = 0.001);
 
+
+}
 
 #endif /* defined(__RNAMake__atom__) */
