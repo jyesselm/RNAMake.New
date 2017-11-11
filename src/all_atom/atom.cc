@@ -14,12 +14,12 @@
 namespace all_atom {
 
 String
-Atom::to_str() {
-    return name_ + " " + coords_.get_str();
+Atom::get_str() {
+    return name_->get_str() + " " + coords_.get_str();
 }
 
 String
-Atom::to_pdb_str(
+Atom::get_pdb_str(
         int acount) {
 
     char buffer[200];

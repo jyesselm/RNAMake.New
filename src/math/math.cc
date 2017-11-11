@@ -87,7 +87,8 @@ PYBIND11_PLUGIN(math_util) {
             .def(py::self + float())
             .def(py::self + py::self);
 
-    m.def("dot_vector", &math::dot_vector);
+    m.def("dot_vector", (void (*)(Matrix const &, Vector const &, Vector &)) &math::dot_vector);
+    m.def("dot_vector",  (Vector (*)(Matrix const &, Vector const &))  &math::dot_vector);
 
 
     m.def("are_floats_equal", &math::are_floats_equal, py::arg("a"), py::arg("b"),

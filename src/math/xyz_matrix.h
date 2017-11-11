@@ -755,6 +755,7 @@ dot_vector(
     vr.set_x(m.get_xx() * v.get_x() + m.get_yx() * v.get_y() + m.get_zx() * v.get_z());
     vr.set_y(m.get_xy() * v.get_x() + m.get_yy() * v.get_y() + m.get_zy() * v.get_z());
     vr.set_z(m.get_xz() * v.get_x() + m.get_yz() * v.get_y() + m.get_zz() * v.get_z());
+    return vr;
 }
 
 }

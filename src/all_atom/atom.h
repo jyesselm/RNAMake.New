@@ -7,8 +7,10 @@
 
 //RNAMake Headers
 #include <base/types.h>
+#include <base/simple_string.h>
 #include <math/xyz_vector.h>
 #include <math/xyz_matrix.h>
+#include <math/numerical.h>
 
 namespace all_atom {
 
@@ -37,7 +39,7 @@ public:
      */
     inline
     Atom(
-            String const & name,
+            base::SimpleStringCOP name,
             math::Point const & coords) :
             name_(name),
             coords_(coords) {}
@@ -59,7 +61,7 @@ public:
             String const & s) {
 
         auto spl = base::split_str_by_delimiter(s, " ");
-        name_ = spl[0];
+        name_ = std::make_shared<base::SimpleString const>(spl[0]);
         coords_ = math::Point(std::stof(spl[1]), std::stof(spl[2]), std::stof(spl[3]));
     }
 
@@ -74,6 +76,24 @@ public:
             coords_(a.coords_) {}
 
 public:
+    inline
+    bool
+    operator == (
+            Atom const & a) const {
+        if(*name_ != *a.name_) { return false; }
+        if(!math::are_points_equal(coords_, a.coords_)) { return false; }
+        return true;
+    }
+
+    inline
+    bool
+    operator != (
+            Atom const & a) const {
+        return !(*this == a);
+    }
+
+
+public:
 
     /**
      * Strigifies atom object
@@ -84,7 +104,7 @@ public:
      *  "H1 0.0 1.0 2.0"
      * @endcode
      */
-    String to_str();
+    String get_str();
 
     /**
      * Strigifies atom into PDB format
@@ -97,8 +117,14 @@ public:
      *  "ATOM      1  P   C   A   1       1.000   2.000   3.000  1.00 62.18           P
      * @endcode
      */
-    String to_pdb_str(int);
+    String get_pdb_str(int);
 
+    /**
+     * @param p xyz coords to move atom by
+     *
+     * @code
+     * @endcode
+     */
     inline
     void
     move(math::Point const & p) {
@@ -131,7 +157,7 @@ public: //accessors
      * Accessor for name_
      */
     inline
-    String const &
+    base::SimpleStringCOP
     get_name() const { return name_; }
 
     /**
@@ -145,7 +171,7 @@ private:
     /**
      * private variable of name of atom
      */
-    String name_;
+    base::SimpleStringCOP name_;
 
     /**
      * private variable of 3D coordinates of atom
