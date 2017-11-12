@@ -41,6 +41,7 @@ set(base_files
 	/Users/jyesselm/projects/RNAMake.New/src/base/string.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/base.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/simple_string.cc
+	/Users/jyesselm/projects/RNAMake.New/src/base/paths.cc
 )
 
 add_library(base_lib ${base_files})
@@ -167,6 +168,8 @@ target_link_libraries(ss_rna_structure_graph_unittest secondary_structure_lib)
 
 set(all_atom_files
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/atom.cc
+	/Users/jyesselm/projects/RNAMake.New/src/all_atom/residue_type_set.cc
+	/Users/jyesselm/projects/RNAMake.New/src/all_atom/residue_type.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/all_atom.cc
 )
 

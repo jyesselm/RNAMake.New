@@ -19,4 +19,15 @@ expects(
     if(!condition) { throw exception(message); }
 }
 
+template <typename exception>
+void
+ensures(
+        bool condition,
+        String const & message) {
+
+    if (!condition) { throw exception(message); }
+}
+
+
+
 #endif //RNAMAKE_NEW_ASSERTIONS_H

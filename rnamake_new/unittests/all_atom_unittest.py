@@ -57,6 +57,16 @@ class AtomUnittest(unittest.TestCase):
             self.failUnless(a == final_atoms[i])
 
 
+class ResidueTypeSetUnittest(unittest.TestCase):
+
+    def setUp(self):
+        self.rts = ResidueTypeSet()
+
+    def test_get_residue_type(self):
+        rtype = self.rts.get_residue_type("GUA")
+
+        self.failUnless(rtype.get_name() == "GUA")
+
 
 
 
