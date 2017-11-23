@@ -67,7 +67,7 @@ void
 PDBParser::_setup_ref_residue(
         String const & pdb_file) {
     _parse_atoms_from_pdb_file(pdb_file);
-    
+
 
 }
 
