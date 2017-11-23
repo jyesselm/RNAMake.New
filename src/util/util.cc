@@ -7,6 +7,7 @@
 
 //rnamake headers
 #include <util/uuid.h>
+#include <util/bead.h>
 
 namespace py = pybind11;
 namespace util {
@@ -19,6 +20,12 @@ PYBIND11_PLUGIN(util) {
             .def(py::init<>())
             .def(py::self == py::self)
             .def(py::self != py::self);
+
+    py::enum_<BeadType>(m, "BeadType")
+            .value("PHOS",  BeadType::PHOS)
+            .value("SUGAR", BeadType::SUGAR)
+            .value("BASE",  BeadType::BASE)
+            .export_values();
 
     return m.ptr();
 }

@@ -58,13 +58,12 @@ public:
             uuid_(r.uuid_),
             i_code_(r.i_code_) {}
 
-    // let derived class setup members
-    Residue() {}
-
     virtual
     ~Residue() {}
 
 protected:
+    // let derived class setup members
+    Residue() {}
 
 public:
 

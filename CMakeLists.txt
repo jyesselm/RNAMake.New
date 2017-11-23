@@ -40,6 +40,7 @@ set(base_files
 	/Users/jyesselm/projects/RNAMake.New/src/base/file_io.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/string.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/base.cc
+	/Users/jyesselm/projects/RNAMake.New/src/base/logger.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/simple_string.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/paths.cc
 )
@@ -49,6 +50,9 @@ target_link_libraries(base_lib pybind11::module)
 
 add_library(base MODULE ${base_files})
 target_link_libraries(base pybind11::module)
+
+add_executable(logger_unittest /Users/jyesselm/projects/RNAMake.New/unittests/base/logger_unittest.cc)
+target_link_libraries(logger_unittest base_lib)
 
 ###########################################################################
 # math
@@ -78,6 +82,7 @@ set(util_files
 	/Users/jyesselm/projects/RNAMake.New/src/util/rna_segment_type.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/uuid.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/util.cc
+	/Users/jyesselm/projects/RNAMake.New/src/util/bead.cc
 )
 
 add_library(util_lib ${util_files})
@@ -169,6 +174,8 @@ target_link_libraries(ss_rna_structure_graph_unittest secondary_structure_lib)
 set(all_atom_files
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/atom.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/residue_type_set.cc
+	/Users/jyesselm/projects/RNAMake.New/src/all_atom/residue.cc
+	/Users/jyesselm/projects/RNAMake.New/src/all_atom/pdb_parser.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/residue_type.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/all_atom.cc
 )
@@ -178,4 +185,7 @@ target_link_libraries(all_atom_lib secondary_structure_lib  pybind11::module)
 
 add_library(all_atom MODULE ${all_atom_files})
 target_link_libraries(all_atom secondary_structure_lib  pybind11::module)
+
+add_executable(pdb_parser_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/pdb_parser_unittest.cc)
+target_link_libraries(pdb_parser_unittest all_atom_lib)
 

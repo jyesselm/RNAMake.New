@@ -48,6 +48,8 @@ private:
 
 };
 
+typedef std::shared_ptr<ResidueTypeSet> ResidueTypeSetOP;
+
 }
 
 #endif /* defined(__RNAMake__residue_type_set__) */

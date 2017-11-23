@@ -28,7 +28,6 @@ namespace all_atom {
  *  auto a2 = Atom(a);
  * @endcode
  */
-
 class Atom {
 public:
 
@@ -190,18 +189,10 @@ typedef std::shared_ptr<Atom> AtomOP;
  */
 typedef std::vector<AtomOP> AtomOPs;
 
-bool
-are_atoms_equal(
-        AtomOP const &,
-        AtomOP const &,
-        float tol = 0.001);
-
-bool
-are_atom_vectors_equal(
-        AtomOPs const &,
-        AtomOPs const &,
-        float tol = 0.001);
-
+/**
+ * Typedef for multiple Atoms
+ */
+typedef std::vector<Atom>   Atoms;
 
 }
 

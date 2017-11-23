@@ -67,6 +67,10 @@ public: //getters
     get_name() const { return name_; }
 
     inline
+    char
+    get_short_name() const { return name_[0]; }
+
+    inline
     SetType
     get_set_type() const { return set_type_; }
 
