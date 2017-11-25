@@ -159,12 +159,28 @@ public: //accessors
     base::SimpleStringCOP
     get_name() const { return name_; }
 
+    inline
+    String
+    get_str_name() const { return name_->get_str(); }
+
     /**
      * Accessor for coords_
      */
     inline
-    math::Point const
+    math::Point
     get_coords() const { return coords_; }
+
+    inline
+    double
+    get_x() const { return coords_.get_x(); }
+
+    inline
+    double
+    get_y() const { return coords_.get_y(); }
+
+    inline
+    double
+    get_z() const { return coords_.get_z(); }
 
 private:
     /**

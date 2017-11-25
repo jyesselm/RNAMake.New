@@ -26,10 +26,15 @@ public:
             residues_(ResidueOPs()),
             rts_(rts) {
 
-        auto path = base::resources_path() + "/ideal_residues/";
-        auto names = Strings{"GUA"};
-        _setup_ref_residue(path+names[0]+".pdb");
+        atom_name_corrections_ = std::map<String, String>();
+        atom_name_corrections_["O1P"] = "OP1";
+        atom_name_corrections_["O2P"] = "OP2";
 
+        auto path = base::resources_path() + "/ideal_residues/";
+        auto names = Strings{"ADE", "CYT", "GUA", "URA"};
+        for(auto const & name : names) {
+            ref_residues_[name] = _setup_ref_residue(path + name + ".pdb");
+        }
     }
 
     ~PDBParser() {}
@@ -46,19 +51,25 @@ private:
     _parse_atoms_from_pdb_file(
             String const &);
 
-    void
+    ResidueOP
     _setup_ref_residue(
+            String const &);
+
+    ResidueOP
+    _set_residue(
             String const &);
 
 private:
     ResidueOPs residues_;
     ResidueTypeSetOP rts_;
+    std::map<String, ResidueOP> ref_residues_;
     // parse variables
     std::map<String, Atoms> atoms_;
     String startswith_;
     String atom_name_, res_name_, res_num_, chain_id_, i_code_;
     String sx_, sy_, sz_;
     math::Point atom_coords_;
+    std::map<String, String> atom_name_corrections_;
 
 
 

@@ -74,7 +74,9 @@ public: //getters
     SetType
     get_set_type() const { return set_type_; }
 
-
+    inline
+    size_t
+    get_num_atoms() const { return atom_name_map_.size(); }
 private:
 
 

@@ -251,8 +251,9 @@ public:
 
     inline
     String
-    to_pdb_str(int & acount) {
-        return to_pdb_str(acount, -1, "");
+    get_pdb_str(
+            int acount) {
+        return get_pdb_str(acount, num_, chain_id_);
     }
 
     /**
@@ -277,17 +278,17 @@ public:
      * @endcode
      */
     String
-    to_pdb_str(
-            int &,
+    get_pdb_str(
             int,
-            String const &) const;
+            int,
+            char) const;
 
     /**
      * writes a PDB string formmated verision of this Residue object to file
      * @param  filename of output PDB file
      */
     void
-    to_pdb(String const);
+    write_pdb(String const);
 
     /**
      * equal operator checks whether the unique indentifier is the same 
@@ -347,26 +348,6 @@ private:
      * residue type object which explains what atoms in belong in this residue.
      */
     ResidueTypeCOP res_type_;
-
-    /**
-     * the name of the residue, only one letter.
-     */
-    char name_;
-
-    /**
-     * the chain_id of the residue, only one letter
-     */
-    char chain_id_;
-
-    /**
-     * the residue insertion code, only one letter
-     */
-    char i_code_;
-
-    /**
-     * the residue number
-     */
-    int num_;
 
     /**
      * vector of the atom objects that belong to this residue

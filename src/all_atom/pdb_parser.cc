@@ -11,6 +11,7 @@
 //RNAMake Headers
 #include <base/string.h>
 #include <base/file_io.h>
+#include <base/logger.h>
 #include <math/xyz_vector.h>
 #include <all_atom/pdb_parser.h>
 
@@ -30,8 +31,16 @@ PDBParser::_parse_atoms_from_pdb_file(
             atom_name_ = line.substr(12, 4);
             atom_name_ = base::trim(atom_name_);
 
+            // do not save hydrogen atoms
+            if(atom_name_[0] == 'H') { continue; }
+
+            if(atom_name_corrections_.find(atom_name_) != atom_name_corrections_.end()) {
+                atom_name_ = atom_name_corrections_[atom_name_];
+            }
+
             res_name_ = line.substr(17, 4);
             res_name_ = base::trim(res_name_);
+
             // do not save water
             if(res_name_ == "HOH") { continue; }
 
@@ -63,12 +72,48 @@ PDBParser::_parse_atoms_from_pdb_file(
 
 }
 
-void
+ResidueOP
 PDBParser::_setup_ref_residue(
         String const & pdb_file) {
     _parse_atoms_from_pdb_file(pdb_file);
+    auto key = atoms_.begin()->first;
+    auto & atoms = atoms_.begin()->second;
+    auto spl = base::split_str_by_delimiter(key, "|");
+    auto res_name = spl[0][0];
+    auto res_type = rts_->get_residue_type(spl[0]);
+    auto res_num = std::stoi(spl[1]);
+    auto chain_id = spl[2][0];
+    auto i_code = spl[3][0];
+
+    return std::make_shared<Residue>(res_name, res_num, chain_id, i_code, res_type, atoms, util::Uuid());
 
 
+    /*auto atom_ptrs = std::vector<Atom *>(res_type->get_num_atoms());
+    for(int i = 0; i < atoms.size(); i++) {
+        // not a valid atom for this residue
+        if(! res_type->is_valid_atom_name(atoms[i].get_str_name())) {
+            LOG_WARNING("PDB_Parser", atoms[i].get_str_name() + " does not belong to residue " +
+                                      res_type->get_name() + ": IGNORING!");
+            continue;
+        }
+        auto index = res_type->get_atom_index(atoms[i].get_str_name());
+        atom_ptrs[i] = &atoms[i];
+    }
+
+    for(auto const & a : atom_ptrs) {
+        if(a == nullptr) { std::cout << "NULL" << std::endl;}
+        else {
+            std::cout << a->get_str_name() << std::endl;
+        }
+    }*/
+
+}
+
+ResidueOP
+PDBParser::_set_residue(
+        String const &) {
+
+    return ResidueOP(nullptr);
 }
 
 

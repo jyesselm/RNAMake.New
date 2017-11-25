@@ -76,30 +76,18 @@ Residue::to_str() const {
         else { ss << a->to_str() + ","; }
     }
     return ss.str();
-}
+}*/
 
 String
-Residue::to_pdb_str(
-        int & acount,
+Residue::get_pdb_str(
+        int acount,
         int rnum,
-        String const & chain_id) const {
+        char chain_id) const {
 
-    int num = num_;
-    if (rnum != -1) {
-        num = rnum;
-    }
-    String cid = chain_id_;
-    if (chain_id != "") {
-        cid = chain_id;
-    }
-
-    String s;
+    auto s = String();
     for (auto const & a : atoms_) {
-        if (a == nullptr) { continue; }
         char buffer[200];
-        std::sprintf(buffer, "%-6s%5d %-4s%1s%-4s%1s%4d%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n", "ATOM", acount,
-                     a->name().c_str(), "", short_name().c_str(), cid.c_str(), num, "", a->coords()[0], a->coords()[1],
-                     a->coords()[2], 1.00, 0.00, "", "");
+        std::sprintf(buffer, "%-6s%5d %-4s%1s%-4c%1c%4d%1s   %8.3f%8.3f%8.3f%6.2f%6.2f      %4s%2s\n", "ATOM", acount, a.get_str_name().c_str(), "", name_, chain_id, rnum, "", a.get_x(), a.get_y(), a.get_z(), 1.00, 0.00, "", "");
         s += String(buffer);
         acount++;
     }
@@ -107,16 +95,14 @@ Residue::to_pdb_str(
 }
 
 void
-Residue::to_pdb(
+Residue::write_pdb(
         String const fname) {
     std::ofstream out;
     out.open(fname.c_str());
-    int i = 1;
-    String s = to_pdb_str(i);
-    out << s << std::endl;
+    out << get_pdb_str(1) << std::endl;
     out.close();
 }
-*/
+
 }
 
 
