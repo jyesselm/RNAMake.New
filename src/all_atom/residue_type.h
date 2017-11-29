@@ -32,8 +32,8 @@ public:
             std::runtime_error(message) {}
 };
 
-enum SetType {
-    RNA, PROTEIN
+enum class SetType {
+    RNA, PROTEIN, UNKNOWN
 };
 
 class ResidueType {
@@ -54,6 +54,10 @@ public:
     Index
     get_atom_index(
             String const &) const;
+
+    String
+    get_atom_name_at_pos(
+            Index) const;
 
     bool
     is_valid_residue_name(
@@ -91,6 +95,11 @@ private:
 typedef std::shared_ptr<ResidueType>       ResidueTypeOP;
 typedef std::shared_ptr<ResidueType const> ResidueTypeCOP;
 typedef std::vector<ResidueTypeOP>         ResidueTypeOPs;
+
+ResidueTypeCOP
+get_new_residue_type(
+        String const & res_name,
+        Strings const & atom_names);
 
 }
 #endif /* defined(__RNAMake__residue_type__) */

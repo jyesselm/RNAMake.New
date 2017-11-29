@@ -43,6 +43,7 @@ set(base_files
 	/Users/jyesselm/projects/RNAMake.New/src/base/logger.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/simple_string.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/paths.cc
+	/Users/jyesselm/projects/RNAMake.New/src/base/option.cc
 )
 
 add_library(base_lib ${base_files})
@@ -53,6 +54,9 @@ target_link_libraries(base pybind11::module)
 
 add_executable(logger_unittest /Users/jyesselm/projects/RNAMake.New/unittests/base/logger_unittest.cc)
 target_link_libraries(logger_unittest base_lib)
+
+add_executable(option_unittest /Users/jyesselm/projects/RNAMake.New/unittests/base/option_unittest.cc)
+target_link_libraries(option_unittest base_lib)
 
 ###########################################################################
 # math

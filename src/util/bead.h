@@ -18,7 +18,7 @@ namespace util {
  * Sugar (1):  O5',C5',C4',O4',C3',O3',C1',C2',O2'\n
  * Base  (2):  All remaining atoms
  */
-enum BeadType { PHOS = 0, SUGAR = 1, BASE = 2 };
+enum class BeadType { PHOS = 0, SUGAR = 1, BASE = 2 };
 
 /**
  * Exception for beads
@@ -123,15 +123,15 @@ public: //getters
     get_type() const { return bead_type_; }
 
     String
-    get_str() {
-        return center_.get_str() + "," + std::to_string(bead_type_);
+    get_str() const {
+        return center_.get_str() + "," + std::to_string((int)bead_type_);
     }
 
     String
     get_type_name() {
-        if     (bead_type_ == 0) { return "PHOSPHATE"; }
-        else if(bead_type_ == 1) { return "SUGAR"; }
-        else if(bead_type_ == 2) { return "BASE"; }
+        if     (bead_type_ == BeadType::PHOS)  { return "PHOSPHATE"; }
+        else if(bead_type_ == BeadType::SUGAR) { return "SUGAR"; }
+        else if(bead_type_ == BeadType::BASE)  { return "BASE"; }
         else { throw BeadException("unknown bead type"); }
     }
 

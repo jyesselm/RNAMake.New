@@ -44,6 +44,15 @@ ResidueType::get_atom_index(
     return atom_name_map_.find(name)->second;
 }
 
+String
+ResidueType::get_atom_name_at_pos(
+        Index index) const {
+    for(auto const & kv : atom_name_map_) {
+        if(kv.second == index) { return kv.first; }
+     }
+    throw ResidueTypeException("residue type does not have an index: " + std::to_string(index));
+}
+
 bool
 ResidueType::is_valid_residue_name(
         String const & res_name) const {
@@ -52,6 +61,21 @@ ResidueType::is_valid_residue_name(
         if(res_name == alt_name) { return true; }
     }
     return false;
+}
+
+ResidueTypeCOP
+get_new_residue_type(
+        String const & res_name,
+        Strings const & atom_names) {
+    auto atom_name_map = StringIntMap();
+    auto i = 0;
+    for(auto const & name : atom_names) {
+        atom_name_map[name] = i;
+        i++;
+    }
+    auto extra_alt_names = Strings();
+
+    return std::make_shared<ResidueType>(res_name, atom_name_map, SetType::UNKNOWN, extra_alt_names);
 }
 
 }

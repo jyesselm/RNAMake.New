@@ -14,69 +14,60 @@
 
 namespace all_atom {
 
-/*math::Point
+math::Point
 center(
-        AtomOPs const & atoms) {
-    assert(atoms.size() > 0);
-    math::Point center(0, 0, 0);
+        Atoms const & atoms) {
+    auto center = math::Point();
     for (auto const & a : atoms) {
-        if (a == nullptr) {
-            continue;
-        }
-        center += a->coords();
+        center += a.get_coords();
     }
     return center / float(atoms.size());
 }
 
 
 void
-Residue::setup_atoms(
-        AtomOPs & atoms) {
-    atoms_ = AtomOPs(rtype_.size());
-    int count = 0;
-    for (auto & a : atoms) {
-        if (a == nullptr) { continue; }
-        String name_change = rtype_.get_correct_atom_name(*a);
-        //check for misnamed atoms
-        if (name_change.length() != 0) { a->name(name_change); }
-        int pos = rtype_.atom_pos_by_name(a->name());
-        if (pos == -1) { continue; }
-        atoms_[pos] = a;
-        count++;
-    }
-
-    if (count == 0) { throw ResidueException("Residue has zero atoms something wrong"); }
-}
-
-Beads
-Residue::get_beads() const {
-    AtomOPs phos_atoms, sugar_atoms, base_atoms;
+Residue::_build_beads() {
+    std::vector<Atom const *> phos_atoms, sugar_atoms, base_atoms;
     int i = -1;
     for (auto const & a : atoms_) {
         i++;
-        if (a == nullptr) { continue; }
-        if (i < 3) { phos_atoms.push_back(a); }
-        else if (i < 12) { sugar_atoms.push_back(a); }
-        else { base_atoms.push_back(a); }
+        if      (i < 3)  { phos_atoms.push_back(&a);  }
+        else if (i < 12) { sugar_atoms.push_back(&a); }
+        else             { base_atoms.push_back(&a);  }
     }
-    Beads beads;
-    if (phos_atoms.size() > 0) { beads.push_back(Bead(center(phos_atoms), BeadType::PHOS)); }
-    if (sugar_atoms.size() > 0) { beads.push_back(Bead(center(sugar_atoms), BeadType::SUGAR)); }
-    if (base_atoms.size() > 0) { beads.push_back(Bead(center(base_atoms), BeadType::BASE)); }
-    return beads;
+
+    auto get_center = [&](
+            std::vector<Atom const *> const & atom_ptrs) {
+        auto center = math::Point();
+        for(auto a : atom_ptrs) {
+            center = center + a->get_coords();
+        }
+        center = center / float(atom_ptrs.size());
+        //std::cout << atom_ptrs.size() << std::endl;
+
+        return center;
+    };
+
+    if (phos_atoms.size() > 0)  {
+        beads_.push_back(util::Bead(get_center(phos_atoms),  util::BeadType::PHOS));
+    }
+    if (sugar_atoms.size() > 0) {
+        beads_.push_back(util::Bead(get_center(sugar_atoms), util::BeadType::SUGAR));
+    }
+    if (base_atoms.size() > 0)  {
+        beads_.push_back(util::Bead(get_center(base_atoms),  util::BeadType::BASE));
+    }
 }
 
-
 String
-Residue::to_str() const {
+Residue::get_str() const {
     std::stringstream ss;
-    ss << rtype_.name() << "," << name_ << "," << num_ << "," << chain_id_ << "," << i_code_ << ",";
+    ss << res_type_->get_name() << "," << name_ << "," << num_ << "," << chain_id_ << "," << i_code_ << ",";
     for (auto const & a : atoms_) {
-        if (a == nullptr) { ss << "N,"; }
-        else { ss << a->to_str() + ","; }
+        ss << a.get_str() + ",";
     }
     return ss.str();
-}*/
+}
 
 String
 Residue::get_pdb_str(

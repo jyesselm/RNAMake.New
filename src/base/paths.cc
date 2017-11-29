@@ -24,5 +24,11 @@ resources_path() {
     return base_path_str + "/resources/";
 }
 
+String
+unittest_resources_path() {
+    auto base_path_str = base_path();
+    return base_path_str + "/unittests/unittest_resources/";
+}
+
 
 }

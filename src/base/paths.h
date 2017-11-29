@@ -15,6 +15,9 @@ base_path();
 String
 resources_path();
 
+String
+unittest_resources_path();
+
 }
 
 #endif //RNAMAKE_NEW_PATHS_H

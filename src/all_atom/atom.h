@@ -103,7 +103,8 @@ public:
      *  "H1 0.0 1.0 2.0"
      * @endcode
      */
-    String get_str();
+    String
+    get_str() const;
 
     /**
      * Strigifies atom into PDB format
@@ -116,7 +117,8 @@ public:
      *  "ATOM      1  P   C   A   1       1.000   2.000   3.000  1.00 62.18           P
      * @endcode
      */
-    String get_pdb_str(int);
+    String
+    get_pdb_str(int) const;
 
     /**
      * @param p xyz coords to move atom by
@@ -167,7 +169,7 @@ public: //accessors
      * Accessor for coords_
      */
     inline
-    math::Point
+    math::Point const &
     get_coords() const { return coords_; }
 
     inline

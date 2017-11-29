@@ -6,8 +6,8 @@
 //  Copyright (c) 2015 Joseph Yesselman. All rights reserved.
 //
 
-#ifndef __RNAMake__residue__
-#define __RNAMake__residue__
+#ifndef __RNAMake__all_atom_residue__
+#define __RNAMake__all_atom_residue__
 
 #include <stdio.h>
 
@@ -24,7 +24,8 @@
 namespace all_atom {
 
 math::Point
-center(Atoms const &);
+center(
+        Atoms const &);
 
 
 /**
@@ -80,13 +81,15 @@ public:
             char name,
             int num,
             char chain_id,
-            char const & i_code,
+            char i_code,
             ResidueTypeCOP res_type,
             Atoms const & atoms,
             util::Uuid const & uuid):
             primitives::Residue(name, num, chain_id, i_code, uuid),
             res_type_(res_type),
-            atoms_(atoms) {}
+            atoms_(atoms) {
+        _build_beads();
+    }
 
     /**
      * Copy constructor
@@ -96,7 +99,8 @@ public:
             Residue const & r):
             primitives::Residue(r.name_, r.num_, r.chain_id_, r.i_code_, r.uuid_),
             res_type_(r.res_type_),
-            atoms_(r.atoms_) {}
+            atoms_(r.atoms_),
+            beads_(r.beads_) {}
 
     /**
      * Construction from String, used in reading data from files
@@ -114,17 +118,14 @@ public:
         num_      = std::stoi(spl[2]);
         chain_id_ = spl[3][0];
         i_code_   = spl[4][0];
+        uuid_     = util::Uuid();
         atoms_    = Atoms();
         int i = 5;
-        /*while (i < spl.size()) {
-            if (spl[i].length() == 1) {
-                atoms.push_back(nullptr);
-            } else {
-                atoms.push_back(std::make_shared<Atom>(spl[i]));
-            }
+        while (i < spl.size()) {
+            atoms_.push_back(Atom(spl[i]));
             i++;
-        }*/
-        //setup_atoms(atoms);
+        }
+        _build_beads();
     }
 
 
@@ -134,18 +135,47 @@ public:
     ~Residue() {}
 
 public: //iterator stuff
+    typedef Atoms::const_iterator const_iterator;
+
+    const_iterator begin() const noexcept { return atoms_.begin(); }
+    const_iterator end() const noexcept   { return atoms_.end(); }
 
 public:
-    /**
-     * put atoms in correct positon in internal atom list, also corrects some
-     * named atom names to their correct name
-     * @param   atoms    list of atom objects that are to be part of this residue
-     */
-    /*void
-    setup_atoms(
-            AtomOPs &);
-    */
+
+    inline
+    bool
+    operator == (
+            Residue const & r) const {
+        if(name_ != r.name_) { return false; }
+        if(num_ != r.num_) { return false; }
+        if(chain_id_ != r.chain_id_) { return false; }
+        if(i_code_ != r.i_code_) { return false; }
+        if(uuid_ != r.uuid_) { return false; }
+        for(int i = 0; i < atoms_.size(); i++) {
+            if(atoms_[i] != r.atoms_[i]) { return false;}
+        }
+        return true;
+    }
+
 public:
+    inline
+    bool
+    is_equal(
+            Residue const & r,
+            bool check_uuid = true) const {
+        if(check_uuid && uuid_ != r.uuid_) { return false; }
+        if(name_ != r.name_) { return false; }
+        if(num_ != r.num_) { return false; }
+        if(chain_id_ != r.chain_id_) { return false; }
+        if(i_code_ != r.i_code_) { return false; }
+        for(int i = 0; i < atoms_.size(); i++) {
+            if(atoms_[i] != r.atoms_[i]) { return false;}
+        }
+        return true;
+    }
+
+
+public: // getters
 
     /**
      * get atom object by its name
@@ -159,16 +189,48 @@ public:
      * @endcode
      */
     inline
-    Atom
-    const &
+    Atom const &
     get_atom(
             String const & name) const {
         int index = res_type_->get_atom_index(name);
         if (index == -1) {
-            throw ResidueException("cannot find atom name " + name);
+            throw ResidueException("atom name: " + name + " does not exist in this residue");
         }
         return atoms_[index];
     }
+
+    inline
+    Atom const &
+    get_atom(
+            Index index) const {
+        return atoms_[index];
+    }
+
+    inline
+    math::Point const &
+    get_coords(
+            String const & name) const {
+        return get_atom(name).get_coords();
+    }
+
+    inline
+    util::Bead const &
+    get_bead(
+            util::BeadType bead_type) const {
+        for(auto const & b : beads_) {
+            if(b.get_type() == bead_type) { return b; }
+        }
+        throw ResidueException(
+                "bead type: " + std::to_string((int)bead_type) + " does not exist in this residue");
+    }
+
+    inline
+    math::Point
+    get_center() const { return center(atoms_); }
+
+    inline
+    String const &
+    get_res_name() { return res_type_->get_name(); }
 
     /**
      * Determine if another residue is connected to this residue, returns 0
@@ -177,7 +239,6 @@ public:
      * @param   res another residue
      * @param   cutoff  distance to be considered connected, default: 3 Angstroms
      */
-
     /*inline
     int
     connected_to(
@@ -207,26 +268,6 @@ public:
     */
 
     /**
-     * Generates steric beads required for checking for steric clashes between
-     * motifs. Each residues has three beads modeled after the typical three
-     * bead models used in coarse grain modeling. The three beads are:
-     *
-     * @code 
-     *  #include "instances/structure_instances.hpp"
-     *  auto r = instances::residue();
-     *  auto beads = r->get_beads();
-     *  //Test instance is the first residue in a chain with no phosphate so it has 
-     *  //only two beads
-     *  std::cout << beads.size() << std::endl;
-     *  //OUTPUT 2
-     *  std::cout << beads[0].btype() == BeadType::SUGAR << std::endl;
-     *  //OUTPUT 1
-     * @endcode
-     */
-    util::Beads
-    get_beads() const;
-
-    /**
      * stringifes residue object
      * @code 
      *  #include "instances/structure_instances.hpp"
@@ -242,7 +283,7 @@ public:
      * @endcode
      */
     String
-    to_str() const;
+    get_str() const;
 
     /**
      * wrapper for to_pdb_str(int &, int, String const &) when one does not care about
@@ -290,44 +331,46 @@ public:
     void
     write_pdb(String const);
 
+public:
+
+    inline
+    void
+    move(
+            math::Point const & p) {
+        for(auto & a : atoms_) { a.move(p); }
+        for(auto & b : beads_) { b.move(p); }
+    }
+
+    inline
+    void
+    transform(
+            math::Matrix const & r,
+            math::Vector const & t,
+            math::Point & dummy) {
+        for(auto & a : atoms_) { a.transform(r, t, dummy); }
+        for(auto & b : beads_) { b.transform(r, t, dummy); }
+    }
+
+    inline
+    void
+    transform(
+            math::Matrix const & r,
+            math::Vector const & t) {
+        auto dummy = math::Point();
+        for(auto & a : atoms_) { a.transform(r, t, dummy); }
+        for(auto & b : beads_) { b.transform(r, t, dummy); }
+    }
+
     /**
      * equal operator checks whether the unique indentifier is the same 
      * @param   r   another residue to check if its the same
      */
-    bool
+    /*bool
     operator==(Residue const & r) const {
         return uuid_ == r.uuid_;
-    }
+    }*/
 
 public: // getters
-
-    /**
-     * getter for the name of the residue, i.e. "A", "G" etc
-     */
-    inline
-    char
-    name() const { return name_; }
-
-    /**
-     * getter the chain_id
-     */
-    inline
-    char
-    chain_id() const { return chain_id_; }
-
-    /**
-     * getter for the residue insertion code
-     */
-    inline
-    char
-    i_code() const { return i_code_; }
-
-    /**
-     * getter for the residue num
-     */
-    inline
-    int
-    num() const { return num_; }
 
     /**
      * getter for the one letter residue type
@@ -336,12 +379,9 @@ public: // getters
     String
     short_name() const { return res_type_->short_name(); }*/
 
-    /**
-     * getter for residue unique indentifier
-     */
-    inline
-    util::Uuid const &
-    uuid() const { return uuid_; }
+private:
+    void
+    _build_beads();
 
 private:
     /**
@@ -370,6 +410,7 @@ private:
  * Shared pointer typedef for Residue. Only use shared pointers!
  */
 typedef std::shared_ptr<Residue> ResidueOP;
+typedef std::shared_ptr<Residue const> ResidueCOP;
 
 /**
  * Typedef of a vector of shared pointer vectors, only used this.
@@ -380,4 +421,4 @@ typedef std::vector<ResidueOP> ResidueOPs;
 }
 
 
-#endif /* defined(__RNAMake__residue__) */
+#endif /* defined(__RNAMake__all_atom_residue__) */
