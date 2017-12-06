@@ -38,7 +38,8 @@ ResidueTypeSet::_read_rtypes_from_dir(
 
         auto name = _get_rtype_name(path + fname);
         auto atom_map = _get_atom_map_from_file(path + fname);
-        auto rtype = std::make_shared<ResidueType>(name, atom_map, set_type, Strings());
+        auto alt_names = _get_extra_resnames_for_specific_res(name);
+        auto rtype = std::make_shared<ResidueType>(name, atom_map, set_type, alt_names);
         residue_types_.push_back(rtype);
     }
     closedir(pDIR);
@@ -93,9 +94,23 @@ ResidueTypeSet::contains_residue_type(
     for (auto const & restype : residue_types_) {
         if (restype->is_valid_residue_name(resname)) { return true; }
     }
-
     return false;
+}
 
+Strings
+ResidueTypeSet::_get_extra_resnames_for_specific_res(
+        String const & res_name) {
+    auto alt_names = Strings();
+    if        (res_name == "GUA") {
+        alt_names = base::split_str_by_delimiter("MIA GDP GTP M2G 1MG 7MG G7M QUO I YG", " ");
+    } else if (res_name == "ADE") {
+        alt_names = base::split_str_by_delimiter("A23 3DA 1MA 12A AET 2MA", " ");
+    } else if (res_name == "URA") {
+        alt_names = base::split_str_by_delimiter("PSU H2U 5MU 4SU 5BU 5MC U3H 2MU 70U BRU DT", " ");
+    } else if (res_name == "CYT") {
+        alt_names = base::split_str_by_delimiter("CBR CCC", " ");
+    }
+    return alt_names;
 }
 
 }

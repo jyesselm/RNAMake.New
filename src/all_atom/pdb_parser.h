@@ -14,7 +14,6 @@
 
 //RNAMake Headers
 #include <base/paths.h>
-#include <base/option.h>
 #include <math/xyz_matrix.h>
 #include <all_atom/residue.h>
 #include <all_atom/residue_type_set.h>
@@ -23,6 +22,27 @@ namespace all_atom {
 
 struct PDBParserResidues {
     ResidueOPs RNA_residues, protein_residues, small_molecule_residues;
+
+    inline
+    bool
+    has_RNA() {
+        if(RNA_residues.size() > 0) { return true; }
+        else                        { return false; }
+    }
+
+    inline
+    bool
+    has_protein() {
+        if(protein_residues.size() > 0) { return true; }
+        else                            { return false; }
+    }
+
+    inline
+    bool
+    has_small_molecules() {
+        if(small_molecule_residues.size() > 0) { return true; }
+        else                                   { return false; }
+    }
 };
 
 typedef std::shared_ptr<PDBParserResidues> PDBParserResiduesOP;
@@ -30,16 +50,23 @@ typedef std::shared_ptr<PDBParserResidues> PDBParserResiduesOP;
 class PDBParser {
 public:
     PDBParser(
-            ResidueTypeSetOP rts) :
-            rts_(rts) {
+            ResidueTypeSetCOP rts) :
+            rts_(rts),
+            atom_name_corrections_(std::map<String, String>()),
+            ions_(std::map<String, int>()) {
 
-        auto opt_infos = base::OptInfos{
-                base::OPT_INFO_BOOL("parse_rna", "true"),
-                base::OPT_INFO_BOOL("parse_proteins", "false"),
-                base::OPT_INFO_BOOL("parse_small_molecules", "false")};
-        options_ = base::Options(opt_infos);
+        ions_["MG"] = 1;
+        ions_["K"] = 1;
+        ions_["BR"] = 1;
+        ions_["ZN"] = 1;
+        ions_["MN"] = 1;
+        ions_["NA"] = 1;
+        ions_["CL"] = 1;
+        ions_["PO4"] = 1;
+        ions_["SO4"] = 1;
+        ions_["NH4"] = 1;
+        ions_["NO3"] = 1;
 
-        atom_name_corrections_ = std::map<String, String>();
         atom_name_corrections_["O1P"] = "OP1";
         atom_name_corrections_["O2P"] = "OP2";
 
@@ -57,23 +84,6 @@ public:
     PDBParserResiduesOP
     parse(
             String const &);
-
-public: // option wrappers
-    inline
-    void
-    set_option_values(
-            StringStringMap const & key_values) { options_.set_values(key_values); }
-
-    inline
-    void
-    set_bool_option_value(
-            String const & name,
-            bool value) { options_.set_bool_value(name, value); }
-
-    inline
-    bool
-    get_bool_option_value(
-            String const & name) { return options_.get_bool_value(name); }
 
 private:
     void
@@ -99,26 +109,23 @@ private:
             std::vector<Atom const *> const &,
             ResidueTypeCOP);
 
-    void
+    bool
     _replace_missing_phosphate_backbone(
             std::vector<Atom const *> &,
             ResidueTypeCOP);
 
+
 private:
-    ResidueTypeSetOP rts_;
+    ResidueTypeSetCOP rts_;
     std::map<String, ResidueOP> ref_residues_;
+    std::map<String, String> atom_name_corrections_;
+    std::map<String, int> ions_;
     // parse variables
     std::map<String, Atoms> atoms_;
     String startswith_;
     String atom_name_, res_name_, res_num_, chain_id_, i_code_;
     String sx_, sy_, sz_;
     math::Point atom_coords_;
-    std::map<String, String> atom_name_corrections_;
-    base::Options options_;
-
-
-
-
 
 };
 

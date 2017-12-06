@@ -42,6 +42,10 @@ private:
             String const &,
             SetType const &);
 
+    Strings
+    _get_extra_resnames_for_specific_res(
+            String const &);
+
 
 private:
     ResidueTypeOPs residue_types_;
@@ -49,6 +53,7 @@ private:
 };
 
 typedef std::shared_ptr<ResidueTypeSet> ResidueTypeSetOP;
+typedef std::shared_ptr<ResidueTypeSet const> ResidueTypeSetCOP;
 
 }
 

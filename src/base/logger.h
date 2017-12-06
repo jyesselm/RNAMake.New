@@ -17,10 +17,6 @@ enum class Loglevel {
 
 static Loglevel LOG_LEVEL = Loglevel::INFO;
 
-#define RESET   "\033[0m"
-#define RED     "\033[31m"      /* Red */
-#define GREEN   "\033[32m"      /* Green */
-
 static inline void
 SET_LOG_LEVEL(
         Loglevel new_level) {
@@ -33,11 +29,11 @@ using namespace std;
 }
 
 #define LOG_WARNING(name, msg)  { \
-    if(LOG_LEVEL <= Loglevel::WARNING) { cout << GREEN << "[WARNING] " << name << ":" << __FUNCTION__ << ": " << msg << RESET << std::endl; } \
+    if(LOG_LEVEL <= Loglevel::WARNING) { cout << "[WARNING] " << name << ":" << __FUNCTION__ << ": " << msg << std::endl; } \
 }
 
 #define LOG_ERROR(name, msg)  { \
-    if(LOG_LEVEL <= Loglevel::ERROR) { cout << RED << "[ERROR]   " << name << ":" << __FUNCTION__ << ": " << msg << RESET << std::endl; } \
+    if(LOG_LEVEL <= Loglevel::ERROR) { cout << "[ERROR]   " << name << ":" << __FUNCTION__ << ": " << msg  << std::endl; } \
 }
 
 

@@ -24,9 +24,6 @@ public:
 
 namespace primitives {
 
-
-// wrapper to avoid doing std::shared_ptr<std::vector<T>> since pybind11 wont allow this
-
 template<typename Chaintype, typename Restype>
 class Structure {
 public:

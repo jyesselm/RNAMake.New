@@ -24,9 +24,19 @@ center(
     return center / float(atoms.size());
 }
 
-
 void
 Residue::_build_beads() {
+    if     (res_type_->get_set_type() == SetType::RNA)     { _build_beads_RNA(); }
+    else if(res_type_->get_set_type() == SetType::PROTEIN) {
+        beads_.push_back(util::Bead(get_coords("CA"), util::BeadType::CALPHA));
+    }
+    else {
+        beads_.push_back(util::Bead(get_center(), util::BeadType::MCENTER));
+    }
+}
+
+void
+Residue::_build_beads_RNA() {
     std::vector<Atom const *> phos_atoms, sugar_atoms, base_atoms;
     int i = -1;
     for (auto const & a : atoms_) {

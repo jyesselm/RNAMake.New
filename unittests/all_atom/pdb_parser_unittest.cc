@@ -38,7 +38,6 @@ TEST_CASE( "Test Parsing PDB formatted files ", "[PDBParser]" ) {
 
     SECTION("test parsing proteins") {
         auto parser = all_atom::PDBParser(rts);
-        parser.set_bool_option_value("parse_proteins", true);
         auto path = base::unittest_resources_path() + "/all_atom/2lxe.pdb";
         auto residues = parser.parse(path);
 
@@ -47,12 +46,19 @@ TEST_CASE( "Test Parsing PDB formatted files ", "[PDBParser]" ) {
 
     SECTION("test parsing small molecules") {
         auto parser = all_atom::PDBParser(rts);
-        parser.set_bool_option_value("parse_small_molecules", true);
         auto path = base::unittest_resources_path() + "/all_atom/1am0.pdb";
         auto residues = parser.parse(path);
         REQUIRE(residues->small_molecule_residues.size() == 1);
         auto amp = residues->small_molecule_residues[0];
         REQUIRE(amp->get_res_name() == "AMP");
+
+        /*std::for_each(amp->bead_begin(),
+                      amp->bead_end(),
+                      [](util::Bead const & b) {
+            std::cout << b.get_center().get_str() << std::endl;
+        });*/
+
     }
+
 
 }

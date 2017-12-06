@@ -18,7 +18,13 @@ namespace util {
  * Sugar (1):  O5',C5',C4',O4',C3',O3',C1',C2',O2'\n
  * Base  (2):  All remaining atoms
  */
-enum class BeadType { PHOS = 0, SUGAR = 1, BASE = 2 };
+enum class BeadType {
+    PHOS,
+    SUGAR,
+    BASE,
+    CALPHA,
+    MCENTER // center of small molecule
+};
 
 /**
  * Exception for beads

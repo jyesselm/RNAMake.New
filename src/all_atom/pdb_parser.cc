@@ -25,6 +25,7 @@ PDBParser::_parse_atoms_from_pdb_file(
     atoms_ = std::map<String, Atoms>();
     auto lines = base::get_lines_from_file(pdb_file);
     auto key = String("");
+    auto found = false;
     for (auto const & line : lines) {
         if(line.size() < 6) { continue; }
         startswith_ = line.substr(0, 6);
@@ -41,12 +42,14 @@ PDBParser::_parse_atoms_from_pdb_file(
 
             res_name_ = line.substr(17, 4);
             res_name_ = base::trim(res_name_);
-
             // do not save water
             if(res_name_ == "HOH") { continue; }
 
+            //do not save ions
+            if(ions_.find(res_name_) != ions_.end()) { continue; }
+
             chain_id_ = line.substr(21, 1);
-            i_code_ = line.substr(16, 1);
+            i_code_ = line.substr(26, 1);
 
             sx_ = line.substr(30, 8);
             sy_ = line.substr(38, 8);
@@ -61,7 +64,15 @@ PDBParser::_parse_atoms_from_pdb_file(
             res_num_ = base::trim(res_num_);
 
             key = res_name_ + "|" + res_num_ + "|" + chain_id_ + "|" + i_code_;
+            found = false;
             if(atoms_.find(key) == atoms_.end()) { atoms_[key] = Atoms(); }
+            for(auto const & a : atoms_[key]) {
+                if(a.get_str_name() == atom_name_) {
+                    found = true;
+                    break;
+                }
+            }
+            if(found) { continue; }
             atoms_[key].push_back(Atom(std::make_shared<base::SimpleString>(atom_name_),
                                        atom_coords_));
 
@@ -150,19 +161,30 @@ PDBParser::_get_res_ref_frame_from_atoms(
 }
 
 
-void
+bool
 PDBParser::_replace_missing_phosphate_backbone(
         std::vector<Atom const *> & atoms,
         ResidueTypeCOP res_type) {
 
     auto ref_res = ref_residues_[res_type->get_name()];
+
+    // if these atoms do not exist cannot build res ref frame
+    if(atoms[ res_type->get_atom_index("C1'")] == nullptr) { return false; }
+    if (res_type->get_short_name() == 'A' || res_type->get_short_name() == 'G') {
+        if(atoms[ res_type->get_atom_index("N9")] == nullptr) { return false; }
+    }
+    else {
+        if(atoms[ res_type->get_atom_index("N1")] == nullptr) { return false; }
+    }
+
     auto ref_frame_1 = _get_res_ref_frame_from_atoms(atoms, res_type);
     auto ref_frame_2 = _get_res_ref_frame(ref_res);
-    //std::cout << ref_frame_1.get_str_readable() << std::endl;
     auto rot = dot(ref_frame_1.transpose(), ref_frame_2);
     auto r_t = rot.transpose();
     auto t = -ref_res->get_center();
     auto c4p_atom =  atoms[ res_type->get_atom_index("C4'") ];
+    if(c4p_atom == nullptr) { return false; }
+
     ref_res->transform(r_t, t);
     ref_res->move(c4p_atom->get_coords() - ref_res->get_coords("C4'"));
 
@@ -170,6 +192,7 @@ PDBParser::_replace_missing_phosphate_backbone(
         atoms[i] = new Atom(ref_res->get_atom(i).get_name(),
                             ref_res->get_atom(i).get_coords());
     }
+    return true;
 }
 
 ResidueOP
@@ -177,6 +200,7 @@ PDBParser::_setup_residue(
         String const & key,
         Atoms const & atoms,
         ResidueTypeCOP res_type) {
+
 
     auto spl = base::split_str_by_delimiter(key, "|");
     auto atom_ptrs = std::vector<Atom const *>(res_type->get_num_atoms());
@@ -200,16 +224,24 @@ PDBParser::_setup_residue(
             if (i < 5 && a == nullptr) { missing_phosphate = 1; }
         }
 
-        if (missing_phosphate) { _replace_missing_phosphate_backbone(atom_ptrs, res_type); }
+        if (missing_phosphate) {
+            if (!_replace_missing_phosphate_backbone(atom_ptrs, res_type)) {
+                LOG_WARNING(
+                        "PDB_Parser",
+                        "tried to fill in missing phosphate backbone for residue " + spl[0] + " " + spl[1]);
+            }
+        }
     }
 
     auto reordered_atoms = Atoms();
     auto i = 0;
-    for(auto a_ptr : atom_ptrs) {
+    for(auto const & a_ptr : atom_ptrs) {
         if(a_ptr == nullptr) {
-            throw std::runtime_error(
+            LOG_WARNING(
+                    "PDB_Parser",
                     "cannot setup residue: " + spl[1] + " " + spl[0] + " missing atom: " +
-                    res_type->get_atom_name_at_pos(i));
+                    res_type->get_atom_name_at_pos(i) + " skipping this residue!");
+            return nullptr;
         }
         reordered_atoms.push_back(std::move(*a_ptr));
         i++;
@@ -228,10 +260,6 @@ PDBParserResiduesOP
 PDBParser::parse(
         String const & pdb_file) {
 
-    auto parse_rna = get_bool_option_value("parse_rna");
-    auto parse_proteins = get_bool_option_value("parse_proteins");
-    auto parse_small_molecules = get_bool_option_value("parse_small_molecules");
-
     auto residues = std::make_shared<PDBParserResidues>();
     _parse_atoms_from_pdb_file(pdb_file);
     for(auto const & kv : atoms_) {
@@ -239,15 +267,18 @@ PDBParser::parse(
         auto has_res_type = rts_->contains_residue_type(spl[0]);
         if(has_res_type) {
             auto res_type = rts_->get_residue_type(spl[0]);
-            if     (res_type->get_set_type() == SetType::RNA && parse_rna) {
-                residues->RNA_residues.push_back(_setup_residue(kv.first, kv.second, res_type));
+            if     (res_type->get_set_type() == SetType::RNA) {
+                auto r = _setup_residue(kv.first, kv.second, res_type);
+                if(r == nullptr) { continue; }
+                residues->RNA_residues.push_back(r);
             }
-            else if(res_type->get_set_type() == SetType::PROTEIN && parse_proteins) {
-                residues->protein_residues.push_back(_setup_residue(kv.first, kv.second, res_type));
+            else if(res_type->get_set_type() == SetType::PROTEIN) {
+                auto r = _setup_residue(kv.first, kv.second, res_type);
+                if(r == nullptr) { continue; }
+                residues->protein_residues.push_back(r);
             }
         }
         else {
-            if(!parse_small_molecules) { continue; }
             auto atom_names = Strings();
             for(auto const & a : kv.second) { atom_names.push_back(a.get_str_name()); }
             auto res_type = get_new_residue_type(spl[0], atom_names);

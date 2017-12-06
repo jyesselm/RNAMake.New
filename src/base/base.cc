@@ -27,6 +27,7 @@ PYBIND11_PLUGIN(base) {
     // paths
     m.def("base_path", &base_path);
     m.def("resources_path", &resources_path);
+    m.def("unittest_resources_path", &unittest_resources_path);
 
     return m.ptr();
 

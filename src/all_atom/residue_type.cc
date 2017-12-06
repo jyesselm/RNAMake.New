@@ -15,12 +15,12 @@ ResidueType::ResidueType(
         String const & name,
         StringIntMap const & atom_name_map,
         SetType set_type,
-        Strings const & extra_alt_names) :
+        Strings const & extra_alt_names):
         name_(name),
         atom_name_map_(atom_name_map),
+        alt_names_(extra_alt_names),
         set_type_(set_type) {
 
-    alt_names_ = Strings();
     if (set_type_ == SetType::RNA) {
         alt_names_.push_back(name_.substr(0, 1));
         alt_names_.push_back("r" + name_.substr(0, 1));
@@ -50,7 +50,7 @@ ResidueType::get_atom_name_at_pos(
     for(auto const & kv : atom_name_map_) {
         if(kv.second == index) { return kv.first; }
      }
-    throw ResidueTypeException("residue type does not have an index: " + std::to_string(index));
+    throw ResidueTypeException("residue type: " + get_name() +" does not have an index: " + std::to_string(index));
 }
 
 bool
@@ -67,8 +67,12 @@ ResidueTypeCOP
 get_new_residue_type(
         String const & res_name,
         Strings const & atom_names) {
+    expects<ResidueTypeException>(
+            atom_names.size() != 0,
+            "must have more than one atom name to create new atom type");
+
     auto atom_name_map = StringIntMap();
-    auto i = 0;
+    int i = 0;
     for(auto const & name : atom_names) {
         atom_name_map[name] = i;
         i++;
@@ -79,30 +83,6 @@ get_new_residue_type(
 }
 
 }
-
-
-/*void
-ResidueType::extend_res_specific_altnames() {
-    // There has to be a better way to do this
-    Strings alt_names;
-    if (name_.compare("GUA") == 0) {
-        alt_names = split_str_by_delimiter("MIA GDP GTP M2G 1MG 7MG G7M QUO I YG", " ");
-    } else if (name_.compare("ADE") == 0) {
-        alt_names = split_str_by_delimiter("A23 3DA 1MA 12A AET 2MA", " ");
-    } else if (name_.compare("URA") == 0) {
-        alt_names = split_str_by_delimiter("PSU H2U 5MU 4SU 5BU 5MC U3H 2MU 70U BRU DT", " ");
-    } else if (name_.compare("CYT") == 0) {
-        alt_names = split_str_by_delimiter("CBR CCC", " ");
-    } else {
-
-    }
-
-    for (auto const & name : alt_names) {
-        alt_names_.push_back(name);
-    }
-}
-
-}*/
 
 
 

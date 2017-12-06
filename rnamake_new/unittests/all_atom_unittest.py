@@ -68,6 +68,38 @@ class ResidueTypeSetUnittest(unittest.TestCase):
         self.failUnless(rtype.get_name() == "GUA")
 
 
+class PDBParserUnittest(unittest.TestCase):
+    def setUp(self):
+        self.rts = ResidueTypeSet()
+        self.pdb_parser = PDBParser(self.rts)
+
+    def test_ideal_res(self):
+        path = resources_path() + "/ideal_residues/GUA.pdb"
+        residues = self.pdb_parser.parse(path)
+        r1 = residues.RNA_residues[0]
+        self.failUnless(len(residues.RNA_residues) == 1)
+
+        path = unittest_resources_path() + "/all_atom/GUA_incomplete.pdb"
+        residues_2 = self.pdb_parser.parse(path)
+        r2 = residues_2.RNA_residues[0]
+        self.failUnless(r1.is_equal(r2, False))
+
+    def test_p4p6(self):
+        path = unittest_resources_path() + "/all_atom/p4p6.pdb"
+        residues = self.pdb_parser.parse(path)
+        self.failUnless(len(residues.RNA_residues) == 157)
+
+    def test_parsing_proteins(self):
+        path = unittest_resources_path() + "/all_atom/2lxe.pdb"
+        residues = self.pdb_parser.parse(path)
+        self.failUnless(len(residues.protein_residues) == 109)
+
+    def test_parsing_small_molecules(self):
+        path = unittest_resources_path() + "/all_atom/1am0.pdb"
+        residues = self.pdb_parser.parse(path)
+        self.failUnless(len(residues.small_molecule_residues) == 1)
+        amp = residues.small_molecule_residues[0]
+        self.failUnless(amp.get_res_name() == "AMP")
 
 
 def main():

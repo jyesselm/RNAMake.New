@@ -140,6 +140,11 @@ public: //iterator stuff
     const_iterator begin() const noexcept { return atoms_.begin(); }
     const_iterator end() const noexcept   { return atoms_.end(); }
 
+    typedef util::Beads::const_iterator bead_const_iterator;
+
+    bead_const_iterator bead_begin() const noexcept { return beads_.begin(); }
+    bead_const_iterator bead_end() const noexcept   { return beads_.end(); }
+
 public:
 
     inline
@@ -155,6 +160,13 @@ public:
             if(atoms_[i] != r.atoms_[i]) { return false;}
         }
         return true;
+    }
+
+    inline
+    bool
+    operator != (
+            Residue const & r) const {
+        return !(*this == r);
     }
 
 public:
@@ -230,42 +242,12 @@ public: // getters
 
     inline
     String const &
-    get_res_name() { return res_type_->get_name(); }
+    get_res_name() const { return res_type_->get_name(); }
 
-    /**
-     * Determine if another residue is connected to this residue, returns 0
-     * if res is not connected to self, returns 1 if connection is going
-     *  from 5' to 3' and returns -1 if connection is going from 3' to 5'
-     * @param   res another residue
-     * @param   cutoff  distance to be considered connected, default: 3 Angstroms
-     */
-    /*inline
-    int
-    connected_to(
-            Residue const & res,
-            float cutoff = 3.0) const {
-        String o3 = "O3'", p = "P";
+    inline
+    SetType
+    get_res_set_type() const { return res_type_->get_set_type(); }
 
-        // 5' to 3'
-        AtomOP o3_atom = get_atom(o3), p_atom = res.get_atom(p);
-        if (o3_atom != nullptr && p_atom != nullptr) {
-            if (o3_atom->coords().distance(p_atom->coords()) < cutoff) {
-                return 1;
-            }
-        }
-
-        // 3' to 5'
-        o3_atom = res.get_atom(o3);
-        p_atom = get_atom(p);
-        if (o3_atom != nullptr && p_atom != nullptr) {
-            if (o3_atom->coords().distance(p_atom->coords()) < cutoff) {
-                return -1;
-            }
-        }
-
-        return 0;
-    }
-    */
 
     /**
      * stringifes residue object
@@ -293,7 +275,7 @@ public: // getters
     inline
     String
     get_pdb_str(
-            int acount) {
+            int acount) const {
         return get_pdb_str(acount, num_, chain_id_);
     }
 
@@ -361,14 +343,6 @@ public:
         for(auto & b : beads_) { b.transform(r, t, dummy); }
     }
 
-    /**
-     * equal operator checks whether the unique indentifier is the same 
-     * @param   r   another residue to check if its the same
-     */
-    /*bool
-    operator==(Residue const & r) const {
-        return uuid_ == r.uuid_;
-    }*/
 
 public: // getters
 
@@ -382,6 +356,9 @@ public: // getters
 private:
     void
     _build_beads();
+
+    void
+    _build_beads_RNA();
 
 private:
     /**
@@ -409,6 +386,7 @@ private:
 /**
  * Shared pointer typedef for Residue. Only use shared pointers!
  */
+typedef std::vector<Residue> Residues;
 typedef std::shared_ptr<Residue> ResidueOP;
 typedef std::shared_ptr<Residue const> ResidueCOP;
 
