@@ -10,6 +10,9 @@
 namespace base {
 
 String
+get_os_name();
+
+String
 base_path();
 
 String

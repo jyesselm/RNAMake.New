@@ -62,11 +62,13 @@ filename(
 String
 base_dir(
         String const & path) {
-    Strings path_spl = split_str_by_delimiter(path, "/");
-    String base_path;
+    auto path_spl = split_str_by_delimiter(path, "/");
+    auto base_path = String();
     for (int i = 0; i < path_spl.size() - 1; i++) {
         base_path += path_spl[i] + "/";
     }
+    if(base_path == "") { base_path = "./"; }
+
     return base_path;
 
 }
