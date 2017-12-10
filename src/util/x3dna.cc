@@ -41,6 +41,9 @@ X3dna::X3dna():
 
     ref_frame_files_to_delete_ = base::split_str_by_delimiter(ref_frame_files, ",");
 
+    auto dssr_filename_str = "dssr-2ndstrs.ct,dssr-2ndstrs.dbn,dssr-helices.pdb,dssr-pairs.pdb,dssr-stems.pdb,hel_regions.pdb,hstacking.pdb,poc_haxis.r3d,stacking.pdb,dssr-torsions.dat,dssr-Kturns.pdb,dssr-multiplets.pdb,dssr-hairpins.pdb,dssr-Aminors.pdb";
+    dssr_files_to_delete_ = base::split_str_by_delimiter(dssr_filename_str, ",");
+
 }
 
 void
@@ -109,7 +112,7 @@ X3dna::_parse_ref_frame_file(
         if(base_path == "./") { _generate_ref_frame(pdb_path); }
         else {
             // ref_frames file exists in correct spot
-            if(!base::file_exists(ref_frames_path)) { _generate_ref_frame(pdb_path); }
+            if(!base::file_exists(base_path + "/ref_frames.dat")) { _generate_ref_frame(pdb_path); }
             else {
                 ref_frames_path = base_path + "/ref_frames.dat";
             }
@@ -117,7 +120,7 @@ X3dna::_parse_ref_frame_file(
     }
     basepairs_ = X3Basepairs();
     auto lines = base::get_lines_from_file(ref_frames_path);
-    auto r = std::regex("#\\s+(\\w+):\\.*(\\d+)_:\\[\\.*(\\S+)\\](\\w+)\\s+\\-\\s+(\\w+):\\.*(\\d+)_:\\[\\.*(\\S+)\\](\\w+)");
+    auto r = std::regex("#\\s+(?:\\.+\\d+\\>)*(\\w+):\\.*(-*\\d+)\\S:\\[\\.*(\\S+)\\](\\w+)\\s+\\-\\s+(?:\\.+\\d+\\>)*(\\w+):\\.*(-*\\d+)\\S:\\[\\.*(\\S+)\\](\\w+)");
     auto start_bp = 0;
     auto rs = math::Points();
     auto d = math::Point();
@@ -129,7 +132,13 @@ X3dna::_parse_ref_frame_file(
         if(l.substr(0,3) == "...") {
             auto m = std::smatch();
             std::regex_search(l, m, r);
-            bp_info = new X3BPInfo(m);
+            try {
+                bp_info = new X3BPInfo(m);
+            }
+            catch(X3dnaException const & e) {
+                std::cout << l << std::endl;
+                throw e;
+            }
             rs = math::Points();
             start_bp = 1;
             continue;
@@ -179,16 +188,10 @@ X3dna::generate_dssr_file(
         throw X3dnaException("could not call x3dna-dssr properly, please make sure you have it set up properly\n");
     }
 
-    String filename_str = "dssr-2ndstrs.ct,dssr-2ndstrs.dbn,dssr-helices.pdb,dssr-pairs.pdb,dssr-stems.pdb,hel_regions.pdb,hstacking.pdb,poc_haxis.r3d,stacking.pdb,dssr-torsions.dat,dssr-Kturns.pdb,dssr-multiplets.pdb,dssr-hairpins.pdb,dssr-Aminors.pdb";
-    Strings files = base::split_str_by_delimiter(filename_str, ",");
-    for(auto const & f : files) {
-        try { std::remove(f.c_str()); }
-        catch(String const & e) {}
-    }
-    delete s;
+    _delete_files(dssr_files_to_delete_);
+    generated_dssr_ = true;
 
 }
-
 
 std::map<String, Strings>
 X3dna::_parse_dssr_file_into_sections(
@@ -204,8 +207,8 @@ X3dna::_parse_dssr_file_into_sections(
         // current directory: always rebuild file
         if(base_path == "./") { generate_dssr_file(pdb_path); }
         else {
-            // ref_frames file exists in correct spot
-            if(!base::file_exists(dssr_file_path)) { _generate_ref_frame(pdb_path); }
+            // dssr file exists in correct spot
+            if(!base::file_exists(base_path + "/" + fname + "_dssr.out")) { generate_dssr_file(pdb_path); }
             else {
                 dssr_file_path = base_path + "/" + fname + "_dssr.out";
             }
@@ -276,7 +279,7 @@ X3dna::_parse_dssr_res_str(
 
     if(i == -1) {
         LOG_WARNING("X3dna", "dssr res string: " + res_str + " could not be successfully parsed, SKIPPING!");
-        nullptr;
+        return nullptr;
     }
 
     return new X3Residue(num, chain, ' ');
@@ -286,6 +289,10 @@ X3dna::_parse_dssr_res_str(
 X3dna::X3Basepairs const &
 X3dna::get_basepairs(
         String const & pdb_path) {
+
+    // check if we created these files
+    generated_ref_frames_ = false;
+    generated_dssr_ = false;
 
     _parse_ref_frame_file(pdb_path);
     auto dssr_file_sections = _parse_dssr_file_into_sections(pdb_path);
@@ -328,6 +335,14 @@ X3dna::get_basepairs(
         delete res1;
         delete res2;
     }
+
+    // clean up generated x3dna files
+    /*if(generated_ref_frames_) { _delete_file("ref_frames.dat"); }
+    if(generated_dssr_)       {
+        auto fname = base::filename(pdb_path);
+        fname = fname.substr(0, fname.length()-4);
+        _delete_file(fname + "_dssr.out");
+    }*/
 
     return basepairs_;
 

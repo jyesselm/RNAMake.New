@@ -96,6 +96,9 @@ target_link_libraries(util_lib math_lib  pybind11::module)
 add_library(util MODULE ${util_files})
 target_link_libraries(util math_lib  pybind11::module)
 
+add_executable(x3dna_on_all_pdbs_unittest /Users/jyesselm/projects/RNAMake.New/unittests/util/x3dna_on_all_pdbs_unittest.cc)
+target_link_libraries(x3dna_on_all_pdbs_unittest util_lib)
+
 add_executable(x3dna_unittest /Users/jyesselm/projects/RNAMake.New/unittests/util/x3dna_unittest.cc)
 target_link_libraries(x3dna_unittest util_lib)
 
