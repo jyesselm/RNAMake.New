@@ -84,7 +84,7 @@ target_link_libraries(xyz_matrix_unittest math_lib)
 ###########################################################################
 
 set(util_files
-	/Users/jyesselm/projects/RNAMake.New/src/util/rna_segment_type.cc
+	/Users/jyesselm/projects/RNAMake.New/src/util/segment_type.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/uuid.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/util.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/bead.cc
@@ -109,12 +109,13 @@ target_link_libraries(x3dna_unittest util_lib)
 ###########################################################################
 
 set(primitives_files
+	/Users/jyesselm/projects/RNAMake.New/src/primitives/segment.cc
 	/Users/jyesselm/projects/RNAMake.New/src/primitives/residue.cc
 	/Users/jyesselm/projects/RNAMake.New/src/primitives/basepair.cc
 	/Users/jyesselm/projects/RNAMake.New/src/primitives/structure.cc
+	/Users/jyesselm/projects/RNAMake.New/src/primitives/pose.cc
 	/Users/jyesselm/projects/RNAMake.New/src/primitives/chain.cc
 	/Users/jyesselm/projects/RNAMake.New/src/primitives/primitives.cc
-	/Users/jyesselm/projects/RNAMake.New/src/primitives/rna_structure.cc
 )
 
 add_library(primitives_lib ${primitives_files})
@@ -157,15 +158,15 @@ target_link_libraries(graph_unittest data_structures_lib)
 ###########################################################################
 
 set(secondary_structure_files
+	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/segment.cc
 	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/residue.cc
 	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/parser.cc
 	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/basepair.cc
 	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/structure.cc
+	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/pose.cc
 	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/chain.cc
 	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/secondary_structure.cc
-	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/rna_structure.cc
 	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/aligner.cc
-	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/rna_segment.cc
 )
 
 add_library(secondary_structure_lib ${secondary_structure_files})
@@ -191,8 +192,8 @@ set(all_atom_files
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/basepair.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/structure.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/pdb_parser.cc
+	/Users/jyesselm/projects/RNAMake.New/src/all_atom/pose.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/chain.cc
-	/Users/jyesselm/projects/RNAMake.New/src/all_atom/rna_structure.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/residue_type.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/all_atom.cc
 )

@@ -21,13 +21,13 @@
  * Exception for RNA Structure
  */
 
-class RNAStructureException : public std::runtime_error {
+class PoseException : public std::runtime_error {
 public:
     /**
      * Standard constructor for RNAStructureException
      * @param   message   Error message for rna structure
      */
-    RNAStructureException(String const & message):
+    PoseException(String const & message):
             std::runtime_error(message)
     {}
 };
@@ -35,7 +35,7 @@ public:
 namespace primitives {
 
 template<typename BPtype, typename Structuretype, typename Chaintype, typename Restype>
-class RNAStructure {
+class Pose {
 public:// types
 
     typedef std::vector<Restype>                 Residues;
@@ -45,7 +45,7 @@ public:// types
 
 
 public:
-    RNAStructure(
+    Pose(
             Structuretype const & structure,
             std::vector<BPtype> const & basepairs,
             std::vector<BPtype> const & ends,
@@ -57,36 +57,36 @@ public:
             end_ids_(end_ids),
             name_(name) {
 
-        expects<RNAStructureException>(
+        expects<PoseException>(
                 end_ids_.size() == ends_.size(),
                 "RNAStructure must have the same number of ends as end_ids has " +
                 std::to_string(ends_.size()) + " ends and " + std::to_string(end_ids.size()) +
                 "end ids");
     }
 
-    RNAStructure(
-            RNAStructure const & rs):
+    Pose(
+            Pose const & rs):
             structure_(rs.structure_),
             basepairs_(rs.basepairs_),
             ends_(rs.ends_),
             end_ids_(rs.end_ids_),
             name_(rs.name_) {}
 
-    RNAStructure(
+    Pose(
             String const & s) {
         auto spl = base::split_str_by_delimiter(s, "&");
     }
 
 protected:
     // let dervived classes fill in members
-    RNAStructure() {}
+    Pose() {}
 
 public: //iterators
     // residue iterator
     typedef typename Residues::const_iterator const_iterator;
 
     const_iterator begin() const { return structure_.begin(); }
-    const_iterator end() const { return structure_.end(); }
+    const_iterator end() const   { return structure_.end(); }
 
     // basepair iterator
     typedef typename std::vector<BPtype>::const_iterator const_bp_iterator;
@@ -145,7 +145,7 @@ public: //get basepairs interface
         }
 
         if(bps.size() == 0) {
-            throw RNAStructureException("could not find any basepairs with this uuid for residues or basepairs");
+            throw PoseException("could not find any basepairs with this uuid for residues or basepairs");
         }
 
         return std::make_shared<base::VectorContainer<BPtype>>(bps);
@@ -163,7 +163,7 @@ public: //get basepairs interface
         }
 
         if(bps.size() == 0) {
-            throw RNAStructureException("could not find any basepairs with these two uuids");
+            throw PoseException("could not find any basepairs with these two uuids");
         }
 
         return std::make_shared<base::VectorContainer<BPtype>>(bps);
@@ -180,7 +180,7 @@ public: //get basepairs interface
         }
 
         if(bps.size() == 0) {
-            throw RNAStructureException("could not find any basepairs with this name: " + name);
+            throw PoseException("could not find any basepairs with this name: " + name);
         }
 
         return std::make_shared<base::VectorContainer<BPtype>>(bps);
@@ -198,11 +198,11 @@ public: // get basepair interface  (single basepair!)
             if (bp.get_res1_uuid() == bp_uuid || bp.get_res2_uuid() == bp_uuid) { bps.push_back(&bp); }
         }
         if (bps.size() > 1) {
-            throw RNAStructureException("got more than one basepair matching this uuid");
+            throw PoseException("got more than one basepair matching this uuid");
         }
         if (bps.size() == 1) { return *bps[0]; }
         else {
-            throw RNAStructureException("no basepairs matching this uuid");
+            throw PoseException("no basepairs matching this uuid");
         }
     }
 
@@ -217,11 +217,11 @@ public: // get basepair interface  (single basepair!)
             if (bp.get_res1_uuid() == uuid2 && bp.get_res2_uuid() == uuid1) { bps.push_back(&bp); }
         }
         if (bps.size() > 1) {
-            throw RNAStructureException("got more than one basepair matching residue uuids");
+            throw PoseException("got more than one basepair matching residue uuids");
         }
         if (bps.size() == 1) { return *bps[0]; }
         else {
-            throw RNAStructureException("no basepair found matching residue uuids supplied");
+            throw PoseException("no basepair found matching residue uuids supplied");
         }
     }
 
@@ -234,11 +234,11 @@ public: // get basepair interface  (single basepair!)
         }
 
         if (bps.size() > 1) {
-            throw RNAStructureException("got more than one basepair matching this name: " + name);
+            throw PoseException("got more than one basepair matching this name: " + name);
         }
         if (bps.size() == 1) { return *bps[0]; }
         else {
-            throw RNAStructureException("no basepair found matching residue uuids supplied");
+            throw PoseException("no basepair found matching residue uuids supplied");
         }
 
     }
@@ -247,7 +247,7 @@ public: // get basepair interface  (single basepair!)
     BPtype const &
     get_basepair(
             Index index) const {
-        expects<RNAStructureException>(
+        expects<PoseException>(
                 index < basepairs_.size(),
                 "cannot get basepair " + std::to_string(index) + " only " + std::to_string(basepairs_.size()) +
                 " total residues");
@@ -267,11 +267,11 @@ public: // get end interace
 
         }
         if (bps.size() > 1) {
-            throw RNAStructureException("got more than one basepair matching this uuid");
+            throw PoseException("got more than one basepair matching this uuid");
         }
         if (bps.size() == 1) { return *bps[0]; }
         else {
-            throw RNAStructureException("no end found matching basepair uuid supplied");
+            throw PoseException("no end found matching basepair uuid supplied");
         }
     }
 
@@ -288,11 +288,11 @@ public: // get end interace
                 bp.get_res2_uuid() == uuid1) { bps.push_back(&bp); }
         }
         if (bps.size() > 1) {
-            throw RNAStructureException("got more than one end matching residue uuids");
+            throw PoseException("got more than one end matching residue uuids");
         }
         if (bps.size() == 1) { return *bps[0]; }
         else {
-            throw RNAStructureException("no end found matching residue uuids supplied");
+            throw PoseException("no end found matching residue uuids supplied");
 
         }
     }
@@ -306,11 +306,11 @@ public: // get end interace
         }
 
         if (bps.size() > 1) {
-            throw RNAStructureException("got more than one basepair matching this name: " + name->get_str());
+            throw PoseException("got more than one basepair matching this name: " + name->get_str());
         }
         if (bps.size() == 1) { return *bps[0]; }
         else {
-            throw RNAStructureException("cannot find end with name: " + name->get_str());
+            throw PoseException("cannot find end with name: " + name->get_str());
         }
     }
 
@@ -323,11 +323,11 @@ public: // get end interace
         }
 
         if (bps.size() > 1) {
-            throw RNAStructureException("got more than one basepair matching this name: " + name);
+            throw PoseException("got more than one basepair matching this name: " + name);
         }
         if (bps.size() == 1) { return *bps[0]; }
         else {
-            throw RNAStructureException("cannot find end with name: " + name);
+            throw PoseException("cannot find end with name: " + name);
         }
     }
 
@@ -336,7 +336,7 @@ public: // get end interace
     get_end(
             Index index) const {
 
-        expects<RNAStructureException>(
+        expects<PoseException>(
                 index < ends_.size(),
                 "trying to get end: " + std::to_string(index) + " there are only " +
                 std::to_string(ends_.size()));
@@ -357,11 +357,11 @@ public: // get end by end id
         }
 
         if (bps.size() > 1) {
-            throw RNAStructureException("got more than one basepair matching this end_id: " + end_id);
+            throw PoseException("got more than one basepair matching this end_id: " + end_id);
         }
         if (bps.size() == 1) { return *bps[0]; }
         else {
-            throw RNAStructureException("cannot find end with end_id: " + end_id);
+            throw PoseException("cannot find end with end_id: " + end_id);
         }
     }
 
@@ -376,11 +376,11 @@ public: // get end by end id
         }
 
         if (bps.size() > 1) {
-            throw RNAStructureException("got more than one basepair matching this end_id: " + end_id->get_str());
+            throw PoseException("got more than one basepair matching this end_id: " + end_id->get_str());
         }
         if (bps.size() == 1) { return *bps[0]; }
         else {
-            throw RNAStructureException("cannot find end with end_id: " + end_id->get_str());
+            throw PoseException("cannot find end with end_id: " + end_id->get_str());
         }
     }
 
@@ -391,7 +391,7 @@ public: // other getters
     get_end_id(
             Index index) const {
         if(index >= end_ids_.size()) {
-            throw RNAStructureException(
+            throw PoseException(
                     "trying to get end_id: " + std::to_string(index) + " there are only " +
                     std::to_string(end_ids_.size()));
         }
@@ -418,7 +418,7 @@ public: // other getters
             if(ei->get_str() == end_id) { return i; }
             i++;
         }
-        throw RNAStructureException("cannot find end with end_id: " + end_id);
+        throw PoseException("cannot find end with end_id: " + end_id);
 
 
     }
@@ -451,8 +451,8 @@ protected:
 
 };
 
-typedef RNAStructure<PrimitiveBasepair, PrimitiveStructure, PrimitiveChain, PrimitiveResidue> PrimitiveRNAStructure;
-typedef std::shared_ptr<PrimitiveRNAStructure> PrimitiveRNAStructureOP;
+typedef Pose<PrimitiveBasepair, PrimitiveStructure, PrimitiveChain, PrimitiveResidue> PrimitivePose;
+typedef std::shared_ptr<PrimitivePose> PrimitivePoseOP;
 
 
 template<typename BPtype, typename Structuretype>
@@ -645,7 +645,7 @@ generate_end_id(
                 ss_id += "U";
             }
             else {
-                throw RNAStructureException(
+                throw PoseException(
                         "unexpected symbol in dot bracket notation: " + std::to_string(e));
             }
         }

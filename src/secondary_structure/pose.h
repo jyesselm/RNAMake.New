@@ -5,7 +5,7 @@
 #ifndef RNAMAKE_NEW_RNA_STRUCTURE_H
 #define RNAMAKE_NEW_RNA_STRUCTURE_H
 
-#include <primitives/rna_structure.h>
+#include <primitives/pose.h>
 #include <secondary_structure/residue.h>
 #include <secondary_structure/chain.h>
 #include <secondary_structure/basepair.h>
@@ -13,13 +13,13 @@
 
 namespace secondary_structure {
 
-class RNAStructure : public primitives::RNAStructure<Basepair, Structure, Chain, Residue> {
+class Pose : public primitives::Pose<Basepair, Structure, Chain, Residue> {
 public:
-    typedef primitives::RNAStructure<Basepair, Structure, Chain, Residue> BaseClass;
+    typedef primitives::Pose<Basepair, Structure, Chain, Residue> BaseClass;
 
 public:
     inline
-    RNAStructure(
+    Pose(
             Structure const & s,
             std::vector<Basepair> const & basepairs,
             std::vector<Basepair> const & ends,
@@ -28,8 +28,8 @@ public:
             BaseClass(s, basepairs, ends, end_ids, name) {}
 
     inline
-    RNAStructure(
-            RNAStructure const & rs) : BaseClass(rs) {}
+    Pose(
+            Pose const & rs) : BaseClass(rs) {}
 
     /*inline
     RNAStructure(
@@ -42,7 +42,7 @@ public:
 
     bool
     operator ==(
-            RNAStructure const & rs) const {
+            Pose const & rs) const {
 
         if(structure_ != rs.structure_) { return false; }
         if(basepairs_.size() != rs.basepairs_.size())  { return false; }
@@ -65,7 +65,7 @@ public:
     inline
     bool
     operator != (
-            RNAStructure const & rs) const {
+            Pose const & rs) const {
         return !(*this == rs);
     }
 
@@ -124,7 +124,7 @@ private:
     _bp_from_str(
             String const & s) {
         auto bp_spl = base::split_str_by_delimiter(s, ";");
-        expects<RNAStructureException>(
+        expects<PoseException>(
                 bp_spl.size() == 3,
                 "incorrect number of sections in basepair string");
 
@@ -140,8 +140,8 @@ private:
 
 };
 
-typedef std::shared_ptr<RNAStructure> RNAStructureOP;
-typedef std::unique_ptr<RNAStructure> RNAStructureUP;
+typedef std::shared_ptr<Pose> PoseOP;
+typedef std::unique_ptr<Pose> PoseUP;
 
 }
 

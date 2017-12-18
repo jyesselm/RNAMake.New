@@ -38,13 +38,8 @@ public:
             Residues const & res,
             Cutpoints const cut_points):
             residues_(res),
-            cut_points_(cut_points) {
+            cut_points_(cut_points) {}
 
-        expects<StructureException>(
-                residues_.size() > 0 && cut_points_.size() > 0,
-                "structures must contain at least one residue and one cutpoint");
-
-    }
     inline
     Structure(
             Structure const & s):

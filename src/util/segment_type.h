@@ -7,7 +7,7 @@
 
 namespace util {
 
-enum class RNASegmentType {
+enum class SegmentType {
     SEGMENT                = 0,
     MOTIF                  = 1,
     HELIX                  = 2,

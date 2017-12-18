@@ -2,7 +2,7 @@
 // Created by Joseph Yesselman on 10/25/17.
 //
 
-#include <primitives/rna_structure.h>
+#include <primitives/pose.h>
 #include <primitives/basepair.h>
 
 

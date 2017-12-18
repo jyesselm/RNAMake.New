@@ -11,7 +11,7 @@
 #include <primitives/chain.h>
 #include <primitives/structure.h>
 #include <primitives/basepair.h>
-#include <primitives/rna_structure.h>
+#include <primitives/pose.h>
 
 namespace primitives {
 
@@ -106,60 +106,60 @@ PYBIND11_PLUGIN(primitives) {
             .def(py::init<const util::Uuid &, const util::Uuid &, const util::Uuid &,
                     BasepairType const &, base::SimpleStringOP const &>());
 
-    py::class_<PrimitiveRNAStructure, PrimitiveRNAStructureOP>(m, "RNAStructure")
+    py::class_<PrimitivePose, PrimitivePoseOP>(m, "Pose")
             .def(py::init<PrimitiveStructure const &, PrimitiveBasepairs const &, PrimitiveBasepairs const &,
                            base::SimpleStringCOPs const &, base::SimpleStringCOP const &>())
-            .def("__iter__", [](const PrimitiveRNAStructure & s) {
+            .def("__iter__", [](const PrimitivePose & s) {
                 return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
-           .def("iter_basepairs", [](const PrimitiveRNAStructure & s) {
+           .def("iter_basepairs", [](const PrimitivePose & s) {
                 return py::make_iterator(s.bps_begin(), s.bps_end()); }, py::keep_alive<0, 1>())
-            .def("iter_ends", [](const PrimitiveRNAStructure & s) {
+            .def("iter_ends", [](const PrimitivePose & s) {
                 return py::make_iterator(s.ends_begin(), s.ends_end()); }, py::keep_alive<0, 1>())
             .def("get_residue",
-                 (Residue const & (PrimitiveRNAStructure::*)(int) const) &PrimitiveRNAStructure::get_residue)
+                 (Residue const & (PrimitivePose::*)(int) const) &PrimitivePose::get_residue)
             .def("get_residue",
-                 (Residue const & (PrimitiveRNAStructure::*)(int, char, char) const) &PrimitiveRNAStructure::get_residue)
+                 (Residue const & (PrimitivePose::*)(int, char, char) const) &PrimitivePose::get_residue)
             .def("get_residue",
-                 (Residue const & (PrimitiveRNAStructure::*)(util::Uuid const &) const) &PrimitiveRNAStructure::get_residue)
-            .def("get_num_residues", &PrimitiveRNAStructure::get_num_residues)
-            .def("get_num_chains", &PrimitiveRNAStructure::get_num_chains)
+                 (Residue const & (PrimitivePose::*)(util::Uuid const &) const) &PrimitivePose::get_residue)
+            .def("get_num_residues", &PrimitivePose::get_num_residues)
+            .def("get_num_chains", &PrimitivePose::get_num_chains)
             .def("get_basepairs",
-                 (BasepairsOP (PrimitiveRNAStructure::*)(util::Uuid const &) const) &PrimitiveRNAStructure::get_basepairs)
+                 (BasepairsOP (PrimitivePose::*)(util::Uuid const &) const) &PrimitivePose::get_basepairs)
             .def("get_basepairs",
-                 (BasepairsOP (PrimitiveRNAStructure::*)(util::Uuid const &, util::Uuid const &) const) &PrimitiveRNAStructure::get_basepairs)
+                 (BasepairsOP (PrimitivePose::*)(util::Uuid const &, util::Uuid const &) const) &PrimitivePose::get_basepairs)
             .def("get_basepairs",
-                 (BasepairsOP (PrimitiveRNAStructure::*)(String const &) const) &PrimitiveRNAStructure::get_basepairs)
+                 (BasepairsOP (PrimitivePose::*)(String const &) const) &PrimitivePose::get_basepairs)
             .def("get_basepair",
-                 (PrimitiveBasepair const & (PrimitiveRNAStructure::*)(util::Uuid const &) const) &PrimitiveRNAStructure::get_basepair)
+                 (PrimitiveBasepair const & (PrimitivePose::*)(util::Uuid const &) const) &PrimitivePose::get_basepair)
             .def("get_basepair",
-                 (PrimitiveBasepair const & (PrimitiveRNAStructure::*)(util::Uuid const &, util::Uuid const &) const) &PrimitiveRNAStructure::get_basepair)
+                 (PrimitiveBasepair const & (PrimitivePose::*)(util::Uuid const &, util::Uuid const &) const) &PrimitivePose::get_basepair)
             .def("get_basepair",
-                 (PrimitiveBasepair const & (PrimitiveRNAStructure::*)(String const &) const) &PrimitiveRNAStructure::get_basepair)
+                 (PrimitiveBasepair const & (PrimitivePose::*)(String const &) const) &PrimitivePose::get_basepair)
             .def("get_basepair",
-                 (PrimitiveBasepair const & (PrimitiveRNAStructure::*)(int) const) &PrimitiveRNAStructure::get_basepair)
+                 (PrimitiveBasepair const & (PrimitivePose::*)(int) const) &PrimitivePose::get_basepair)
             .def("get_end",
-                 (PrimitiveBasepair const & (PrimitiveRNAStructure::*)(util::Uuid const &) const) &PrimitiveRNAStructure::get_end)
+                 (PrimitiveBasepair const & (PrimitivePose::*)(util::Uuid const &) const) &PrimitivePose::get_end)
             .def("get_end",
-                 (PrimitiveBasepair const & (PrimitiveRNAStructure::*)(util::Uuid const &, util::Uuid const &) const) &PrimitiveRNAStructure::get_end)
+                 (PrimitiveBasepair const & (PrimitivePose::*)(util::Uuid const &, util::Uuid const &) const) &PrimitivePose::get_end)
             .def("get_end",
-                 (PrimitiveBasepair const & (PrimitiveRNAStructure::*)(String const &) const) &PrimitiveRNAStructure::get_end)
+                 (PrimitiveBasepair const & (PrimitivePose::*)(String const &) const) &PrimitivePose::get_end)
             .def("get_end",
-                 (PrimitiveBasepair const & (PrimitiveRNAStructure::*)(base::SimpleStringCOP) const) &PrimitiveRNAStructure::get_end)
+                 (PrimitiveBasepair const & (PrimitivePose::*)(base::SimpleStringCOP) const) &PrimitivePose::get_end)
             .def("get_end",
-                 (PrimitiveBasepair const & (PrimitiveRNAStructure::*)(int) const) &PrimitiveRNAStructure::get_end)
+                 (PrimitiveBasepair const & (PrimitivePose::*)(int) const) &PrimitivePose::get_end)
             .def("get_end_by_id",
-                 (PrimitiveBasepair const & (PrimitiveRNAStructure::*)(String const &) const) &PrimitiveRNAStructure::get_end_by_id)
+                 (PrimitiveBasepair const & (PrimitivePose::*)(String const &) const) &PrimitivePose::get_end_by_id)
             .def("get_end_by_id",
-                 (PrimitiveBasepair const & (PrimitiveRNAStructure::*)(base::SimpleStringCOP) const) &PrimitiveRNAStructure::get_end_by_id)
-            .def("get_end_id", &PrimitiveRNAStructure::get_end_id)
+                 (PrimitiveBasepair const & (PrimitivePose::*)(base::SimpleStringCOP) const) &PrimitivePose::get_end_by_id)
+            .def("get_end_id", &PrimitivePose::get_end_id)
             .def("get_end_index",
-                 (int (PrimitiveRNAStructure::*)(base::SimpleStringCOP) const) &PrimitiveRNAStructure::get_end_index)
+                 (int (PrimitivePose::*)(base::SimpleStringCOP) const) &PrimitivePose::get_end_index)
             .def("get_end_index",
-                 (int (PrimitiveRNAStructure::*)(String const &) const) &PrimitiveRNAStructure::get_end_index)
-            .def("get_bp_res", &PrimitiveRNAStructure::get_bp_res)
-            .def("get_num_basepairs", &PrimitiveRNAStructure::get_num_basepairs)
-            .def("get_num_ends", &PrimitiveRNAStructure::get_num_ends)
-            .def("get_name", &PrimitiveRNAStructure::get_name);
+                 (int (PrimitivePose::*)(String const &) const) &PrimitivePose::get_end_index)
+            .def("get_bp_res", &PrimitivePose::get_bp_res)
+            .def("get_num_basepairs", &PrimitivePose::get_num_basepairs)
+            .def("get_num_ends", &PrimitivePose::get_num_ends)
+            .def("get_name", &PrimitivePose::get_name);
 
 
     m.def("generate_bp_name", &generate_bp_name<PrimitiveResidue>);
@@ -170,7 +170,7 @@ PYBIND11_PLUGIN(primitives) {
     py::register_exception<ChainException>(m, "ChainException");
     py::register_exception<StructureException>(m, "StructureException");
     py::register_exception<BasepairException>(m, "BasepairException");
-    py::register_exception<RNAStructureException>(m, "RNAStructureException");
+    py::register_exception<PoseException>(m, "PoseException");
 
     return m.ptr();
 }

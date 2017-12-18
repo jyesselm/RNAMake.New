@@ -13,7 +13,7 @@ depends = {
 }
 
 libs = "base math util primitives data_structures secondary_structure all_atom"
-#libs = "base math util primitives data_structures"
+#libs = "base math util primitives data_structures secondary_structure"
 all_lib_paths = libs.split()
 
 

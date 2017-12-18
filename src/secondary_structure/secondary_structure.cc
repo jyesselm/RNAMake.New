@@ -11,7 +11,7 @@
 #include <secondary_structure/chain.h>
 #include <secondary_structure/structure.h>
 #include <secondary_structure/basepair.h>
-#include <secondary_structure/rna_structure.h>
+#include <secondary_structure/pose.h>
 
 namespace py = pybind11;
 namespace secondary_structure {
@@ -124,63 +124,63 @@ PYBIND11_PLUGIN(secondary_structure) {
             .def("size", &BasepairsVC::size)
             .def("__getitem__", &BasepairsVC::operator[]);
 
-    py::class_<RNAStructure, std::shared_ptr<RNAStructure>>(m, "RNAStructure")
+    py::class_<Pose, std::shared_ptr<Pose>>(m, "Pose")
             .def(py::init<Structure const &, std::vector<Basepair> const &, std::vector<Basepair> const &,
             base::SimpleStringCOPs const &, base::SimpleStringCOP const &>())
-            .def("__iter__", [](const RNAStructure & s) {
+            .def("__iter__", [](const Pose & s) {
                 return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
-            .def("iter_basepairs", [](const RNAStructure & s) {
+            .def("iter_basepairs", [](const Pose & s) {
                 return py::make_iterator(s.bps_begin(), s.bps_end()); }, py::keep_alive<0, 1>())
-            .def("iter_ends", [](const RNAStructure & s) {
+            .def("iter_ends", [](const Pose & s) {
                 return py::make_iterator(s.ends_begin(), s.ends_end()); }, py::keep_alive<0, 1>())
             .def("get_residue",
-                 (Residue const & (RNAStructure::*)(int) const) &RNAStructure::get_residue)
+                 (Residue const & (Pose::*)(int) const) &Pose::get_residue)
             .def("get_residue",
-                 (Residue const & (RNAStructure::*)(int, char, char) const) &RNAStructure::get_residue)
+                 (Residue const & (Pose::*)(int, char, char) const) &Pose::get_residue)
             .def("get_residue",
-                 (Residue const & (RNAStructure::*)(util::Uuid const &) const) &RNAStructure::get_residue)
-            .def("get_num_residues", &RNAStructure::get_num_residues)
-            .def("get_num_chains", &RNAStructure::get_num_chains)
+                 (Residue const & (Pose::*)(util::Uuid const &) const) &Pose::get_residue)
+            .def("get_num_residues", &Pose::get_num_residues)
+            .def("get_num_chains", &Pose::get_num_chains)
             .def("get_basepairs",
-                 (BasepairsOP (RNAStructure::*)(util::Uuid const &) const) &RNAStructure::get_basepairs)
+                 (BasepairsOP (Pose::*)(util::Uuid const &) const) &Pose::get_basepairs)
             .def("get_basepairs",
-                 (BasepairsOP (RNAStructure::*)(util::Uuid const &, util::Uuid const &) const) &RNAStructure::get_basepairs)
+                 (BasepairsOP (Pose::*)(util::Uuid const &, util::Uuid const &) const) &Pose::get_basepairs)
             .def("get_basepairs",
-                 (BasepairsOP (RNAStructure::*)(String const &) const) &RNAStructure::get_basepairs)
+                 (BasepairsOP (Pose::*)(String const &) const) &Pose::get_basepairs)
             .def("get_basepair",
-                 (Basepair const & (RNAStructure::*)(util::Uuid const &) const) &RNAStructure::get_basepair)
+                 (Basepair const & (Pose::*)(util::Uuid const &) const) &Pose::get_basepair)
             .def("get_basepair",
-                 (Basepair const & (RNAStructure::*)(util::Uuid const &, util::Uuid const &) const) &RNAStructure::get_basepair)
+                 (Basepair const & (Pose::*)(util::Uuid const &, util::Uuid const &) const) &Pose::get_basepair)
             .def("get_basepair",
-                 (Basepair const & (RNAStructure::*)(String const &) const) &RNAStructure::get_basepair)
+                 (Basepair const & (Pose::*)(String const &) const) &Pose::get_basepair)
             .def("get_basepair",
-                 (Basepair const & (RNAStructure::*)(int) const) &RNAStructure::get_basepair)
+                 (Basepair const & (Pose::*)(int) const) &Pose::get_basepair)
             .def("get_end",
-                 (Basepair const & (RNAStructure::*)(util::Uuid const &) const) &RNAStructure::get_end)
+                 (Basepair const & (Pose::*)(util::Uuid const &) const) &Pose::get_end)
             .def("get_end",
-                 (Basepair const & (RNAStructure::*)(util::Uuid const &, util::Uuid const &) const) &RNAStructure::get_end)
+                 (Basepair const & (Pose::*)(util::Uuid const &, util::Uuid const &) const) &Pose::get_end)
             .def("get_end",
-                 (Basepair const & (RNAStructure::*)(String const &) const) &RNAStructure::get_end)
+                 (Basepair const & (Pose::*)(String const &) const) &Pose::get_end)
             .def("get_end",
-                 (Basepair const & (RNAStructure::*)(base::SimpleStringCOP) const) &RNAStructure::get_end)
+                 (Basepair const & (Pose::*)(base::SimpleStringCOP) const) &Pose::get_end)
             .def("get_end",
-                 (Basepair const & (RNAStructure::*)(int) const) &RNAStructure::get_end)
+                 (Basepair const & (Pose::*)(int) const) &Pose::get_end)
             .def("get_end_by_id",
-                 (Basepair const & (RNAStructure::*)(String const &) const) &RNAStructure::get_end_by_id)
+                 (Basepair const & (Pose::*)(String const &) const) &Pose::get_end_by_id)
             .def("get_end_by_id",
-                 (Basepair const & (RNAStructure::*)(base::SimpleStringCOP) const) &RNAStructure::get_end_by_id)
-            .def("get_end_id", &RNAStructure::get_end_id)
+                 (Basepair const & (Pose::*)(base::SimpleStringCOP) const) &Pose::get_end_by_id)
+            .def("get_end_id", &Pose::get_end_id)
             .def("get_end_index",
-                 (int (RNAStructure::*)(base::SimpleStringCOP) const) &RNAStructure::get_end_index)
+                 (int (Pose::*)(base::SimpleStringCOP) const) &Pose::get_end_index)
             .def("get_end_index",
-                 (int (RNAStructure::*)(String const &) const) &RNAStructure::get_end_index)
-            .def("get_bp_res", &RNAStructure::get_bp_res)
-            .def("get_num_basepairs", &RNAStructure::get_num_basepairs)
-            .def("get_num_ends", &RNAStructure::get_num_ends)
-            .def("get_name", &RNAStructure::get_name)
-            .def("get_str", &RNAStructure::get_str)
-            .def("set_residue_name", &RNAStructure::set_residue_name)
-            .def("set_sequence", &RNAStructure::set_sequence)
+                 (int (Pose::*)(String const &) const) &Pose::get_end_index)
+            .def("get_bp_res", &Pose::get_bp_res)
+            .def("get_num_basepairs", &Pose::get_num_basepairs)
+            .def("get_num_ends", &Pose::get_num_ends)
+            .def("get_name", &Pose::get_name)
+            .def("get_str", &Pose::get_str)
+            .def("set_residue_name", &Pose::set_residue_name)
+            .def("set_sequence", &Pose::set_sequence)
             .def(py::self == py::self)
             .def(py::self != py::self);
 
@@ -193,7 +193,7 @@ PYBIND11_PLUGIN(secondary_structure) {
     py::register_exception<ResidueException>(m, "ResidueException");
     py::register_exception<ChainException>(m, "ChainException");
     py::register_exception<StructureException>(m, "StructureException");
-    py::register_exception<RNAStructureException>(m, "RNAStructureException");
+    py::register_exception<PoseException>(m, "PoseException");
 
     return m.ptr();
 

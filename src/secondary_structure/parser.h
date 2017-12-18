@@ -7,8 +7,8 @@
 
 #include <data_structures/graph.h>
 #include <secondary_structure/residue.h>
-#include <secondary_structure/rna_structure.h>
-#include <secondary_structure/rna_segment.h>
+#include <secondary_structure/pose.h>
+#include <secondary_structure/segment.h>
 
 namespace secondary_structure {
 
@@ -108,13 +108,13 @@ public:
     ~Parser() {}
 
 public:
-    RNAStructureOP
-    parse_to_rna_structure(
+    PoseOP
+    parse_to_pose(
             String const &,
             String const &);
 
-    RNASegmentOP
-    parse_to_rna_segment(
+    SegmentOP
+    parse_to_segment(
             String const &,
             String const &);
 
@@ -185,7 +185,7 @@ private:
             }
         }
 
-        throw RNAStructureException("cannot find pair to (");
+        throw PoseException("cannot find pair to (");
 
     }
 
@@ -200,8 +200,8 @@ private:
         }
     }
 
-    RNAStructureOP
-    _generate_rna_structure(
+    PoseOP
+    _generate_pose(
             Structure const & s);
 
 

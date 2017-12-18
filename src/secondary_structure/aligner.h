@@ -5,7 +5,7 @@
 #ifndef RNAMAKE_NEW_ALIGNER_H
 #define RNAMAKE_NEW_ALIGNER_H
 
-#include <secondary_structure/rna_segment.h>
+#include <secondary_structure/segment.h>
 
 namespace secondary_structure {
 
@@ -19,13 +19,13 @@ public:
     void
     align(
             Basepair const & ref_bp,
-            RNASegmentOP & rs) { }
+            SegmentOP & rs) { }
 
-    RNASegmentOP
+    SegmentOP
     get_aligned(
             Basepair const & ref_bp,
-            RNASegment const & rs) {
-        return std::make_shared<RNASegment>(rs);
+            SegmentOP const & rs) {
+        return std::make_shared<Segment>(*rs);
     }
 };
 

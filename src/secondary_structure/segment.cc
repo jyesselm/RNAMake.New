@@ -2,4 +2,4 @@
 // Created by Joseph Yesselman on 11/3/17.
 //
 
-#include "rna_segment.h"
+#include <secondary_structure/segment.h>
