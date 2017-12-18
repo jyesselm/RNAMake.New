@@ -9,6 +9,7 @@
 //RNAMake Headers
 #include <base/types.h>
 #include <math/numerical.h>
+#include <math/quaternion.h>
 
 namespace math {
 
@@ -54,7 +55,12 @@ are_matrices_equal(
 	}
 
 	return 1;
+}
 
+Matrix
+get_random_rotation_matrix() {
+    auto q = get_random_quaternion();
+    return q.get_rotation_matrix();
 }
 
 }

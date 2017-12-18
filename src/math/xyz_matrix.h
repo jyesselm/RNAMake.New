@@ -83,44 +83,6 @@ private:
 
     }
 
-    friend
-    inline
-    void
-    dot(
-            xyzMatrix<T> const & a,
-            xyzMatrix<T> const & b,
-            xyzMatrix<T> & c) {
-
-        c.xx_ = a.xx_ * b.xx_ + a.xy_ * b.yx_ + a.xz_ * b.zx_;
-        c.xy_ = a.xx_ * b.xy_ + a.xy_ * b.yy_ + a.xz_ * b.zy_;
-        c.xz_ = a.xx_ * b.xz_ + a.xy_ * b.yz_ + a.xz_ * b.zz_;
-        c.yx_ = a.yx_ * b.xx_ + a.yy_ * b.yx_ + a.yz_ * b.zx_;
-        c.yy_ = a.yx_ * b.xy_ + a.yy_ * b.yy_ + a.yz_ * b.zy_;
-        c.yz_ = a.yx_ * b.xz_ + a.yy_ * b.yz_ + a.yz_ * b.zz_;
-        c.zx_ = a.zx_ * b.xx_ + a.zy_ * b.yx_ + a.zz_ * b.zx_;
-        c.zy_ = a.zx_ * b.xy_ + a.zy_ * b.yy_ + a.zz_ * b.zy_;
-        c.zz_ = a.zx_ * b.xz_ + a.zy_ * b.yz_ + a.zz_ * b.zz_;
-    }
-
-    friend
-    inline
-    xyzMatrix<T>
-    dot(
-            xyzMatrix<T> const & a,
-            xyzMatrix<T> const & b) {
-        auto c = xyzMatrix<T>();
-        c.xx_ = a.xx_ * b.xx_ + a.xy_ * b.yx_ + a.xz_ * b.zx_;
-        c.xy_ = a.xx_ * b.xy_ + a.xy_ * b.yy_ + a.xz_ * b.zy_;
-        c.xz_ = a.xx_ * b.xz_ + a.xy_ * b.yz_ + a.xz_ * b.zz_;
-        c.yx_ = a.yx_ * b.xx_ + a.yy_ * b.yx_ + a.yz_ * b.zx_;
-        c.yy_ = a.yx_ * b.xy_ + a.yy_ * b.yy_ + a.yz_ * b.zy_;
-        c.yz_ = a.yx_ * b.xz_ + a.yy_ * b.yz_ + a.yz_ * b.zz_;
-        c.zx_ = a.zx_ * b.xx_ + a.zy_ * b.yx_ + a.zz_ * b.zx_;
-        c.zy_ = a.zx_ * b.xy_ + a.zy_ * b.yy_ + a.zz_ * b.zy_;
-        c.zz_ = a.zx_ * b.xz_ + a.zy_ * b.yz_ + a.zz_ * b.zz_;
-        return c;
-    }
-
 
 public: //creation
     /// @brief Default constructor
@@ -757,6 +719,42 @@ dot_vector(
     vr.set_z(m.get_xz() * v.get_x() + m.get_yz() * v.get_y() + m.get_zz() * v.get_z());
     return vr;
 }
+
+inline
+void
+dot(
+        Matrix const & a,
+        Matrix const & b,
+        Matrix & c) {
+
+    c.set_xx(a.get_xx() * b.get_xx() + a.get_xy() * b.get_yx() + a.get_xz() * b.get_zx());
+    c.set_xy(a.get_xx() * b.get_xy() + a.get_xy() * b.get_yy() + a.get_xz() * b.get_zy());
+    c.set_xz(a.get_xx() * b.get_xz() + a.get_xy() * b.get_yz() + a.get_xz() * b.get_zz());
+    c.set_yx(a.get_yx() * b.get_xx() + a.get_yy() * b.get_yx() + a.get_yz() * b.get_zx());
+    c.set_yy(a.get_yx() * b.get_xy() + a.get_yy() * b.get_yy() + a.get_yz() * b.get_zy());
+    c.set_yz(a.get_yx() * b.get_xz() + a.get_yy() * b.get_yz() + a.get_yz() * b.get_zz());
+    c.set_zx(a.get_zx() * b.get_xx() + a.get_zy() * b.get_yx() + a.get_zz() * b.get_zx());
+    c.set_zy(a.get_zx() * b.get_xy() + a.get_zy() * b.get_yy() + a.get_zz() * b.get_zy());
+    c.set_zz(a.get_zx() * b.get_xz() + a.get_zy() * b.get_yz() + a.get_zz() * b.get_zz());
+}
+
+inline
+Matrix
+dot(
+        Matrix const & a,
+        Matrix const & b) {
+    return Matrix(
+            a.get_xx() * b.get_xx() + a.get_xy() * b.get_yx() + a.get_xz() * b.get_zx(),
+            a.get_xx() * b.get_xy() + a.get_xy() * b.get_yy() + a.get_xz() * b.get_zy(),
+            a.get_xx() * b.get_xz() + a.get_xy() * b.get_yz() + a.get_xz() * b.get_zz(),
+            a.get_yx() * b.get_xx() + a.get_yy() * b.get_yx() + a.get_yz() * b.get_zx(),
+            a.get_yx() * b.get_xy() + a.get_yy() * b.get_yy() + a.get_yz() * b.get_zy(),
+            a.get_yx() * b.get_xz() + a.get_yy() * b.get_yz() + a.get_yz() * b.get_zz(),
+            a.get_zx() * b.get_xx() + a.get_zy() * b.get_yx() + a.get_zz() * b.get_zx(),
+            a.get_zx() * b.get_xy() + a.get_zy() * b.get_yy() + a.get_zz() * b.get_zy(),
+            a.get_zx() * b.get_xz() + a.get_zy() * b.get_yz() + a.get_zz() * b.get_zz());
+}
+
 
 }
 

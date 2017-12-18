@@ -64,6 +64,7 @@ target_link_libraries(option_unittest base_lib)
 
 set(math_files
 	/Users/jyesselm/projects/RNAMake.New/src/math/math.cc
+	/Users/jyesselm/projects/RNAMake.New/src/math/quaternion.cc
 	/Users/jyesselm/projects/RNAMake.New/src/math/xyz_vector.cc
 	/Users/jyesselm/projects/RNAMake.New/src/math/xyz_matrix.cc
 	/Users/jyesselm/projects/RNAMake.New/src/math/numerical.cc
@@ -88,6 +89,7 @@ set(util_files
 	/Users/jyesselm/projects/RNAMake.New/src/util/util.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/bead.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/x3dna.cc
+	/Users/jyesselm/projects/RNAMake.New/src/util/random_number_generator.cc
 )
 
 add_library(util_lib ${util_files})
@@ -186,9 +188,11 @@ set(all_atom_files
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/atom.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/residue_type_set.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/residue.cc
+	/Users/jyesselm/projects/RNAMake.New/src/all_atom/basepair.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/structure.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/pdb_parser.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/chain.cc
+	/Users/jyesselm/projects/RNAMake.New/src/all_atom/rna_structure.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/residue_type.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/all_atom.cc
 )
@@ -201,6 +205,9 @@ target_link_libraries(all_atom secondary_structure_lib  pybind11::module)
 
 add_executable(pdb_parser_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/pdb_parser_unittest.cc)
 target_link_libraries(pdb_parser_unittest all_atom_lib)
+
+add_executable(all_atom_basepair_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_basepair_unittest.cc)
+target_link_libraries(all_atom_basepair_unittest all_atom_lib)
 
 add_executable(parse_all_pdbs_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/parse_all_pdbs_unittest.cc)
 target_link_libraries(parse_all_pdbs_unittest all_atom_lib)

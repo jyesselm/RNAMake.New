@@ -12,4 +12,6 @@ TEST_CASE( "Test X3dna parser ", "[X3dnaParser]" ) {
     auto x = util::X3dna();
     auto path = base::unittest_resources_path() + "/all_atom/p4p6.pdb";
     auto x3dna_bps = x.get_basepairs(path);
+
+
 }

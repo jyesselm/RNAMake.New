@@ -27,7 +27,6 @@ TEST_CASE( "run x3dna on all pdbs", "[X3dnaParser]" ) {
         auto fname = String(entry->d_name);
         //if(fname != "2EZ6") { continue; }
         if(fname.length() != 4) { continue; }
-        std::cout << fname << std::endl;
 
         if(!base::file_exists(path + "/" + fname + "/ref_frames.dat")) { continue; }
 

@@ -5,6 +5,7 @@
 #include <base/file_io.h>
 #include <math/xyz_matrix.h>
 #include <math/numerical.h>
+#include <math/quaternion.h>
 
 
 TEST_CASE( "Test Matrix math ", "[XYZMatrix]" ) {
@@ -32,7 +33,16 @@ TEST_CASE( "Test Matrix math ", "[XYZMatrix]" ) {
         REQUIRE(math::are_matrices_equal(org_m, unit));
         
     }
-    
+
+    SECTION("test random quaterion") {
+        auto q = math::get_random_quaternion();
+    }
+
+    SECTION("test random matrix") {
+        auto m = math::get_random_rotation_matrix();
+        std::cout << m.get_str_readable() << std::endl;
+    }
+
     /*SECTION("Test unitarize in batch with 1000 matrices") {
         auto path = unittest_resource_dir() + "/math/test_unitarize_multi.dat";
         auto lines = get_lines_from_file(path);
@@ -60,9 +70,9 @@ TEST_CASE( "Test Matrix math ", "[XYZMatrix]" ) {
             
             
         }
-        
+
         REQUIRE(fail == 0);
-        
+
     }*/
     
 }

@@ -2,7 +2,8 @@
 // Created by Joseph Yesselman on 11/28/17.
 //
 
-#include "all_atom/structure.h"
+#include <base/logger.h>
+#include <all_atom/structure.h>
 #include <all_atom/pdb_parser.h>
 
 namespace all_atom {
@@ -186,6 +187,66 @@ get_structure_from_pdb(
     else {
         throw StructureException("residue set type not supported");
     }
+
+}
+
+
+base::VectorContainerOP<Basepair>
+get_basepairs_from_x3dna(
+        util::X3dna::X3Basepairs const & x3dna_basepairs,
+        Structure const & s) {
+
+    auto bps = Basepairs();
+    for(auto const & xbp : x3dna_basepairs) {
+        Residue const * res1;
+        Residue const * res2;
+        try {
+            res1 = &s.get_residue(xbp.res1.num, xbp.res1.chain_id, xbp.res1.i_code);
+        }
+        catch(StructureException) {
+            LOG_WARNING(
+                    "Structure", "cannot find RNA residue in basepair with num: " +
+                    std::to_string(xbp.res1.num)  + " chain_id: " +
+                    String(xbp.res1.chain_id, 1) + " i_code: " +  String(xbp.res1.i_code, 1) +
+                    "in structure SKIPPING!");
+            continue;
+        }
+
+        try {
+            res2 = &s.get_residue(xbp.res2.num, xbp.res2.chain_id, xbp.res2.i_code);
+        }
+        catch(StructureException) {
+            LOG_WARNING(
+                    "Structure", "cannot find RNA residue in basepair with num: " +
+                    std::to_string(xbp.res2.num)  + " chain_id: " +
+                    String(xbp.res2.chain_id, 1) + " i_code: " +  String(xbp.res2.i_code, 1) +
+                    "in structure SKIPPING!");
+            continue;
+        }
+
+        // calculate center of base pair
+        auto center = math::Point();
+        auto count = 0;
+        for(auto const & a : *res1) {
+            center += a.get_coords();
+            count += 1;
+        }
+        for(auto const & a : *res2) {
+            center += a.get_coords();
+            count += 1;
+        }
+        center /= count;
+
+        auto bp_name = std::make_shared<base::SimpleString>(generate_bp_name(*res1, *res2));
+        auto bp_type = generate_bp_type(*res1, *res2, xbp.bp_type);
+        auto c1_prime_coords = math::Points{res1->get_coords("C1'"), res2->get_coords("C1'")};
+
+        bps.push_back(
+                Basepair(res1->get_uuid(), res2->get_uuid(), util::Uuid(), bp_type,
+                         bp_name, xbp.bp_type, xbp.r, center, c1_prime_coords));
+
+    }
+    return std::make_shared<base::VectorContainer<Basepair>>(bps);
 
 }
 

@@ -153,21 +153,6 @@ generate_bp_name(
 }
 
 
-/*template <typename Restype>
-Basepair::BasepairType
-get_bp_type(std::vector<std::shared_ptr<Restype>> const & res,
-            X3dna::X3dnaBPType const & x3dna_bp_type) {
-    auto bp_str = String();
-    bp_str += res[0]->name(); bp_str += res[1]->name();
-    auto wc_names = Strings{"GC", "CG", "AU", "UA"};
-    // not in WC orientation, is non-cononical
-    if(x3dna_bp_type != X3dna::X3dnaBPType::cWUW) { return BasepairType::NC; }
-    // has correct residues to be a WC basepair
-    if (std::find(wc_names.begin(), wc_names.end(), bp_str) != wc_names.end()) { return BasepairType::WC; }
-    if (bp_str == "GU" || bp_str == "UG" ) { return BasepairType::GU; }
-    return BasepairType::NC;
-}
-*/
 }
 
 

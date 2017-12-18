@@ -34,6 +34,9 @@ are_matrices_equal(
         Matrix const &,
         Matrix const &);
 
+Matrix
+get_random_rotation_matrix();
+
 }
 
 #endif /* defined(__REDESIGNC__Numeric_Test__) */

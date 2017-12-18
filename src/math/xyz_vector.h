@@ -371,6 +371,16 @@ public: // Methods
 		);
 	}
 
+public:
+    friend
+    std::ostream &
+    operator<< (
+            std::ostream & stream ,
+            xyzVector const & v) {
+        stream << v.get_str();
+        return stream;
+    }
+
 
 public: // Properties: accessors
 
@@ -506,6 +516,7 @@ typedef std::vector<Vector> Vectors;
 
 typedef xyzVector<double> Point;
 typedef std::vector<Point> Points;
+
 
 }
 

@@ -155,8 +155,8 @@ X3dna::_parse_ref_frame_file(
             auto r = math::Matrix(rs[0].get_x(), rs[0].get_y(), rs[0].get_z(),
                                   rs[1].get_x(), rs[1].get_y(), rs[1].get_z(),
                                   rs[2].get_x(), rs[2].get_y(), rs[2].get_z());
-            auto res1 = X3Residue{bp_info->res1_num, bp_info->res1_name, ' '};
-            auto res2 = X3Residue{bp_info->res2_num, bp_info->res2_name, ' '};
+            auto res1 = X3Residue{bp_info->res1_num, bp_info->res1_chain_id, ' '};
+            auto res2 = X3Residue{bp_info->res2_num, bp_info->res2_chain_id, ' '};
             auto bp   = X3Basepair{res1, res2, d, r, X3dnaBPType::cDDD};
             basepairs_.push_back(bp);
             start_bp = 0;
@@ -337,12 +337,12 @@ X3dna::get_basepairs(
     }
 
     // clean up generated x3dna files
-    /*if(generated_ref_frames_) { _delete_file("ref_frames.dat"); }
+    if(generated_ref_frames_) { _delete_file("ref_frames.dat"); }
     if(generated_dssr_)       {
         auto fname = base::filename(pdb_path);
         fname = fname.substr(0, fname.length()-4);
         _delete_file(fname + "_dssr.out");
-    }*/
+    }
 
     return basepairs_;
 

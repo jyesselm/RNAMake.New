@@ -5,9 +5,12 @@
 #ifndef RNAMAKE_NEW_STRUCTURE_H
 #define RNAMAKE_NEW_STRUCTURE_H
 
+#include <base/vector_container.h>
+#include <util/x3dna.h>
 #include <primitives/structure.h>
 #include <all_atom/residue.h>
 #include <all_atom/chain.h>
+#include <all_atom/basepair.h>
 
 namespace all_atom {
 
@@ -148,6 +151,13 @@ get_structure_from_pdb(
         ResidueTypeSetOP,
         SetType);
 
+base::VectorContainerOP<Basepair>
+get_basepairs_from_x3dna(
+        util::X3dna::X3Basepairs const &,
+        Structure const &);
+
+
 }
+
 
 #endif //RNAMAKE_NEW_STRUCTURE_H
