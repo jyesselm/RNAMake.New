@@ -21,6 +21,9 @@ class Uuid {
 public:
     Uuid();
 
+    Uuid(Uuid const & uuid):
+        id_(uuid.id_) {}
+
     ~Uuid() {}
 
 public:
@@ -49,6 +52,16 @@ public:
     operator >(Uuid const & uuid) const {
         return id_ > uuid.id_;
     }
+
+    friend
+    std::ostream &
+    operator<< (
+            std::ostream & stream ,
+            Uuid const & uuid) {
+        stream << uuid.id_;
+        return stream;
+    }
+
 
 
 private:

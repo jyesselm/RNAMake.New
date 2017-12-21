@@ -9,6 +9,7 @@
 #include <primitives/pose.h>
 #include <all_atom/structure.h>
 #include <all_atom/basepair.h>
+#include <all_atom/pdb_parser.h>
 
 namespace all_atom {
 
@@ -32,19 +33,50 @@ public:
             small_molecules_(small_molecules),
             dot_bracket_(dot_bracket) {}
 
+public:
+    inline
+    String
+    dot_bracket() { return dot_bracket_->get_str(); }
+
 private:
     Structure proteins_;
     Structure small_molecules_;
     base::SimpleStringCOP dot_bracket_;
-
 };
 
 typedef std::shared_ptr<Pose> PoseOP;
 
+inline
+base::VectorContainerOP<Basepair>
+get_ends_from_basepairs(
+        Structure const & s,
+        Basepairs const & bps) {
+    return primitives::get_ends_from_basepairs<Basepair, Structure>(s, bps);
+}
+
+inline
+String
+generate_end_id(
+        Structure const & s,
+        Basepairs const & bps,
+        Basepairs const & ends,
+        Basepair const & end) {
+    return primitives::generate_end_id<Structure, Chain, Basepair, Residue>(s, bps, ends, end);
+}
+
+inline
+String
+generate_secondary_structure(
+        Structure const & s,
+        Basepairs const & bps,
+        Basepairs const & ends) {
+    return primitives::generate_secondary_structure<Structure, Chain, Basepair, Residue>(s, bps, ends);
+}
+
 PoseOP
-pose_from_pdb(
+get_pose_from_pdb(
         String const &,
-        ResidueTypeSetCOP);
+        PDBParser &);
 
 }
 #endif //RNAMAKE_NEW_ALL_ATOM_RNA_STRUCTURE_H

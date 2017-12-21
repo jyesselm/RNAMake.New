@@ -213,6 +213,12 @@ target_link_libraries(all_atom_basepair_unittest all_atom_lib)
 add_executable(parse_all_pdbs_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/parse_all_pdbs_unittest.cc)
 target_link_libraries(parse_all_pdbs_unittest all_atom_lib)
 
+add_executable(all_pdbs_to_poses_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_pdbs_to_poses_unittest.cc)
+target_link_libraries(all_pdbs_to_poses_unittest all_atom_lib)
+
 add_executable(all_atom_structure_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_structure_unittest.cc)
 target_link_libraries(all_atom_structure_unittest all_atom_lib)
+
+add_executable(all_atom_pose_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_pose_unittest.cc)
+target_link_libraries(all_atom_pose_unittest all_atom_lib)
 

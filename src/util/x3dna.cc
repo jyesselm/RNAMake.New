@@ -18,7 +18,10 @@
 namespace util {
 
 X3dna::X3dna():
-        rebuild_files_(true) {
+        rebuild_files_(true),
+        generated_dssr_(false),
+        generated_ref_frames_(false),
+        no_ref_frames_(false) {
     auto os_name = base::get_os_name();
     auto x3dna_path = base::resources_path() + "/x3dna/" + os_name + "/";
     auto env = "X3DNA=" + x3dna_path;
@@ -74,7 +77,12 @@ X3dna::_generate_ref_frame(
     auto result = std::system(s);
 
     if (result != 0) {
-        throw X3dnaException("could not call find_pair properly, please make sure you have it set up properly\n");
+        generated_ref_frames_ = true;
+        no_ref_frames_ = true;
+        LOG_WARNING("X3dna",
+                    "no ref_frames.dat generated from X3dna this is likely due to there being no "
+                    "basepairs in this pdb");
+        return;
     }
 
     _delete_files(ref_frame_files_to_delete_);
@@ -118,6 +126,9 @@ X3dna::_parse_ref_frame_file(
             }
         }
     }
+
+    if(no_ref_frames_) { return; }
+
     basepairs_ = X3Basepairs();
     auto lines = base::get_lines_from_file(ref_frames_path);
     auto r = std::regex("#\\s+(?:\\.+\\d+\\>)*(\\w+):\\.*(-*\\d+)\\S:\\[\\.*(\\S+)\\](\\w+)\\s+\\-\\s+(?:\\.+\\d+\\>)*(\\w+):\\.*(-*\\d+)\\S:\\[\\.*(\\S+)\\](\\w+)");
@@ -291,10 +302,14 @@ X3dna::get_basepairs(
         String const & pdb_path) {
 
     // check if we created these files
+    no_ref_frames_ = false;
     generated_ref_frames_ = false;
     generated_dssr_ = false;
 
     _parse_ref_frame_file(pdb_path);
+
+    if(no_ref_frames_) { return basepairs_; }
+
     auto dssr_file_sections = _parse_dssr_file_into_sections(pdb_path);
     if(dssr_file_sections.find("base") == dssr_file_sections.end()) { return basepairs_; }
     auto dssr_bp_section = dssr_file_sections["base"];

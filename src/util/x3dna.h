@@ -240,6 +240,7 @@ private:
     Strings ref_frame_files_to_delete_, dssr_files_to_delete_;
     bool rebuild_files_;
     bool generated_ref_frames_, generated_dssr_;
+    bool no_ref_frames_;
 };
 
 X3dnaBPType

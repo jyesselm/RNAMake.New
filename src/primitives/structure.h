@@ -133,10 +133,10 @@ public:
             if (cut_points_[pos] == i) {
                 auto c = Chaintype(res);
                 chains.push_back(c);
-                res = Residues{r};
+                res = Residues{Restype(r)};
                 pos += 1;
             } else {
-                res.push_back(r);
+                res.push_back(Restype(r));
             }
             i++;
         }

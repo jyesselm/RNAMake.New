@@ -9,3 +9,6 @@ CMakeCache.txt
 CMakeFiles
 
 cmake/build_clang
+html/
+latex/
+bindings/

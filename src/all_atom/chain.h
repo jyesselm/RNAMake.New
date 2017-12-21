@@ -84,6 +84,29 @@ public:
         return s;
     }
 
+    String
+    get_pdb_str(
+            int,
+            int,
+            char) const;
+
+    inline
+    String
+    get_pdb_str(
+            int acount = 1) const {
+        return get_pdb_str(acount, get_first().get_num(), get_first().get_chain_id());
+    }
+
+    void
+    write_pdb(
+            String const & f_name) const {
+        auto out = std::ofstream();
+        out.open(f_name);
+        out << get_pdb_str();
+        out.close();
+    }
+
+
 };
 
 typedef std::shared_ptr<Chain> ChainOP;

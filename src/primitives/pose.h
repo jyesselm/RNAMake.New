@@ -460,22 +460,27 @@ base::VectorContainerOP<BPtype>
 get_ends_from_basepairs(
         Structuretype const & s,
         std::vector<BPtype> const & bps) {
-    auto chain_end_uuids = std::vector<util::Uuid>();
+    auto start_chain_end_uuids = std::vector<util::Uuid>();
+    auto end_chain_end_uuids = std::vector<util::Uuid>();
+
     for(auto const & r : s) {
-        if     (s.is_residue_start_of_chain(r)) { chain_end_uuids.push_back(r.get_uuid()); }
-        else if(s.is_residue_end_of_chain(r))   { chain_end_uuids.push_back(r.get_uuid()); }
+        if     (s.is_residue_start_of_chain(r)) { start_chain_end_uuids.push_back(r.get_uuid()); }
+        else if(s.is_residue_end_of_chain(r))   { end_chain_end_uuids.push_back(r.get_uuid()); }
     }
 
     auto ends = std::vector<BPtype>();
     for(auto const & bp : bps) {
         if(bp.get_bp_type() == BasepairType::NC) { continue; }
-        if(std::find(chain_end_uuids.begin(), chain_end_uuids.end(), bp.get_res1_uuid()) == chain_end_uuids.end())  {
-            continue;
+
+        if     (std::find(start_chain_end_uuids.begin(), start_chain_end_uuids.end(), bp.get_res1_uuid()) != start_chain_end_uuids.end() &&
+                std::find(end_chain_end_uuids.begin(), end_chain_end_uuids.end(), bp.get_res2_uuid()) != end_chain_end_uuids.end()) {
+            ends.push_back(bp);
         }
-        if(std::find(chain_end_uuids.begin(), chain_end_uuids.end(), bp.get_res2_uuid()) == chain_end_uuids.end())  {
-            continue;
+        else if(std::find(start_chain_end_uuids.begin(), start_chain_end_uuids.end(), bp.get_res2_uuid()) != start_chain_end_uuids.end() &&
+                std::find(end_chain_end_uuids.begin(), end_chain_end_uuids.end(), bp.get_res1_uuid()) != end_chain_end_uuids.end()) {
+            ends.push_back(bp);
         }
-        ends.push_back(bp);
+
     }
 
     return std::make_shared<base::VectorContainer<BPtype>>(ends);
@@ -490,17 +495,17 @@ get_res_wc_or_gu_basepair(
         Restype const & r) {
 
     for(auto const & bp : basepairs) {
-        if((bp.get_res1_uuid() == r.get_uuid() ||
-            bp.get_res2_uuid() == r.get_uuid()) &&
-           bp.get_bp_type() != BasepairType::NC) {
+        if(bp.get_bp_type() == BasepairType::NC) { continue; }
+        if(bp.get_res1_uuid() == r.get_uuid() ||
+            bp.get_res2_uuid() == r.get_uuid()) {
             return &bp;
         }
     }
 
     for(auto const & bp : ends) {
-        if((bp.get_res1_uuid() == r.get_uuid() ||
-            bp.get_res2_uuid() == r.get_uuid()) &&
-           bp.get_bp_type() != BasepairType::NC) {
+        if(bp.get_bp_type() == BasepairType::NC) { continue; }
+        if(bp.get_res1_uuid() == r.get_uuid() ||
+            bp.get_res2_uuid() == r.get_uuid()) {
             return &bp;
         }
     }
@@ -508,7 +513,6 @@ get_res_wc_or_gu_basepair(
     return nullptr;
 
 }
-
 
 template<typename Structuretype, typename Chaintype, typename BPtype, typename Restype>
 String
@@ -654,6 +658,121 @@ generate_end_id(
     }
 
     return ss_id;
+
+};
+
+template<typename Structuretype, typename Chaintype, typename BPtype, typename Restype>
+String
+generate_secondary_structure(
+        Structuretype const & s,
+        std::vector<BPtype> const & bps,
+        std::vector<BPtype> const & ends) {
+
+    auto open_chains = std::vector<Chaintype const *>();
+    auto chains = s.get_chains();
+
+    if(chains->size() == 0) { return String(""); }
+    open_chains.push_back(&chains->get_data()[0]);
+
+    auto seen_res    = std::map<util::Uuid, int>();
+    auto seen_bps    = std::map<BPtype const *, int>();
+    auto seen_chains = std::map<Chaintype const *, int>();
+    seen_chains[open_chains[0]] = 1;
+
+    BPtype const * bp = nullptr;
+    auto seq = String("");
+    auto ss = String("");
+    auto dot_bracket = ' ';
+
+    auto best_chains = std::vector<Chaintype const *>();
+    Chaintype const * best_chain;
+    Chaintype const * c = nullptr;
+    auto best_score = 0;
+    auto score = 0;
+    auto pos = 0;
+    auto final_ss = String("");
+
+    while( open_chains.size() > 0) {
+        c = open_chains[0];
+        open_chains.erase(open_chains.begin());
+
+        for (auto const & r : *c) {
+            dot_bracket = '.';
+            bp = get_res_wc_or_gu_basepair(bps, ends, r);
+            if (bp != nullptr && bp->get_bp_type() != BasepairType::NC) {
+                auto & partner_res_uuid = bp->get_partner(r.get_uuid());
+                auto & partner_res = s.get_residue(partner_res_uuid);
+                if (seen_bps.find(bp) == seen_bps.end() &&
+                    seen_res.find(r.get_uuid()) == seen_res.end() &&
+                    seen_res.find(partner_res.get_uuid()) == seen_res.end()) {
+                    seen_res[r.get_uuid()] = 1;
+                    dot_bracket = '(';
+                } else if (seen_res.find(partner_res.get_uuid()) != seen_res.end()) {
+                    if (seen_res[partner_res.get_uuid()] > 1) { dot_bracket = '.'; }
+                    else {
+                        dot_bracket = ')';
+                        seen_res[r.get_uuid()] = 1;
+                        seen_res[partner_res.get_uuid()] += 1;
+                    }
+                }
+            }
+            ss += dot_bracket;
+            seq += r.get_name();
+            if (bp != nullptr) { seen_bps[bp] = 1; }
+        }
+
+        if(final_ss.length() > 0) { final_ss += "&"; }
+        final_ss += ss;
+
+        ss = "";
+        seq = "";
+        best_score = -1;
+        best_chains = std::vector<Chaintype const *>();
+        for(auto const & c : *chains) {
+            if(seen_chains.find(&c) != seen_chains.end()) { continue; }
+            score = 0;
+            for(auto const & r : c) {
+                bp = get_res_wc_or_gu_basepair(bps, ends, r);
+                if(bp != nullptr && seen_bps.find(bp) == seen_bps.end()) { score += 1; }
+            }
+            if(score > best_score) { best_score = score; }
+        }
+
+        for(auto const & c: *chains) {
+            if(seen_chains.find(&c) != seen_chains.end()) { continue; }
+            score = 0;
+            for(auto const & r : c) {
+                bp = get_res_wc_or_gu_basepair(bps, ends, r);
+                if(bp != nullptr && seen_bps.find(bp) == seen_bps.end()) { score += 1; }
+            }
+            if(score == best_score) { best_chains.push_back(&c);  }
+        }
+
+        best_chain = nullptr;
+        best_score = 1000;
+        for(auto const & c: best_chains) {
+            auto i = -1;
+            pos = 1000;
+            for(auto const & r : *c) {
+                i++;
+                bp = get_res_wc_or_gu_basepair(bps, ends, r);
+                if(bp != nullptr && seen_bps.find(bp) != seen_bps.end()) {
+                    pos = i;
+                    break;
+                }
+            }
+            if(pos < best_score) {
+                best_score = pos;
+                best_chain = c;
+            }
+        }
+
+        if(best_chain == nullptr) { break; }
+        seen_chains[best_chain] = 1;
+        open_chains.push_back(best_chain);
+    }
+
+    return final_ss;
 
 };
 

@@ -241,6 +241,10 @@ public: // getters
     get_center() const { return center(atoms_); }
 
     inline
+    size_t
+    get_num_atoms() const { return atoms_.size(); }
+
+    inline
     String const &
     get_res_name() const { return res_type_->get_name(); }
 
@@ -375,11 +379,6 @@ private:
      * vector of bead objects for sterics
      */
     util::Beads beads_;
-
-    /**
-     * unique residue indentifier so each residue can be be found in larger structures
-     */
-    util::Uuid uuid_;
 
 };
 
