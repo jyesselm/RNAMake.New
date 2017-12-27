@@ -65,7 +65,7 @@ PYBIND11_PLUGIN(all_atom) {
             .def("get_res_set_type", &Residue::get_res_set_type)
             .def("get_str", &Residue::get_str)
             .def("get_pdb_str", (String (Residue::*)(int) const) &Residue::get_pdb_str)
-            .def("get_pdb_str", (String (Residue::*)(int, int, char) const) &Residue::get_pdb_str)
+            .def("get_pdb_str", (String (Residue::*)(int & , int, char) const) &Residue::get_pdb_str)
             .def("write_pdb", &Residue::write_pdb)
             .def("is_equal", &Residue::is_equal)
             .def("move", &Residue::move)

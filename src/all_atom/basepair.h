@@ -38,7 +38,7 @@ public:
             Basepair const & bp):
             primitives::Basepair(bp) {}*/
 
-public:
+public: // non const methods
 
     inline
     void
@@ -75,6 +75,19 @@ public:
             math::Vector const & t) {
         auto dummy = math::Point();
         transform(r, t, dummy);
+    }
+
+    inline
+    void
+    swap_residue_positions() {
+        std::swap(res1_uuid_, res2_uuid_);
+        std::swap(c1_prime_coords_[0], c1_prime_coords_[1]);
+    }
+
+    inline
+    void
+    invert_reference_frame() {
+        ref_frame_ = ref_frame_.get_flip_orientation();
     }
 
 

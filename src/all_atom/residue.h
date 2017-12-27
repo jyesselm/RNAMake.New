@@ -280,7 +280,9 @@ public: // getters
     String
     get_pdb_str(
             int acount) const {
-        return get_pdb_str(acount, num_, chain_id_);
+        auto num = num_;
+        auto chain_id = chain_id_;
+        return get_pdb_str(acount, num, chain_id);
     }
 
     /**
@@ -306,7 +308,7 @@ public: // getters
      */
     String
     get_pdb_str(
-            int,
+            int &,
             int,
             char) const;
 
@@ -317,7 +319,7 @@ public: // getters
     void
     write_pdb(String const);
 
-public:
+public: // non const
 
     inline
     void
@@ -346,6 +348,14 @@ public:
         for(auto & a : atoms_) { a.transform(r, t, dummy); }
         for(auto & b : beads_) { b.transform(r, t, dummy); }
     }
+
+    inline
+    void
+    remove_beads() { beads_ = util::Beads(); }
+
+    inline
+    void
+    build_beads() { _build_beads(); }
 
 
 public: // getters
@@ -393,6 +403,47 @@ typedef std::shared_ptr<Residue const> ResidueCOP;
  * Typedef of a vector of shared pointer vectors, only used this.
  */
 typedef std::vector<ResidueOP> ResidueOPs;
+
+inline
+bool
+residue_steric_clash_RNA(
+        Residue const & r1,
+        Residue const & r2) {
+    for(auto it1 = r1.bead_begin(); it1 != r1.bead_end(); it1++) {
+        if(it1->get_type() == util::BeadType::PHOS) { continue;}
+        for(auto it2 = r2.bead_begin(); it2 != r2.bead_end(); it2++) {
+            if(it2->get_type() == util::BeadType::PHOS) { continue;}
+            if(it1->distance(*it2) < 2.5) { return true; }
+        }
+    }
+
+    /*std::for_each(r1.bead_begin(), r1.bead_end(), [](util::Bead const & b1) {
+        if(b1.get_type() != util::BeadType::PHOS) {
+            std::for_each(r2.bead_begin(), r2.bead_end(), [](util::Bead const & b2) {
+                if (b2.get_type() != util::BeadType::PHOS) {
+                    if (b1.distance(b2) < 2.5) { return true; }
+                }
+            });
+        }
+    });*/
+
+    return false;
+}
+
+inline
+bool
+residue_steric_clash(
+        Residue const & r1,
+        Residue const & r2) {
+    for(auto it1 = r1.bead_begin(); it1 != r1.bead_end(); it1++) {
+        for(auto it2 = r2.bead_begin(); it2 != r2.bead_end(); it2++) {
+            if(it1->distance(*it2) < 2.5) { return true; }
+        }
+    }
+
+    return false;
+}
+
 
 
 }

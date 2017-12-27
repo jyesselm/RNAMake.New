@@ -81,7 +81,7 @@ Residue::get_str() const {
 
 String
 Residue::get_pdb_str(
-        int acount,
+        int & acount,
         int rnum,
         char chain_id) const {
 

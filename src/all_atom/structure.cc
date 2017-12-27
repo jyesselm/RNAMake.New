@@ -10,21 +10,33 @@ namespace all_atom {
 
 String
 Structure::get_pdb_str(
-        int acount,
-        int rnum,
-        char chain_id) {
+        int & acount,
+        int & rnum,
+        char & chain_id) {
 
     auto s = String();
     auto i = -1;
     auto pos = 0;
+    auto anscii_num = int(chain_id);
     for(auto const & r : residues_) {
         i++;
+        s += r.get_pdb_str(acount, rnum, chain_id);
         if (cut_points_[pos] == i) {
-
+            anscii_num += 1;
+            chain_id = char(anscii_num);
         }
     }
     return s;
 
+}
+
+void
+Structure::write_pdb(
+        String const & fname) {
+    std::ofstream out;
+    out.open(fname.c_str());
+    out << get_pdb_str(1) << std::endl;
+    out.close();
 }
 
 

@@ -776,35 +776,9 @@ generate_secondary_structure(
 
 };
 
-
-
-
-/*Strings
-end_id_to_seq_and_db(String const & ss_id) {
-    auto ss = String("");
-    auto seq = String("");
-    auto spl = base::split_str_by_delimiter(ss_id, "_");
-    for(int i = 0; i < spl.size()-1; i+=2) {
-        seq += spl[i];
-        for(auto const & e : spl[i+1]) {
-            if     (e == 'L') { ss += "("; }
-            else if(e == 'R') { ss += ")"; }
-            else if(e == 'U') { ss += "."; }
-            else {
-                throw std::runtime_error("unexpected symbol in ss_id: " + std::to_string(e) );
-            }
-        }
-
-        if(i != spl.size()-2) {
-            seq += "&";
-            ss  += "&";
-        }
-    }
-
-    auto dummy_str = Strings(2);
-    dummy_str[0] = seq; dummy_str[1] = ss;
-    return dummy_str;
-}*/
+String
+get_dot_bracket_from_end_id(
+        String const &);
 
 }
 

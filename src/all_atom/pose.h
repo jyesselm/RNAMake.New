@@ -13,7 +13,10 @@
 
 namespace all_atom {
 
-class Pose : primitives::Pose<Basepair, Structure, Chain, Residue> {
+class Pose : public primitives::Pose<Basepair, Structure, Chain, Residue> {
+public:
+    friend class SegmentFactory;
+
 public:
     typedef primitives::Pose<Basepair, Structure, Chain, Residue> BaseClass;
 
@@ -38,7 +41,7 @@ public:
     String
     dot_bracket() { return dot_bracket_->get_str(); }
 
-private:
+protected:
     Structure proteins_;
     Structure small_molecules_;
     base::SimpleStringCOP dot_bracket_;

@@ -1,13 +1,12 @@
 //
-// Created by Joseph Yesselman on 11/4/17.
+// Created by Joseph Yesselman on 12/26/17.
 //
 
-#ifndef RNAMAKE_NEW_SS_ALIGNER_H
-#define RNAMAKE_NEW_SS_ALIGNER_H
+#ifndef RNAMAKE_NEW_ALIGNER_H
+#define RNAMAKE_NEW_ALIGNER_H
 
-#include <secondary_structure/segment.h>
 
-namespace secondary_structure {
+namespace primitives {
 
 class Aligner {
 public:
@@ -19,7 +18,7 @@ public:
     void
     align(
             Basepair const & ref_bp,
-            SegmentOP & rs) { }
+            SegmentOP & rs) {}
 
     SegmentOP
     get_aligned(
@@ -29,7 +28,7 @@ public:
     }
 };
 
-
 }
+
 
 #endif //RNAMAKE_NEW_ALIGNER_H

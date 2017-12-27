@@ -186,6 +186,8 @@ target_link_libraries(ss_rna_structure_graph_unittest secondary_structure_lib)
 ###########################################################################
 
 set(all_atom_files
+	/Users/jyesselm/projects/RNAMake.New/src/all_atom/segment.cc
+	/Users/jyesselm/projects/RNAMake.New/src/all_atom/segment_factory.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/atom.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/residue_type_set.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/residue.cc
@@ -215,6 +217,9 @@ target_link_libraries(parse_all_pdbs_unittest all_atom_lib)
 
 add_executable(all_pdbs_to_poses_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_pdbs_to_poses_unittest.cc)
 target_link_libraries(all_pdbs_to_poses_unittest all_atom_lib)
+
+add_executable(all_atom_segment_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_segment_unittest.cc)
+target_link_libraries(all_atom_segment_unittest all_atom_lib)
 
 add_executable(all_atom_structure_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_structure_unittest.cc)
 target_link_libraries(all_atom_structure_unittest all_atom_lib)

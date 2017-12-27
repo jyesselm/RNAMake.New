@@ -44,7 +44,7 @@ public:
 
     ~Structure() {}
 
-public:
+public: //operators
     bool
     operator == (
             Structure const & s) const {
@@ -88,6 +88,42 @@ public:
 
     }
 
+public: // non const
+    void
+    move(
+            math::Point const & p) {
+        for(auto & r : residues_) { r.move(p); }
+    }
+
+    void
+    transform(
+            math::Matrix const & r,
+            math::Vector const & t,
+            math::Point & dummy) {
+
+        for(auto & res : residues_) { res.transform(r, t, dummy); }
+    }
+
+    inline
+    void
+    transform(
+            math::Matrix const & r,
+            math::Vector const & t) {
+        auto dummy = math::Point();
+        transform(r, t, dummy);
+    }
+
+
+    inline
+    void
+    remove_residue_beads(
+            util::Uuid const & r_uuid) {
+
+        auto & r = get_residue(r_uuid);
+        auto i =  get_res_index(r);
+        residues_[i].remove_beads();
+    }
+
 public: //getters
 
     String
@@ -107,9 +143,22 @@ public: //getters
 
     String
     get_pdb_str(
-            int,
-            int,
-            char);
+            int &,
+            int &,
+            char &);
+
+    inline
+    String
+    get_pdb_str(
+            int acount = 0) {
+        auto num = residues_[0].get_num();
+        auto chain_id = residues_[0].get_chain_id();
+        return get_pdb_str(acount, num, chain_id);
+    }
+
+    void
+    write_pdb(
+            String const &);
 
 
 };
