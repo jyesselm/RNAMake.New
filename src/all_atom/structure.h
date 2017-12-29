@@ -160,6 +160,10 @@ public: //getters
     write_pdb(
             String const &);
 
+    void
+    write_steric_beads_to_pdb(
+            String const &);
+
 
 };
 

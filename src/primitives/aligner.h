@@ -5,27 +5,32 @@
 #ifndef RNAMAKE_NEW_ALIGNER_H
 #define RNAMAKE_NEW_ALIGNER_H
 
+#include <memory>
 
 namespace primitives {
 
-class Aligner {
+template <typename SegmentType, typename BasepairType>
+class Aligner  {
+public:
+    typedef std::shared_ptr<SegmentType> SegmentTypeOP;
+
 public:
     Aligner() {}
 
     ~Aligner() {}
 
 public:
+    virtual
     void
     align(
-            Basepair const & ref_bp,
-            SegmentOP & rs) {}
+            BasepairType const & ref_bp,
+            SegmentType & seg) = 0;
 
-    SegmentOP
+    virtual
+    SegmentTypeOP
     get_aligned(
-            Basepair const & ref_bp,
-            SegmentOP const & rs) {
-        return std::make_shared<Segment>(*rs);
-    }
+            BasepairType const & ref_bp,
+            SegmentType const & seg) = 0;
 };
 
 }

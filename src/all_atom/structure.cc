@@ -39,6 +39,33 @@ Structure::write_pdb(
     out.close();
 }
 
+void
+Structure::write_steric_beads_to_pdb(
+        String const & fname) {
+
+    auto acount = 1;
+    auto rnum = residues_[0].get_num();
+    auto chain_id = residues_[0].get_chain_id();
+
+    auto s = String();
+    auto i = -1;
+    auto pos = 0;
+    auto anscii_num = int(chain_id);
+    for(auto const & r : residues_) {
+        i++;
+        s += r.get_bead_pdb_str(acount, rnum, chain_id);
+        if (cut_points_[pos] == i) {
+            anscii_num += 1;
+            chain_id = char(anscii_num);
+        }
+    }
+
+    std::ofstream out;
+    out.open(fname.c_str());
+    out << s << std::endl;
+    out.close();
+}
+
 
 // external functions
 int

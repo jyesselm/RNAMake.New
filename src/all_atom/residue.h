@@ -274,8 +274,7 @@ public: // getters
     /**
      * wrapper for to_pdb_str(int &, int, String const &) when one does not care about
      * renumbering atoms and residue
-     */
-
+     **/
     inline
     String
     get_pdb_str(
@@ -308,6 +307,12 @@ public: // getters
      */
     String
     get_pdb_str(
+            int &,
+            int,
+            char) const;
+
+    String
+    get_bead_pdb_str(
             int &,
             int,
             char) const;
@@ -345,8 +350,7 @@ public: // non const
             math::Matrix const & r,
             math::Vector const & t) {
         auto dummy = math::Point();
-        for(auto & a : atoms_) { a.transform(r, t, dummy); }
-        for(auto & b : beads_) { b.transform(r, t, dummy); }
+        transform(r, t, dummy);
     }
 
     inline

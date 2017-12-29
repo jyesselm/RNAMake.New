@@ -44,6 +44,41 @@ public:
             small_molecules_(seg.small_molecules_),
             dot_bracket_(seg.dot_bracket_) {}
 
+public: // non const methods
+    void
+    move(
+            math::Point const & p) {
+        structure_.move(p);
+        proteins_.move(p);
+        small_molecules_.move(p);
+        for(auto & bp : basepairs_) { bp.move(p); }
+        for(auto & bp : ends_) { bp.move(p); }
+
+    }
+
+    void
+    transform(
+            math::Matrix const & r,
+            math::Vector const & t,
+            math::Point & dummy) {
+        structure_.transform(r, t, dummy);
+        proteins_.transform(r, t, dummy);
+        small_molecules_.transform(r, t, dummy);
+        for(auto & bp : basepairs_) { bp.transform(r, t, dummy); }
+        for(auto & bp : ends_) { bp.transform(r, t, dummy); }
+    }
+
+    inline
+    void
+    transform(
+            math::Matrix const & r,
+            math::Vector const & t) {
+        auto dummy = math::Point();
+        transform(r, t, dummy);
+    }
+
+
+
 public:
     bool
     steric_clash(
@@ -148,10 +183,40 @@ public:
 
         return steric_clash_count;
     }
+
+public:
+
+    String
+    get_pdb_str(
+            int &,
+            int &,
+            char &);
+
+    inline
+    String
+    get_pdb_str(
+            int acount = 0) {
+        auto num = structure_.get_residue(0).get_num();
+        auto chain_id = structure_.get_residue(0).get_chain_id();
+        return get_pdb_str(acount, num, chain_id);
+    }
+
+    void
+    write_pdb(
+            String const &);
+
+    void
+    write_steric_beads_to_pdb(
+            String const &);
+
 public:
     inline
     String
     dot_bracket() { return dot_bracket_->get_str(); }
+
+    inline
+    Basepair const &
+    get_aligned_end() { return ends_[aligned_end_]; }
 
 protected:
     Structure proteins_;
@@ -162,6 +227,7 @@ protected:
 };
 
 typedef std::shared_ptr<Segment> SegmentOP;
+typedef std::vector<SegmentOP>   SegmentOPs;
 
 
 }

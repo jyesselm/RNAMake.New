@@ -464,8 +464,8 @@ get_ends_from_basepairs(
     auto end_chain_end_uuids = std::vector<util::Uuid>();
 
     for(auto const & r : s) {
-        if     (s.is_residue_start_of_chain(r)) { start_chain_end_uuids.push_back(r.get_uuid()); }
-        else if(s.is_residue_end_of_chain(r))   { end_chain_end_uuids.push_back(r.get_uuid()); }
+        if(s.is_residue_start_of_chain(r)) { start_chain_end_uuids.push_back(r.get_uuid()); }
+        if(s.is_residue_end_of_chain(r))   { end_chain_end_uuids.push_back(r.get_uuid()); }
     }
 
     auto ends = std::vector<BPtype>();

@@ -121,6 +121,7 @@ private:
 
 };
 
+typedef std::shared_ptr<Basepair> BasepairOP;
 typedef std::vector<Basepair> Basepairs;
 
 inline

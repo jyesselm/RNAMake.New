@@ -116,6 +116,7 @@ set(primitives_files
 	/Users/jyesselm/projects/RNAMake.New/src/primitives/pose.cc
 	/Users/jyesselm/projects/RNAMake.New/src/primitives/chain.cc
 	/Users/jyesselm/projects/RNAMake.New/src/primitives/primitives.cc
+	/Users/jyesselm/projects/RNAMake.New/src/primitives/aligner.cc
 )
 
 add_library(primitives_lib ${primitives_files})
@@ -196,6 +197,7 @@ set(all_atom_files
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/pdb_parser.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/pose.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/chain.cc
+	/Users/jyesselm/projects/RNAMake.New/src/all_atom/aligner.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/residue_type.cc
 	/Users/jyesselm/projects/RNAMake.New/src/all_atom/all_atom.cc
 )

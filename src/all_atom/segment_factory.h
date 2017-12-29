@@ -6,6 +6,7 @@
 #define RNAMAKE_NEW_SEGMENT_FACTORY_H
 
 #include <util/x3dna.h>
+#include <all_atom/aligner.h>
 #include <all_atom/segment.h>
 #include <all_atom/pdb_parser.h>
 #include <all_atom/pose.h>
@@ -22,18 +23,23 @@ public:
 
 class SegmentFactory {
 public:
-    struct MotifElements {
+    struct SegmentElements {
+        base::SimpleStringCOP name;
+        base::SimpleStringCOPs end_ids;
         Structure rna, proteins, small_molecules;
         Basepairs basepairs;
         Basepairs ends;
 
         inline
-        MotifElements(
+        SegmentElements(
+                base::SimpleStringCOP nname,
                 Structure const & rna_struc,
                 Structure const & protein_struc,
                 Structure const & small_molecule_struc,
                 Basepairs const & bps,
                 Basepairs const & nends):
+                name(nname),
+                end_ids(base::SimpleStringCOPs()),
                 rna(rna_struc),
                 proteins(protein_struc),
                 small_molecules(small_molecule_struc),
@@ -66,7 +72,7 @@ public:
 
     };
 
-    typedef std::shared_ptr<MotifElements> MotifElementsOP;
+    typedef std::shared_ptr<SegmentElements> SegmentElementsOP;
 
 public:
     SegmentFactory(
@@ -89,12 +95,27 @@ public:
             util::SegmentType segment_type = util::SegmentType::SEGMENT,
             bool rebuild_x3dna_files = true);
 
+    SegmentOPs
+    all_segments_from_pdb(
+            String const & pdb_path,
+            util::SegmentType segment_type = util::SegmentType::SEGMENT,
+            bool rebuild_x3dna_files = true);
+
+    void
+    align_segment_to_ref_frame(
+            Segment &);
+
 private:
     PoseOP
     _setup_ref_motif();
 
     SegmentOP
     _setup_base_helix();
+
+    SegmentElementsOP
+    _get_segment_elements_from_pdb(
+            String const &,
+            bool);
 
 private:
 
@@ -126,23 +147,46 @@ private:
 
     void
     _standardize_motif_elements(
-            MotifElements &,
+            SegmentElements &,
             Index);
 
     void
     _align_motif_elements_to_frame(
             Basepair const &,
-            MotifElements &,
+            SegmentElements &,
             Index);
+
+    void
+    _align_motif_elements_back_to_org_frame(
+            Basepairs const &,
+            Structure const &,
+            SegmentElements &);
+
+    void
+    _align_segment_to_frame(
+            Basepair const &,
+            Segment &);
+
+    SegmentOP
+    _get_aligned_segment(
+            Basepair const &,
+            Segment &);
 
     int
     _num_steric_clashes(
-            MotifElements const &,
+            SegmentElements const &,
             Segment const &);
+
+    int
+    _are_structures_overlaid(
+            Structure const &,
+            Structure const &);
+
 
 
 private:
     ResidueTypeSetCOP rts_;
+    Aligner aligner_;
     util::X3dna x3dna_;
     PDBParser pdb_parser_;
     PoseOP ref_motif_;
