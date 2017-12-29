@@ -208,6 +208,9 @@ target_link_libraries(all_atom_lib secondary_structure_lib  pybind11::module)
 add_library(all_atom MODULE ${all_atom_files})
 target_link_libraries(all_atom secondary_structure_lib  pybind11::module)
 
+add_executable(all_atom_generate_all_segments /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_generate_all_segments.cc)
+target_link_libraries(all_atom_generate_all_segments all_atom_lib)
+
 add_executable(pdb_parser_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/pdb_parser_unittest.cc)
 target_link_libraries(pdb_parser_unittest all_atom_lib)
 

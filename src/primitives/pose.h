@@ -653,7 +653,7 @@ generate_end_id(
                         "unexpected symbol in dot bracket notation: " + std::to_string(e));
             }
         }
-        if(i != ss_chain.size()-1) { ss_id += "_"; }
+        if(i != ss_chains.size()-1) { ss_id += "_"; }
         i++;
     }
 

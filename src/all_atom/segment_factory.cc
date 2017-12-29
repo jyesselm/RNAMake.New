@@ -102,7 +102,7 @@ SegmentFactory::_standardize_motif_elements(
         m_elements.ends[end_index].invert_reference_frame();
         _align_motif_elements_to_frame(base_helix_->get_end(1), m_elements, end_index);
         steric_clashes_2 =  _num_steric_clashes(m_elements, *base_helix_);
-        if(steric_clashes_2 != 2) {
+        if(steric_clashes_2 > 2) {
             LOG_WARNING("SegmentFactory",
                         " there is no aligment without clashes this may lead to issues during building!");
         }
@@ -117,19 +117,18 @@ SegmentFactory::_standardize_motif_elements(
         auto aligned_helix = _get_aligned_segment(m_elements.ends[i], *added_helix_);
         steric_clashes_1  = _num_steric_clashes(m_elements, *aligned_helix);
         steric_clashes_1 += base_helix_->get_num_steric_clashes(*aligned_helix);
-        if(steric_clashes_1 == 2) { continue; }
+        if(steric_clashes_1 < 2) { continue; }
 
         m_elements.ends[i].invert_reference_frame();
         aligned_helix = _get_aligned_segment(m_elements.ends[i], *added_helix_);
         steric_clashes_2  = _num_steric_clashes(m_elements, *aligned_helix);
         steric_clashes_2 += base_helix_->get_num_steric_clashes(*aligned_helix);
 
-        if(steric_clashes_2 != 2) {
+        if(steric_clashes_2 > 2) {
             LOG_WARNING("SegmentFactory",
                         "basepair end: " + m_elements.ends[i].get_name()->get_str() +
-                        " generates clashes when helix is added this may lead toissues during building!");
+                        " generates clashes when helix is added this may lead to issues during building!");
         }
-
         if(steric_clashes_2 > steric_clashes_1) {
             m_elements.ends[i].invert_reference_frame();
         }

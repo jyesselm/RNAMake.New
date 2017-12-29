@@ -18,6 +18,8 @@ get_dot_bracket_from_end_id(
             else if(e == 'R') { s += ')'; }
             else if(e == 'U') { s += '.'; }
             else {
+                std::cout << end_id << std::endl;
+                std::cout << e << std::endl;
                 throw std::runtime_error(String(e, 1) + " is not a supported secondary structure symbol");
             }
         }

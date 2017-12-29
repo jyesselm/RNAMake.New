@@ -14,6 +14,7 @@
 
 TEST_CASE( "Parse all pdbs to poses", "[PDBParser]" ) {
     auto rts = std::make_shared<all_atom::ResidueTypeSet>();
+    auto pdb_parser = all_atom::PDBParser(rts);
     auto path = String("/Users/jyesselm/projects/REDESIGN/resources/non-redundant-rnas/");
 
     DIR *pDIR;
@@ -24,7 +25,6 @@ TEST_CASE( "Parse all pdbs to poses", "[PDBParser]" ) {
     if(ENOENT == errno) { exit(0); }
 
     while ((entry = readdir(pDIR)) != NULL) {
-        auto pdb_parser = all_atom::PDBParser(rts);
         auto fname = String(entry->d_name);
         //if(fname != "1DUQ") { continue; }
         if(fname.length() != 4) { continue; }
