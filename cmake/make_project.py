@@ -53,6 +53,8 @@ def get_cmake_lists_header():
     s += "set(PYBIND11_CPP_STANDARD -std=c++11)\n"
     s += "# requires pybind11 to be in local directory need to find workaround!\n"
     s += "add_subdirectory(pybind11/)\n\n"
+    s += "# sqlite libraries\n"
+    s += "find_library(SQLITE3_LIBRARY sqlite3)\n\n"
     s += "find_package(Boost)\n\n"
     s += """if (Boost_FOUND)
         set(Boost_USE_MULTITHREADED true)
@@ -115,16 +117,23 @@ def get_build_library_declaration(lib):
     s += "target_link_libraries(%s" % (lib + "_lib")
     for depend in depends[lib]:
         s += " " + depend + "_lib "
-    s += " pybind11::module)\n\n"
+    if lib != "util":
+        s += " pybind11::module)\n\n"
+    else:
+        s += " ${SQLITE3_LIBRARY} pybind11::module)\n\n"
     return s
 
 
 def get_build_module_declaration(lib):
     s  = "add_library(%s MODULE ${%s})\n" % (lib, lib + "_files")
     s += "target_link_libraries(%s" % (lib)
+
     for depend in depends[lib]:
         s += " " + depend + "_lib "
-    s += " pybind11::module)\n\n"
+    if lib != "util":
+        s += " pybind11::module)\n\n"
+    else:
+        s += " ${SQLITE3_LIBRARY} pybind11::module)\n\n"
 
     """s += "add_custom_command(\n"
     s += "\t TARGET " + lib + "_copy POST_BUILD COMMAND " + \

@@ -20,6 +20,9 @@ set(PYBIND11_CPP_STANDARD -std=c++11)
 # requires pybind11 to be in local directory need to find workaround!
 add_subdirectory(pybind11/)
 
+# sqlite libraries
+find_library(SQLITE3_LIBRARY sqlite3)
+
 find_package(Boost)
 
 if (Boost_FOUND)
@@ -86,6 +89,7 @@ target_link_libraries(xyz_matrix_unittest math_lib)
 set(util_files
 	/Users/jyesselm/projects/RNAMake.New/src/util/segment_type.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/uuid.cc
+	/Users/jyesselm/projects/RNAMake.New/src/util/sqlite3_connection.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/util.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/bead.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/x3dna.cc
@@ -93,16 +97,19 @@ set(util_files
 )
 
 add_library(util_lib ${util_files})
-target_link_libraries(util_lib math_lib  pybind11::module)
+target_link_libraries(util_lib math_lib  ${SQLITE3_LIBRARY} pybind11::module)
 
 add_library(util MODULE ${util_files})
-target_link_libraries(util math_lib  pybind11::module)
+target_link_libraries(util math_lib  ${SQLITE3_LIBRARY} pybind11::module)
 
 add_executable(x3dna_on_all_pdbs_unittest /Users/jyesselm/projects/RNAMake.New/unittests/util/x3dna_on_all_pdbs_unittest.cc)
 target_link_libraries(x3dna_on_all_pdbs_unittest util_lib)
 
 add_executable(x3dna_unittest /Users/jyesselm/projects/RNAMake.New/unittests/util/x3dna_unittest.cc)
 target_link_libraries(x3dna_unittest util_lib)
+
+add_executable(sqlite3_connection_unittest /Users/jyesselm/projects/RNAMake.New/unittests/util/sqlite3_connection_unittest.cc)
+target_link_libraries(sqlite3_connection_unittest util_lib)
 
 ###########################################################################
 # primitives
