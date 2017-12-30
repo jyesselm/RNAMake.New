@@ -6,37 +6,66 @@
 #include "../common.hpp"
 
 #include <base/paths.h>
+#include <util/sqlite_wrappers.h>
 
 TEST_CASE( "Test Basic Sqlite3 connections ", "[Sqlite3Connection]" ) {
-    /*try { std::remove("test.db"); }
+
+    try { std::remove("test.db"); }
     catch (String const & e) {}
 
-    auto conn = util::Sqlite3Connection();
-    conn.connect("test.db");
+    auto db = util::sqlite::Database("test.db");
+    auto q = util::sqlite::Connection(db);
 
-    auto table_name = String("data_table");
-    auto primary_key = String("id");
-    auto keys = Strings{"word", "id"};
-    auto types = Strings{"TEXT", "INT"};
-    auto data = std::vector<Strings>{ {"the_word", "0"}, {"the", "1"}, {"hello", "2"} };
+    q.exec("CREATE TABLE data_table (word TEXT, id INT, PRIMARY KEY(id));");
+    q.start_transaction();
 
-    conn.create_table(table_name, keys, types, primary_key, data);
+    q.exec("INSERT INTO data_table( word, id) VALUES ('the_word','0');");
+    q.exec("INSERT INTO data_table( word, id) VALUES ('the','1');");
+    q.exec("INSERT INTO data_table( word, id) VALUES ('word','2');");
 
-    // table does not exist
-    REQUIRE_THROWS_AS(conn.get_number_of_rows("fake_table"), util::Sqlite3ConnectionException);
+    q.commit_transaction();
+
+    SECTION("test getting first row") {
+        auto row = q.get_first_row("SELECT * FROM data_table");
+        REQUIRE(row->at(0).get_name() == "word");
+        REQUIRE(row->at(0).get_str() == "the_word");
+
+        // cannot use auto needs "int" to figure out what the type is
+        int id = row->at(1);
+        REQUIRE(id == 0);
+
+        //stop from weird casting ...
+        REQUIRE_THROWS_AS(int id = row->at(0), util::sqlite::SqliteException);
+    }
 
 
-    exit(0);
+    /*auto db = sqlitepp::db("test.db");
+    sqlitepp::query q(db, "CREATE TABLE data_table (word TEXT, id INT, PRIMARY KEY(id));");
 
-    SECTION( "test counting number of row in table") {
+    auto rc = q.exec();
+    sqlitepp::transaction tr(db);
 
-        auto count = conn.get_number_of_rows("data_table");
+    sqlitepp::query q2(db);
+    q2.exec("INSERT INTO data_table( word, id) VALUES ('the_word','0');");
+    q2.exec("INSERT INTO data_table( word, id) VALUES ('the','1');");
+    q2.exec("INSERT INTO data_table( word, id) VALUES ('word','2');");
+
+    SECTION("test counting rows in table") {
+
+        sqlitepp::query q1(db, "SELECT count(*) FROM data_table");
+        sqlitepp::result res = q1.store();
+
+        int count = res[0]["count(*)"];
         REQUIRE(count == 3);
-        // does repeated calls mess it up
-        for (int i = 0; i < 100; i++) {
-            count = conn.get_number_of_rows("data_table");
-        }
-        REQUIRE(count == 3);
+
     }*/
 
-}
+    /*for(auto const & _row : res) {
+        for (sqlitepp::row::size_type c = 0; c < _row.num_fields(); ++c) {
+            if (!_row[c].is_null()) {
+                std::cout << _row[c].name() << std::endl;
+            }
+        }
+    }*/
+
+    exit(0);

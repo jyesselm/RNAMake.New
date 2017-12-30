@@ -88,6 +88,7 @@ target_link_libraries(xyz_matrix_unittest math_lib)
 
 set(util_files
 	/Users/jyesselm/projects/RNAMake.New/src/util/segment_type.cc
+	/Users/jyesselm/projects/RNAMake.New/src/util/sqlite_wrappers.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/uuid.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/sqlite3_connection.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/util.cc
