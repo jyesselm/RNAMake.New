@@ -6,7 +6,7 @@
 #include "../common.hpp"
 
 #include <base/paths.h>
-#include <util/sqlite_wrappers.h>
+#include <util/sqlite/connection.h>
 
 TEST_CASE( "Test Basic Sqlite3 connections ", "[Sqlite3Connection]" ) {
 
@@ -68,4 +68,4 @@ TEST_CASE( "Test Basic Sqlite3 connections ", "[Sqlite3Connection]" ) {
         }
     }*/
 
-    exit(0);
+}

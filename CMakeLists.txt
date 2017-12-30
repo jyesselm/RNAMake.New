@@ -88,13 +88,14 @@ target_link_libraries(xyz_matrix_unittest math_lib)
 
 set(util_files
 	/Users/jyesselm/projects/RNAMake.New/src/util/segment_type.cc
-	/Users/jyesselm/projects/RNAMake.New/src/util/sqlite_wrappers.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/uuid.cc
-	/Users/jyesselm/projects/RNAMake.New/src/util/sqlite3_connection.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/util.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/bead.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/x3dna.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/random_number_generator.cc
+	/Users/jyesselm/projects/RNAMake.New/src/util/sqlite/connection.cc
+	/Users/jyesselm/projects/RNAMake.New/src/util/sqlite/database.cc
+	/Users/jyesselm/projects/RNAMake.New/src/util/sqlite/field.cc
 )
 
 add_library(util_lib ${util_files})

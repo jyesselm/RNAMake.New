@@ -87,7 +87,7 @@ def get_lib_file_declaration(lib):
     cc_files = get_cc_files_in_dir(abs_path)
     s  = "set(%s_files\n" % (lib)
     for cc_file in cc_files:
-        s += "\t" + abs_path + cc_file + "\n"
+        s += "\t" + cc_file + "\n"
     s += ")\n\n"
     return s
 
@@ -103,10 +103,10 @@ def get_unittests_apps_for_library(lib):
 
     s = ""
     for unit in unittest_files:
-        spl = unit.split(".")
+        spl = unit.split("/")[-1].split(".")
         prog_name = spl[0]
 
-        s += "add_executable(" + prog_name + " " + abs_path  + unit + ")\n"
+        s += "add_executable(" + prog_name + " " +  unit + ")\n"
         s += "target_link_libraries(" + prog_name + " %s_lib)\n\n" % lib
 
     return s
@@ -165,7 +165,10 @@ def get_cc_files_in_dir(path):
     for root, dirnames, filenames in os.walk(path):
             for filename in filenames:
                 if filename[-2:] == 'cc' or filename[-3:] == 'cpp':
-                    cpp_files.append(filename)
+                    final_root = root
+                    if final_root[-1] != "/":
+                        final_root += "/"
+                    cpp_files.append(final_root + filename)
     return cpp_files
 
 
@@ -188,7 +191,7 @@ def write_application_cmake_file():
         symlink = spl[0]+"_symlink"
         fsum.write("add_executable("+spl[0] + " ")
         for f in cpp_files:
-            fsum.write(app_dir + "/" + f + " ")
+            fsum.write(f + " ")
         fsum.write(")\n")
         fsum.write("target_link_libraries("+spl[0]+" all_libs)\n")
         fsum.write("add_custom_target("+symlink+" ALL)\n")
