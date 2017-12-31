@@ -36,7 +36,7 @@ public:
         seg.transform(r_t, t_, dummy_);
         seg.move(ref_bp.get_center() - seg.get_aligned_end().get_center());
 
-        sugar_dist_ = ref_bp.get_res1_c1_prime_coord().distance(seg.get_aligned_end().get_res1_c1_prime_coord());
+        sugar_dist_ = ref_bp.get_res1_c1_prime_coord().distance(seg.get_aligned_end().get_res2_c1_prime_coord());
         if(sugar_dist_ > 5) {
             LOG_WARNING("SegmentAligener",
                         "difference in sugar c1' coords between reference and aligned is greater than 5. "
@@ -44,8 +44,8 @@ public:
             return;
         }
 
-        sugar_diff_1_ =  ref_bp.get_res1_c1_prime_coord() - seg.get_aligned_end().get_res1_c1_prime_coord();
-        sugar_diff_2_ =  ref_bp.get_res2_c1_prime_coord() - seg.get_aligned_end().get_res2_c1_prime_coord();
+        sugar_diff_1_ =  ref_bp.get_res1_c1_prime_coord() - seg.get_aligned_end().get_res2_c1_prime_coord();
+        sugar_diff_2_ =  ref_bp.get_res2_c1_prime_coord() - seg.get_aligned_end().get_res1_c1_prime_coord();
         avg_sugar_diff_ = (sugar_diff_1_ + sugar_diff_2_) / 2;
         seg.move(avg_sugar_diff_);
 

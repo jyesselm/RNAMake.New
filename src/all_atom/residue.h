@@ -169,6 +169,17 @@ public:
         return !(*this == r);
     }
 
+    friend
+    std::ostream &
+    operator<< (
+            std::ostream & stream ,
+            Residue const & r) {
+        stream << r.num_ << r.chain_id_;
+        if(r.i_code_ != ' ') { stream << "(" << r.i_code_ << ")"; }
+        return stream;
+    }
+
+
 public:
     inline
     bool

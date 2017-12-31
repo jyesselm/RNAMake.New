@@ -25,6 +25,7 @@ Structure::get_pdb_str(
             anscii_num += 1;
             chain_id = char(anscii_num);
         }
+        rnum++;
     }
     return s;
 
