@@ -33,12 +33,23 @@ public:
     }
 
     // returns true if the database is open
-    inline bool is_open() const { return open_; }
+    inline
+    bool
+    is_open() const { return open_; }
 
     // SQLite3 access
-    inline sqlite3 *get() const { return db_; }
+    inline
+    sqlite3
+    *get() const { return db_; }
 
-    inline sqlite3 *operator()() const { return db_; }
+    inline
+    sqlite3
+    *operator()() const { return db_; }
+
+    inline
+    String const &
+    get_name() const { return name_; }
+
 
 private:
     // open (connect) the database

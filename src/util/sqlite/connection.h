@@ -7,28 +7,10 @@
 
 #include <util/sqlite/field.h>
 #include <util/sqlite/database.h>
+#include <util/sqlite/table_details.h>
 
 namespace util {
 namespace sqlite {
-
-struct ColumnDetails {
-    String name;
-    String type;
-    bool is_primary;
-};
-
-struct TableDetails {
-    String name;
-    std::vector<ColumnDetails> columns_;
-
-    //iterator
-    typedef std::vector<ColumnDetails>::iterator iterator;
-
-    iterator begin() { return columns_.begin(); }
-    iterator end()   { return columns_.end(); }
-
-};
-
 
 class Connection {
 public:
@@ -39,7 +21,7 @@ public:
 
     ~Connection() {}
 
-public:
+public: // interface to get rows
     int
     start_iterate_rows(
             String const & command) {
@@ -66,6 +48,59 @@ public:
 
     void
     abort_iterate_rows() { sqlite3_finalize(stmt_); }
+
+public: // get other table infos
+    TableDetailsOP
+    get_table_details(
+            String const & table_name) {
+
+        auto q  = "SELECT sql FROM sqlite_master WHERE tbl_name = " + _quoted_string(table_name);
+        _prepare(q);
+        rc_ = sqlite3_step(stmt_);
+
+        auto table_str = String(reinterpret_cast<const char *>(sqlite3_column_text(stmt_, 0)));
+        auto spl = base::split_str_by_delimiter(table_str, "(");
+        if(spl.size() != 3) {
+            throw SqliteException("not a valid table declaration: " + table_str);
+        }
+        auto columns = base::split_str_by_delimiter(spl[1], ",");
+        auto names = Strings();
+        auto types = Strings();
+        auto primary_keys = std::map<String, bool>();
+        for(auto const & col : columns) {
+            auto trimed_col = col;
+            base::trim(trimed_col);
+            auto col_spl = base::split_str_by_delimiter(trimed_col, " ");
+            if(col_spl.size() < 2) {
+                throw SqliteException("cannot parse table declaration section: " + col);
+            }
+
+            if(col_spl[0] == "PRIMARY") {
+                for(auto i = 1; i < col_spl.size(); i++) {
+                    primary_keys[col_spl[i]] = true;
+                }
+            }
+            else {
+                names.push_back(col_spl[0]);
+                types.push_back(col_spl[1]);
+            }
+        }
+
+        auto td = std::make_shared<TableDetails>(table_name);
+        for(int i = 0; i < names.size(); i++) {
+            auto is_primary = false;
+            if(primary_keys.find(names[i]) == primary_keys.end()) { is_primary = true; }
+            td->add_column(names[i], types[i], is_primary);
+        }
+
+        return td;
+    }
+
+    String const &
+    get_database_name() {
+        return db_.get_name();
+    }
+
 
 public:
     int
@@ -142,6 +177,12 @@ private:
     }
 
 
+    String
+    _quoted_string( String const & s ) {
+        return String("'") + s + String("'");
+    }
+
+
 private:
     Database const & db_;
     sqlite3_stmt *stmt_;  // statement
@@ -153,8 +194,14 @@ private:
 
 void
 create_table(
-        Connection const &,
+        Connection &,
         TableDetails const &);
+
+void
+insert_many(
+        Connection &,
+        String const &,
+        std::vector<Strings> const &);
 
 }
 }

@@ -95,6 +95,7 @@ set(util_files
 	/Users/jyesselm/projects/RNAMake.New/src/util/random_number_generator.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/sqlite/connection.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/sqlite/database.cc
+	/Users/jyesselm/projects/RNAMake.New/src/util/sqlite/table_details.cc
 	/Users/jyesselm/projects/RNAMake.New/src/util/sqlite/field.cc
 )
 
