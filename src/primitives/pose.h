@@ -407,7 +407,7 @@ public: // other getters
             if(bp == end) { return i; }
             i++;
         }
-
+        throw PoseException("cannot find end with name: " + name->get_str());
     }
 
     int

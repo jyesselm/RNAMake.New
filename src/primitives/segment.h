@@ -24,14 +24,19 @@ public:
             base::SimpleStringCOPs const & end_ids,
             base::SimpleStringCOP name,
             util::SegmentType segment_type,
-            Index aligned_end):
+            Index aligned_end_index):
             BaseClass(structure, basepairs, ends, end_ids, name),
             segment_type_(segment_type),
-            aligned_end_(aligned_end) {}
+            aligned_end_index_(aligned_end_index) {}
+
+public:
+    inline
+    Index
+    get_aligned_end_index() const{ return aligned_end_index_; }
 
 protected:
     util::SegmentType segment_type_;
-    Index aligned_end_;
+    Index aligned_end_index_;
 };
 
 }

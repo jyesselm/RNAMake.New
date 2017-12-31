@@ -145,12 +145,12 @@ public: //getters
     get_pdb_str(
             int &,
             int &,
-            char &);
+            char &) const;
 
     inline
     String
     get_pdb_str(
-            int acount = 0) {
+            int acount = 0) const {
         auto num = residues_[0].get_num();
         auto chain_id = residues_[0].get_chain_id();
         return get_pdb_str(acount, num, chain_id);
@@ -158,7 +158,7 @@ public: //getters
 
     void
     write_pdb(
-            String const &);
+            String const &) const;
 
     void
     write_steric_beads_to_pdb(

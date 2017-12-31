@@ -30,8 +30,8 @@ public:
             Structure const & small_molecules,
             base::SimpleStringCOP dot_bracket,
             util::SegmentType segment_type,
-            Index aligned_end):
-            BaseClass(structure, basepairs, ends, end_ids, name, segment_type, aligned_end),
+            Index aligned_end_index):
+            BaseClass(structure, basepairs, ends, end_ids, name, segment_type, aligned_end_index),
             proteins_(proteins),
             small_molecules_(small_molecules),
             dot_bracket_(dot_bracket) {}
@@ -39,7 +39,7 @@ public:
     Segment(
             Segment const & seg):
             BaseClass(seg.structure_, seg.basepairs_, seg.ends_, seg.end_ids_, seg.name_,
-                      seg.segment_type_, seg.aligned_end_),
+                      seg.segment_type_, seg.aligned_end_index_),
             proteins_(seg.proteins_),
             small_molecules_(seg.small_molecules_),
             dot_bracket_(seg.dot_bracket_) {}
@@ -203,7 +203,7 @@ public:
 
     void
     write_pdb(
-            String const &);
+            String const &) const;
 
     void
     write_steric_beads_to_pdb(
@@ -216,7 +216,7 @@ public:
 
     inline
     Basepair const &
-    get_aligned_end() { return ends_[aligned_end_]; }
+    get_aligned_end() { return ends_[aligned_end_index_]; }
 
 protected:
     Structure proteins_;

@@ -38,6 +38,14 @@ TEST_CASE( "Test Basic Sqlite3 connections ", "[Sqlite3Connection]" ) {
         REQUIRE_THROWS_AS(int id = row->at(0), util::sqlite::SqliteException);
     }
 
+    SECTION("test create table") {
+        try { std::remove("test2.db"); }
+        catch (String const & e) {}
+
+
+
+    }
+
 
     /*auto db = sqlitepp::db("test.db");
     sqlitepp::query q(db, "CREATE TABLE data_table (word TEXT, id INT, PRIMARY KEY(id));");

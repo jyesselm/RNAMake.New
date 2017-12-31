@@ -11,6 +11,25 @@
 namespace util {
 namespace sqlite {
 
+struct ColumnDetails {
+    String name;
+    String type;
+    bool is_primary;
+};
+
+struct TableDetails {
+    String name;
+    std::vector<ColumnDetails> columns_;
+
+    //iterator
+    typedef std::vector<ColumnDetails>::iterator iterator;
+
+    iterator begin() { return columns_.begin(); }
+    iterator end()   { return columns_.end(); }
+
+};
+
+
 class Connection {
 public:
 
@@ -131,6 +150,11 @@ private:
 
 
 };
+
+void
+create_table(
+        Connection const &,
+        TableDetails const &);
 
 }
 }

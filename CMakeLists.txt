@@ -148,9 +148,9 @@ target_link_libraries(primitive_memory_leak_unittest primitives_lib)
 ###########################################################################
 
 set(data_structures_files
-	/Users/jyesselm/projects/RNAMake.New/src/data_structures/rna_structure_type_graph.cc
 	/Users/jyesselm/projects/RNAMake.New/src/data_structures/data_structures.cc
 	/Users/jyesselm/projects/RNAMake.New/src/data_structures/graph.cc
+	/Users/jyesselm/projects/RNAMake.New/src/data_structures/segment_graph.cc
 	/Users/jyesselm/projects/RNAMake.New/src/data_structures/directed_graph.cc
 )
 
@@ -216,6 +216,9 @@ target_link_libraries(all_atom_lib secondary_structure_lib  pybind11::module)
 
 add_library(all_atom MODULE ${all_atom_files})
 target_link_libraries(all_atom secondary_structure_lib  pybind11::module)
+
+add_executable(all_atom_graph_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_graph_unittest.cc)
+target_link_libraries(all_atom_graph_unittest all_atom_lib)
 
 add_executable(all_atom_generate_all_segments /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_generate_all_segments.cc)
 target_link_libraries(all_atom_generate_all_segments all_atom_lib)

@@ -17,10 +17,10 @@ Segment::get_pdb_str(
 
 void
 Segment::write_pdb(
-        String const & fname) {
+        String const & fname) const {
     std::ofstream out;
     out.open(fname.c_str());
-    out << get_pdb_str(1) << std::endl;
+    out << structure_.get_pdb_str(1) << std::endl;
     out.close();
 }
 

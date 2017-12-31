@@ -10,45 +10,49 @@
 
 namespace data_structures {
 
-template<typename RNASegmentType, typename AlignerType>
-class RNASegmentTypeGraph {
+template<typename SegmentType, typename AlignerType>
+class SegmentGraph {
 public:
-    typedef std::shared_ptr<RNASegmentType> RNASegmentTypeOP;
+    typedef std::shared_ptr<SegmentType> SegmentTypeOP;
 
 public:
-    RNASegmentTypeGraph():
-            dg_(DirectedGraph<RNASegmentType>()){}
+    SegmentGraph():
+            dg_(DirectedGraph<SegmentType>()){}
 
 public: //iterators
+    typedef typename DirectedGraph<SegmentType>::const_iterator const_iterator;
+
+    const_iterator begin() const noexcept { return dg_.begin(); }
+    const_iterator end() const noexcept   { return dg_.end(); }
 
 
 public:
     Index
-    add_rna_segment(
-            RNASegmentTypeOP rs) {
-        auto rs_copy = std::make_shared<RNASegmentType>(*rs);
+    add_segment(
+            SegmentTypeOP rs) {
+        auto rs_copy = std::make_shared<SegmentType>(*rs);
         return dg_.add_node(rs_copy, rs_copy->get_num_ends());
     }
 
     Index
-    add_rna_segment(
-            RNASegmentTypeOP rs,
+    add_segment(
+            SegmentTypeOP rs,
             Index parent_index,
             base::SimpleStringCOP parent_end_name) {
         auto parent = dg_.get_node(parent_index);
         auto parent_end_index = parent->get_end_index(parent_end_name);
 
         expects<GraphException>(
-                parent_end_index != parent->block_end(),
+                parent_end_index != parent->get_aligned_end_index(),
                 "cannot add rna_segment to parent's blocked end");
 
-        auto rs_copy = std::make_shared<RNASegmentType>(*rs);
-        aligner_.align(parent->get_end(parent_end_index), rs_copy);
+        auto rs_copy = std::make_shared<SegmentType>(*rs);
+        aligner_.align(parent->get_end(parent_end_index), *rs_copy);
         return dg_.add_node(rs_copy, rs_copy->get_num_ends(), parent_index, parent_end_index, 0);
     }
 
 public:
-    RNASegmentType const *
+    SegmentType const *
     get_rna_segment(
             Index n_index) const {
         return dg_.get_node(n_index);
@@ -65,13 +69,13 @@ public:
 private:
     bool
     _in_graph_already(
-            RNASegmentTypeOP rs) {
+            SegmentTypeOP rs) {
         //for(auto const & n : )
         return true;
     }
 
 private:
-    DirectedGraph<RNASegmentType> dg_;
+    DirectedGraph<SegmentType> dg_;
     AlignerType aligner_;
 };
 

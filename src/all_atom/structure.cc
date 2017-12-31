@@ -12,7 +12,7 @@ String
 Structure::get_pdb_str(
         int & acount,
         int & rnum,
-        char & chain_id) {
+        char & chain_id) const {
 
     auto s = String();
     auto i = -1;
@@ -32,7 +32,7 @@ Structure::get_pdb_str(
 
 void
 Structure::write_pdb(
-        String const & fname) {
+        String const & fname) const {
     std::ofstream out;
     out.open(fname.c_str());
     out << get_pdb_str(1) << std::endl;
