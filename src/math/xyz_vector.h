@@ -20,6 +20,7 @@
 
 //RNAMake Headers
 #include <base/string.h>
+#include <base/json.h>
 
 namespace math {
 
@@ -83,6 +84,13 @@ public: // Creation
 		z_ = (Value) std::stod(spl[2]);
 	}
 
+	inline
+	xyzVector(json::JSON & j) {
+		x_ = j[0].ToFloat();
+		y_ = j[1].ToFloat();
+		z_ = j[2].ToFloat();
+	}
+
 public:
 
 	inline
@@ -90,6 +98,12 @@ public:
 	get_str() const {
 		return std::to_string(x_) + " " + std::to_string(y_) + " " +
 			   std::to_string(z_);
+	}
+
+	inline
+	json::JSON
+	get_json() const {
+		return json::Array(x_, y_, z_);
 	}
 
 public: // Assignment

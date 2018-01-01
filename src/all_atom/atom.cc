@@ -18,6 +18,13 @@ Atom::get_str() const {
     return name_->get_str() + " " + coords_.get_str();
 }
 
+json::JSON
+Atom::get_json() const {
+    return json::JSON {
+            "name", name_->get_str(),
+            "coords", coords_.get_json() };
+}
+
 String
 Atom::get_pdb_str(
         int acount) const {

@@ -9,7 +9,7 @@
 #include <iostream>
 #include "../common.hpp"
 
-#include <data_structures/rna_structure_type_graph.h>
+#include <data_structures/segment_graph.h>
 #include <secondary_structure/aligner.h>
 #include <secondary_structure/parser.h>
 

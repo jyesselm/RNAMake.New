@@ -3,11 +3,11 @@
 #define __RNAMake__atom__
 
 #include <stdio.h>
-//#include <math/transform.h>
 
 //RNAMake Headers
 #include <base/types.h>
 #include <base/simple_string.h>
+#include <base/json.h>
 #include <math/xyz_vector.h>
 #include <math/xyz_matrix.h>
 #include <math/numerical.h>
@@ -64,6 +64,14 @@ public:
         coords_ = math::Point(std::stof(spl[1]), std::stof(spl[2]), std::stof(spl[3]));
     }
 
+
+    inline
+    Atom(
+            json::JSON & j) {
+        name_ = std::make_shared<base::SimpleString const>(j[0].ToString());
+        coords_ = math::Point(j[1]);
+    }
+
     /**
      * Copy constructor
      * @param   a   atom object to from
@@ -106,6 +114,9 @@ public:
     String
     get_str() const;
 
+    json::JSON
+    get_json() const;
+
     /**
      * Strigifies atom into PDB format
      * @param   acount  the number of the atom, default=1
@@ -130,7 +141,6 @@ public:
     void
     move(math::Point const & p) {
         coords_ = coords_ + p;
-
     }
 
     inline

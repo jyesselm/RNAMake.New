@@ -42,6 +42,7 @@ if (Boost_FOUND)
 set(base_files
 	/Users/jyesselm/projects/RNAMake.New/src/base/file_io.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/string.cc
+	/Users/jyesselm/projects/RNAMake.New/src/base/json.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/base.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/logger.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/simple_string.cc
@@ -57,6 +58,9 @@ target_link_libraries(base pybind11::module)
 
 add_executable(logger_unittest /Users/jyesselm/projects/RNAMake.New/unittests/base/logger_unittest.cc)
 target_link_libraries(logger_unittest base_lib)
+
+add_executable(compression_unittest /Users/jyesselm/projects/RNAMake.New/unittests/base/compression_unittest.cc)
+target_link_libraries(compression_unittest base_lib)
 
 add_executable(option_unittest /Users/jyesselm/projects/RNAMake.New/unittests/base/option_unittest.cc)
 target_link_libraries(option_unittest base_lib)
@@ -113,6 +117,9 @@ target_link_libraries(x3dna_unittest util_lib)
 
 add_executable(sqlite3_connection_unittest /Users/jyesselm/projects/RNAMake.New/unittests/util/sqlite3_connection_unittest.cc)
 target_link_libraries(sqlite3_connection_unittest util_lib)
+
+add_executable(json_unittest /Users/jyesselm/projects/RNAMake.New/unittests/util/json_unittest.cc)
+target_link_libraries(json_unittest util_lib)
 
 ###########################################################################
 # primitives
