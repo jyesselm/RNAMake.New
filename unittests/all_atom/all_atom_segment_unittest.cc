@@ -17,11 +17,11 @@ TEST_CASE( "Test all atom segment", "[AllAtomSegments]" ) {
     auto segs = seg_factory.all_segments_from_pdb(path, util::SegmentType::HELIX, false);
 
     int i = -1;
-    for(auto & seg: segs) {
+    /*for(auto & seg: segs) {
         i++;
         seg_factory.align_segment_to_ref_frame(*seg);
         seg->write_pdb("test."+std::to_string(i)+".pdb");
 
-    }
+    }*/
 
 }
