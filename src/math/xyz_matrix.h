@@ -167,8 +167,12 @@ public:
         s += " " + std::to_string(yx_) + ", " + std::to_string(yy_) + ", " + std::to_string(yz_) + ",\n";
         s += " " + std::to_string(zx_) + ", " + std::to_string(zy_) + ", " + std::to_string(zz_) + "]";
         return s;
-
     }
+
+    inline
+    json::JSON
+    get_json() const { return json::Array(xx_, xy_, xz_, yx_, yy_, yz_, zx_, zy_, zz_); }
+
 
 public:
 

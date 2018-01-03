@@ -47,6 +47,7 @@ def get_cmake_lists_header():
     s += "include_directories(/usr/include/python2.7)\n\n"
     s += "# Include paths for RNAMake src\n"
     s += "include_directories(%s)\n" % (base_dir + "/src/")
+    s += "include_directories(%s)\n" % (base_dir + "/src/gzip/")
     s += "include_directories(%s)\n\n" % (base_dir + "/unittests/")
     s += "# pybind11 setup \n"
     s += "find_library(PYBIND11 pybind11)\n"

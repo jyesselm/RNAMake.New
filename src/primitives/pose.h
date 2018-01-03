@@ -79,7 +79,8 @@ public:
 
 protected:
     // let dervived classes fill in members
-    Pose() {}
+    Pose():
+            structure_(Structuretype(Residues(), Cutpoints())){}
 
 public: //iterators
     // residue iterator

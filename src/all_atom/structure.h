@@ -148,7 +148,7 @@ public: //getters
     }
 
     json::JSON
-    get_json() {
+    get_json() const {
         auto j_res = json::Array();
         auto j_cuts = json::Array();
         for(auto const & r : residues_) { j_res.append(r.get_json()); }

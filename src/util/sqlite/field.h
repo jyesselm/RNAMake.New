@@ -95,6 +95,10 @@ public: // getters
         return get_str();
     }
 
+    operator
+    std::vector<std::uint8_t>() const { return vec_; }
+
+
 public:
     inline
     int

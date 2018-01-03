@@ -8,11 +8,13 @@
 #include "../common.hpp"
 
 #include <base/logger.h>
-#include <all_atom/residue_type_set.h>
 #include <all_atom/pdb_parser.h>
-#include <all_atom/structure.h>
+#include <all_atom/pose.h>
 
+#include <gzip/compress.hpp>
+#include <gzip/decompress.hpp>
 
+#include <util/sqlite/connection.h>
 
 TEST_CASE( "testing basic all atom classes", "[AllAtom]" ) {
 
@@ -124,8 +126,53 @@ TEST_CASE( "testing basic all atom classes", "[AllAtom]" ) {
     }
 
     SECTION("test pose") {
-        auto p = all_atom::get_pose_from_pdb(path, pdb_parser);
 
+        auto db = util::sqlite::Database(":memory:");
+        auto conn = util::sqlite::Connection(db);
+
+        auto tb = util::sqlite::TableDetails("data_table");
+        tb.add_column("id", "INT", true);
+        tb.add_column("str", "TEXT");
+        util::sqlite::create_table(conn, tb);
+
+        int level = Z_BEST_COMPRESSION; // Z_DEFAULT_COMPRESSION is the default if no arg is passed
+        int strategy = Z_DEFAULT_STRATEGY; // Z_DEFAULT_STRATEGY is the defaul if no arg is passed
+
+        auto str = String("hello hello hello hello hello");
+        int size = str.length();
+        auto compressed_data = gzip::compress(str.c_str(), size, level, strategy);
+
+        auto datas = std::vector<Strings>();
+        std::cout << compressed_data << std::endl;
+        datas.push_back(Strings{"1", compressed_data});
+        util::sqlite::insert_many(conn, "data_table", datas);
+
+
+        exit(0);
+
+        /*auto p = all_atom::get_pose_from_pdb(path, parser);
+        auto j = p->get_json();
+        //std:cout << j.dump_minimized() << std::endl;
+        //auto p2 = all_atom::Pose(j, *rts);
+
+        int level = Z_BEST_COMPRESSION; // Z_DEFAULT_COMPRESSION is the default if no arg is passed
+        int strategy = Z_DEFAULT_STRATEGY; // Z_DEFAULT_STRATEGY is the defaul if no arg is passed
+
+        int size = j.dump_minimized().length();
+        auto compressed_data = gzip::compress(j.dump_minimized().c_str(), size, level, strategy);
+
+
+        ofstream out ("test.bin");
+        out << compressed_data.size();
+        out.write(compressed_data.c_str(), compressed_data.size());
+        out.close();
+
+        ifstream in ("test.bin");
+        char * buff = new char[5];
+        in.read(buff, 5);
+        std::cout << buff << std::endl;*/
+
+        //auto decompressed_data = gzip::decompress(compressed_data.data(), compressed_data.size());
 
 
     }

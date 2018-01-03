@@ -107,6 +107,11 @@ public:
     exec(
             String const & command) {
         int err = _prepare(command);
+        err = do_bind();
+        if (err != SQLITE_OK)   {
+            sqlite3_finalize(stmt_);
+            return err;
+        }
         err = sqlite3_step(stmt_);
         if (err != SQLITE_DONE) {
             sqlite3_finalize(stmt_);
@@ -124,6 +129,25 @@ public:
 
     void
     rollback_transaction() { _execute("ROLLBACK;"); }
+
+    // bind a BLOB or TEXT to query
+    // CAUTION: vector and string MUST BE constant until end of query execution of exec()/use()/store()
+    void bind(int param, std::vector<std::uint8_t> const& blob) {
+        BindType b(param, &blob);
+        bind_.push_back(b);
+    }
+    void bind(int param, String const & text) {
+        BindType t(param, text);
+        bind_.push_back(t);
+    }
+    void bind(const char* param, std::vector<std::uint8_t> const & blob) {
+        BindType b(param, &blob);
+        bind_.push_back(b);
+    }
+    void bind(const char* param, std::string const& text) {
+        BindType t(param, &text);
+        bind_.push_back(t);
+    }
 
 private:
     int
@@ -182,12 +206,87 @@ private:
         return String("'") + s + String("'");
     }
 
+    int do_bind() {
+        int err = SQLITE_OK;
+        for (std::vector<BindType>::const_iterator it = bind_.begin(); it != bind_.end(); ++it) {
+            if (it->type_== SQLITE_BLOB) {
+                const std::vector<std::uint8_t>* v = static_cast<const std::vector<std::uint8_t>*>(it->ptr_);
+                err = ::sqlite3_bind_blob(stmt_, !it->param_str_ ? it->param_num_ : ::sqlite3_bind_parameter_index(stmt_, it->param_str_), v->size() ? (const void*)&(*v)[0] : nullptr, (int)v->size(), SQLITE_STATIC);
+                if (err != SQLITE_OK) break;
+            }
+            if (it->type_ == SQLITE_TEXT) {
+                //const std::string* s = static_cast<const std::string*>(it->ptr_);
+                std::cout << it->str_ << std::endl;
+                sqlite3_bind_text(stmt_, it->param_num_, it->str_.c_str(), it->str_.size()+1, nullptr);
+                /*err = ::sqlite3_bind_text(stmt_, !it->param_str_ ? it->param_num_ : ::sqlite3_bind_parameter_index(stmt_, it->param_str_), s->size() ? s->c_str() : nullptr, (int)s->size(), SQLITE_STATIC);*/
+                if (err != SQLITE_OK) break;
+            }
+            if (it->type_ == SQLITE_NULL) {
+                err = ::sqlite3_bind_null(stmt_, !it->param_str_ ? it->param_num_ : ::sqlite3_bind_parameter_index(stmt_, it->param_str_));
+                if (err != SQLITE_OK) break;
+            }
+        }
+        bind_.clear();  // clear bindings
+        return err;
+    }
+
+
+private:
+    struct BindType {
+        void const * ptr_;
+        char const * param_str_;
+        int         param_num_;
+        int         type_;
+        String      str_;
+
+        BindType(
+                int param,
+                std::vector<std::uint8_t> const * blob):
+                param_num_(param),
+                param_str_(nullptr),
+                ptr_(blob),
+                type_(SQLITE_BLOB) { };
+
+        BindType(
+                int param,
+                String const & text):
+                param_num_(param),
+                param_str_(nullptr),
+                str_(text),
+                type_(SQLITE_TEXT) { };
+
+        BindType(
+                int param,
+                std::string const * text):
+                param_num_(param),
+                param_str_(nullptr),
+                ptr_(text),
+                type_(SQLITE_TEXT) { };
+
+        BindType(
+                const char* param,
+                const std::vector<std::uint8_t>* blob) :
+                param_num_(0),
+                param_str_(param),
+                ptr_(blob),
+                type_(SQLITE_BLOB) { };
+
+        BindType(
+                const char* param,
+                std::string const * text) :
+                param_num_(0),
+                param_str_(param),
+                ptr_(text),
+                type_(SQLITE_TEXT) { };
+    };
+
 
 private:
     Database const & db_;
     sqlite3_stmt *stmt_;  // statement
     char *zErrMsg_;
     int rc_;
+    std::vector<BindType> bind_;
 
 
 };

@@ -35,11 +35,66 @@ public:
             proteins_(proteins),
             small_molecules_(small_molecules),
             dot_bracket_(dot_bracket) {}
+    inline
+    Pose(
+            Pose const & p):
+            BaseClass(p.structure_, p.basepairs_, p.ends_, p.end_ids_, p.name_),
+            proteins_(p.proteins_),
+            small_molecules_(p.small_molecules_),
+            dot_bracket_(p.dot_bracket_) {}
+
+    inline
+    Pose(
+            json::JSON & j,
+            ResidueTypeSet const & rts):
+            BaseClass(),
+            proteins_(Structure(j["proteins"], rts)),
+            small_molecules_(Structure(j["small_molecules"], rts)) {
+        structure_ = Structure(j["structure"], rts);
+    }
 
 public:
     inline
     String
-    dot_bracket() { return dot_bracket_->get_str(); }
+    get_dot_bracket() { return dot_bracket_->get_str(); }
+
+public:
+
+    json::JSON
+    get_json() const {
+        auto j_bps = json::Array();
+        auto j_ends = json::Array();
+        auto j_end_ids = json::Array();
+
+        for(auto const & bp : basepairs_) {
+            auto bp_res = get_bp_res(bp);
+            j_bps.append(json::Array(bp.get_json(), bp_res->at(0).get_num(), bp_res->at(0).get_chain_id(),
+                                     bp_res->at(0).get_i_code(), bp_res->at(1).get_num(),
+                                     bp_res->at(1).get_chain_id(), bp_res->at(1).get_i_code()));
+        }
+
+        for(auto const & bp : ends_) {
+            auto bp_res = get_bp_res(bp);
+            j_ends.append(json::Array(bp.get_json(), bp_res->at(0).get_num(), bp_res->at(0).get_chain_id(),
+                                     bp_res->at(0).get_i_code(), bp_res->at(1).get_num(),
+                                     bp_res->at(1).get_chain_id(), bp_res->at(1).get_i_code()));
+        }
+
+        for(auto const & end_id : end_ids_) { j_end_ids.append(end_id->get_str()); }
+
+        return json::JSON{
+                "structure", structure_.get_json(),
+                "basepairs", j_bps,
+                "ends", j_ends,
+                "end_ids", j_end_ids,
+                "name", name_->get_str(),
+                "proteins", proteins_.get_json(),
+                "small_molecules", small_molecules_.get_json(),
+                "dot_bracket", dot_bracket_->get_str() };
+
+    }
+
+
 
 protected:
     Structure proteins_;

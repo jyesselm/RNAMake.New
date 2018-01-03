@@ -8,6 +8,9 @@
 #include <base/paths.h>
 #include <util/sqlite/connection.h>
 
+#include <gzip/compress.hpp>
+#include <gzip/decompress.hpp>
+
 TEST_CASE( "Test Basic Sqlite3 connections ", "[Sqlite3Connection]" ) {
 
     SECTION("test basic features of connection") {
@@ -72,8 +75,82 @@ TEST_CASE( "Test Basic Sqlite3 connections ", "[Sqlite3Connection]" ) {
             REQUIRE(row->at(0).get_str() == "the_word");
         }
 
+    }
 
+    SECTION("test bindings") {
+        auto db = util::sqlite::Database(":memory:");
+        auto conn = util::sqlite::Connection(db);
+
+        auto td = util::sqlite::TableDetails("data_table");
+        td.add_column("word", "TEXT");
+        td.add_column("id", "INT", true);
+        util::sqlite::create_table(conn, td);
+
+        auto str = String("hello");
+        conn.bind(1, str);
+        auto err = conn.exec("INSERT INTO data_table( id, word ) VALUES ('0', ?);");
+
+        auto row = conn.get_first_row("SELECT * FROM data_table");
+        REQUIRE(row->at(0).get_str() == "hello");
+    }
+
+    SECTION("test bindings with compressed str") {
+        auto db = util::sqlite::Database(":memory:");
+        auto conn = util::sqlite::Connection(db);
+
+        auto td = util::sqlite::TableDetails("data_table");
+        td.add_column("word", "BLOB");
+        td.add_column("id", "INT", true);
+        util::sqlite::create_table(conn, td);
+
+        int level = Z_BEST_COMPRESSION; // Z_DEFAULT_COMPRESSION is the default if no arg is passed
+        int strategy = Z_DEFAULT_STRATEGY; // Z_DEFAULT_STRATEGY is the defaul if no arg is passed
+
+        auto str = String("hello hello hello hello hello");
+        int size = str.length();
+        auto compressed_data = gzip::compress(str.c_str(), size, level, strategy);
+        std::vector<uint8_t> myVector(compressed_data.begin(), compressed_data.end());
+
+
+        conn.bind(1, myVector);
+        auto err = conn.exec("INSERT INTO data_table( id, word ) VALUES ('0', ?);");
+
+        auto row = conn.get_first_row("SELECT * FROM data_table");
+        auto sql_str = row->at(0).get_str();
+        std::vector<uint8_t> blob = row->at(0);
+        auto sql_data = String(blob.begin(), blob.end());
+        std::cout << sql_data << std::endl;
+
+        auto decompressed_data = gzip::decompress(sql_data.data(), sql_data.size());
+        std::cout << compressed_data << std::endl;
+        std::cout << sql_data << std::endl;
+        std::cout << decompressed_data << std::endl;
 
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
