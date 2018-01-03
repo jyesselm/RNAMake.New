@@ -118,11 +118,15 @@ TEST_CASE( "testing basic all atom classes", "[AllAtom]" ) {
 
         SECTION("test json") {
             auto j = struc->get_json();
-            //std::cout << j << std::endl;
             auto struc2 = all_atom::Structure(j, *rts);
             REQUIRE(struc->is_equal(struc2, false));
-
         }
+    }
+
+    SECTION("test pose") {
+        auto p = all_atom::get_pose_from_pdb(path, pdb_parser);
+
+
 
     }
 
