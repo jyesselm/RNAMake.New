@@ -378,7 +378,7 @@ class JSON
             return "";
         }
 
-    string dump_minimized( int depth = 1, string tab = "  ") const {
+    string dump_minimized( int depth = 1, string tab = "") const {
         string pad = "";
         for( int i = 0; i < depth; ++i, pad += tab );
 
@@ -390,7 +390,7 @@ class JSON
                 bool skip = true;
                 for( auto &p : *Internal.Map ) {
                     if( !skip ) s += ", ";
-                    s += ( pad + "\"" + p.first + "\" : " + p.second.dump( depth + 1, tab ) );
+                    s += ( pad + "\"" + p.first + "\":" + p.second.dump_minimized( depth + 1, tab ) );
                     skip = false;
                 }
                 s += ( pad.erase( 0, 2 ) + "}" ) ;
@@ -400,8 +400,8 @@ class JSON
                 string s = "[";
                 bool skip = true;
                 for( auto &p : *Internal.List ) {
-                    if( !skip ) s += ", ";
-                    s += p.dump( depth + 1, tab );
+                    if( !skip ) s += ",";
+                    s += p.dump_minimized( depth + 1, tab );
                     skip = false;
                 }
                 s += "]";

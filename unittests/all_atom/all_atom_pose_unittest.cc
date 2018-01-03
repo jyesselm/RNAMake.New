@@ -21,5 +21,4 @@ TEST_CASE( "Test all atom pose", "[Basepair]" ) {
     auto p = all_atom::get_pose_from_pdb(path, parser);
 
 
-
 }

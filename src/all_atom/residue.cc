@@ -79,6 +79,20 @@ Residue::get_str() const {
     return ss.str();
 }
 
+json::JSON
+Residue::get_json() const {
+    auto atom_array = json::Array();
+    for(auto const & a : atoms_) { atom_array.append(a.get_json()); }
+    return json::JSON {
+            "res_type", res_type_->get_name(),
+            "name", name_,
+            "num", num_,
+            "chain_id", chain_id_,
+            "i_code", i_code_,
+            "atoms", atom_array };
+}
+
+
 String
 Residue::get_pdb_str(
         int & acount,

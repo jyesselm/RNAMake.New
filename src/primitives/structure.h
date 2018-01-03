@@ -64,6 +64,12 @@ public:
     virtual
     ~Structure() {}
 
+protected:
+    inline
+    Structure():
+            residues_(Residues()),
+            cut_points_(Cutpoints()) {}
+
 public: //res iterator
     typedef typename Residues::const_iterator const_iterator;
 
@@ -190,11 +196,6 @@ public:
         }
         return false;
     }
-
-
-
-protected:
-    Structure() {}
 
 protected:
 

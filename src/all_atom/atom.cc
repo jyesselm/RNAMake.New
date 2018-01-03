@@ -20,9 +20,7 @@ Atom::get_str() const {
 
 json::JSON
 Atom::get_json() const {
-    return json::JSON {
-            "name", name_->get_str(),
-            "coords", coords_.get_json() };
+    return json::Array(name_->get_str(), coords_.get_json());
 }
 
 String

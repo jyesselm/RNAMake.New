@@ -83,6 +83,9 @@ target_link_libraries(math_lib base_lib  pybind11::module)
 add_library(math MODULE ${math_files})
 target_link_libraries(math base_lib  pybind11::module)
 
+add_executable(serialization_unittest /Users/jyesselm/projects/RNAMake.New/unittests/math/serialization_unittest.cc)
+target_link_libraries(serialization_unittest math_lib)
+
 add_executable(xyz_matrix_unittest /Users/jyesselm/projects/RNAMake.New/unittests/math/xyz_matrix_unittest.cc)
 target_link_libraries(xyz_matrix_unittest math_lib)
 
@@ -251,4 +254,7 @@ target_link_libraries(all_atom_structure_unittest all_atom_lib)
 
 add_executable(all_atom_pose_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_pose_unittest.cc)
 target_link_libraries(all_atom_pose_unittest all_atom_lib)
+
+add_executable(all_atom_basic_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_basic_unittest.cc)
+target_link_libraries(all_atom_basic_unittest all_atom_lib)
 

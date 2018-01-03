@@ -46,17 +46,6 @@ public:
 
     inline
     Chain(
-            Chain const & c) {
-        residues_ = Residues();
-        int i = 0;
-        for(auto const & r : c.residues_) {
-            residues_.push_back(Restype(r));
-            i++;
-        }
-    }
-
-    inline
-    Chain(
             String const & s) {
         residues_ = Residues();
         Strings spl = base::split_str_by_delimiter(s, ";");

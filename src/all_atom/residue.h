@@ -128,6 +128,23 @@ public:
         _build_beads();
     }
 
+    Residue(
+            json::JSON & j,
+            ResidueTypeSet const & rts):
+            primitives::Residue() {
+        res_type_ = rts.get_residue_type(j["res_type"].ToString());
+        name_     = (char)j["name"].ToInt();
+        num_      = (int)j["num"].ToInt();
+        chain_id_ = (char)j["chain_id"].ToInt();
+        i_code_   = (char)j["i_code"].ToInt();
+        uuid_     = util::Uuid();
+        atoms_    = Atoms();
+        auto & atoms_json = j["atoms"];
+        for(int i = 0; i < atoms_json.size(); i++) {
+            atoms_.push_back(Atom(atoms_json[i]));
+        }
+    }
+
 
     /**
      * Empty deconstructor
@@ -281,6 +298,9 @@ public: // getters
      */
     String
     get_str() const;
+
+    json::JSON
+    get_json() const;
 
     /**
      * wrapper for to_pdb_str(int &, int, String const &) when one does not care about

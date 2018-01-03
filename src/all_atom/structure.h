@@ -25,12 +25,11 @@ public:
             Cutpoints const & cut_points): ParentClass(residues, cut_points) {}
     inline
     Structure(
-            Structure const & structure): ParentClass(structure) {}
-
+            Structure const & structure): ParentClass(structure.residues_, structure.cut_points_) {}
     inline
     Structure(
             String const & s,
-            ResidueTypeSet const & rts) {
+            ResidueTypeSet const & rts) : ParentClass() {
 
         auto spl = base::split_str_by_delimiter(s, ";");
         for(Index i = 0; i < spl.size()-1; i++) {
@@ -42,30 +41,37 @@ public:
         }
     }
 
+    inline
+    Structure(
+            json::JSON & j,
+            ResidueTypeSet const & rts): ParentClass() {
+        auto & j_res =  j["residues"];
+        auto & j_cuts = j["cutpoints"];
+
+        for(int i = 0; i < j_res.size(); i++) {
+            residues_.push_back(Residue(j_res[i], rts));
+        }
+        for(int i = 0; i < j_cuts.size(); i++) {
+            cut_points_.push_back(j_cuts[i].ToInt());
+        }
+
+    }
+
     ~Structure() {}
 
 public: //operators
+    inline
     bool
     operator == (
             Structure const & s) const {
-        if(residues_.size() != s.residues_.size() ) { return false; }
-        if(cut_points_.size() != s.cut_points_.size() ) { return false; }
-
-        for(int i = 0; i < residues_.size(); i++) {
-            if(residues_[i] != s.residues_[i]) { return false; }
-        }
-
-        for(int i = 0; i < cut_points_.size(); i++) {
-            if(cut_points_[i] != s.cut_points_[i]) { return false; }
-        }
-
-        return true;
+        return is_equal(s);
     }
 
+    inline
     bool
     operator !=(
             Structure const & s) const {
-        return !(*this == s);
+        return !(is_equal(s));
     }
 
 public:
@@ -78,7 +84,7 @@ public:
         if(cut_points_.size() != s.cut_points_.size() ) { return false; }
 
         for(int i = 0; i < residues_.size(); i++) {
-            if(residues_[i].is_equal(residues_[i]), check_uuid) { return false; }
+            if(!(residues_[i].is_equal(s.residues_[i], check_uuid))) { return false; }
         }
 
         for(int i = 0; i < cut_points_.size(); i++) {
@@ -139,6 +145,19 @@ public: //getters
         }
         s += ";";
         return s;
+    }
+
+    json::JSON
+    get_json() {
+        auto j_res = json::Array();
+        auto j_cuts = json::Array();
+        for(auto const & r : residues_) { j_res.append(r.get_json()); }
+        for(auto const & i : cut_points_) { j_cuts.append(i); }
+        auto j = json::Object();
+        return json::JSON{
+                "residues", j_res,
+                "cutpoints", j_cuts};
+
     }
 
     String

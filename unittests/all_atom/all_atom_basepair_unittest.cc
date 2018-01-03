@@ -33,10 +33,6 @@ TEST_CASE( "Test all atom base pair ", "[Basepair]" ) {
         bp_res.push_back(s->get_residue(bp.get_res1_uuid()));
         bp_res.push_back(s->get_residue(bp.get_res2_uuid()));
 
-        auto j = bp_res[0].get_atom("P").get_json();
-
-
-
         auto rng = util::RandomNumberGenerator();
         for (int i = 0; i < 100; i++) {
             auto rot = math::get_random_rotation_matrix();
