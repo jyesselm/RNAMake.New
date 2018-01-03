@@ -7,6 +7,7 @@
 
 #include <sqlite3.h>
 #include <base/types.h>
+#include <base/file_io.h>
 
 namespace util {
 namespace sqlite {
@@ -16,7 +17,8 @@ public:
     Database(
             String name) :
             name_(name),
-            db_(nullptr) { open(); }
+            db_(nullptr),
+            created_(false){ open(); }
 
     ~Database() {
         // close the db
@@ -37,6 +39,10 @@ public:
     bool
     is_open() const { return open_; }
 
+    inline
+    bool
+    is_created() const { return created_; }
+
     // SQLite3 access
     inline
     sqlite3
@@ -54,6 +60,8 @@ public:
 private:
     // open (connect) the database
     int open(int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE) {
+        if(!base::file_exists(name_)) { created_ = true; }
+
         int err = sqlite3_open_v2(name_.c_str(), &db_, flags, nullptr);
         open_ = !err;
         return err;
@@ -66,6 +74,7 @@ private:
     sqlite3 *db_;    // associated db
     String const name_;  // db filename
     bool open_;  // db open status
+    bool created_;
 };
 
 }

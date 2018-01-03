@@ -14,7 +14,6 @@ namespace sqlite {
 
 class Connection {
 public:
-
     Connection(
             Database const & db) :
             db_(db) {}
@@ -57,6 +56,9 @@ public: // get other table infos
         auto q  = "SELECT sql FROM sqlite_master WHERE tbl_name = " + _quoted_string(table_name);
         _prepare(q);
         rc_ = sqlite3_step(stmt_);
+        if(rc_ != SQLITE_ROW) {
+            throw SqliteException(table_name + " does not exist cannot get details");
+        }
 
         auto table_str = String(reinterpret_cast<const char *>(sqlite3_column_text(stmt_, 0)));
         auto spl = base::split_str_by_delimiter(table_str, "(");
@@ -96,9 +98,16 @@ public: // get other table infos
         return td;
     }
 
+    inline
     String const &
-    get_database_name() {
+    get_database_name() const {
         return db_.get_name();
+    }
+
+    inline
+    bool
+    is_database_created() const {
+        return db_.is_created();
     }
 
 
@@ -137,7 +146,7 @@ public:
         bind_.push_back(b);
     }
     void bind(int param, String const & text) {
-        BindType t(param, text);
+        BindType t(param, &text);
         bind_.push_back(t);
     }
     void bind(const char* param, std::vector<std::uint8_t> const & blob) {
@@ -169,7 +178,7 @@ private:
                                  &stmt_,
                                  NULL);
         if (rc_ != SQLITE_OK) {
-            throw SqliteException("error returned with query: " + command);
+            throw SqliteException("error="+std::to_string(rc_)+" returned with query: " + command);
         }
         return rc_;
     }
@@ -215,10 +224,8 @@ private:
                 if (err != SQLITE_OK) break;
             }
             if (it->type_ == SQLITE_TEXT) {
-                //const std::string* s = static_cast<const std::string*>(it->ptr_);
-                std::cout << it->str_ << std::endl;
-                sqlite3_bind_text(stmt_, it->param_num_, it->str_.c_str(), it->str_.size()+1, nullptr);
-                /*err = ::sqlite3_bind_text(stmt_, !it->param_str_ ? it->param_num_ : ::sqlite3_bind_parameter_index(stmt_, it->param_str_), s->size() ? s->c_str() : nullptr, (int)s->size(), SQLITE_STATIC);*/
+                const std::string* s = static_cast<const std::string*>(it->ptr_);
+                err = ::sqlite3_bind_text(stmt_, !it->param_str_ ? it->param_num_ : ::sqlite3_bind_parameter_index(stmt_, it->param_str_), s->size() ? s->c_str() : nullptr, (int)s->size(), SQLITE_STATIC);
                 if (err != SQLITE_OK) break;
             }
             if (it->type_ == SQLITE_NULL) {
@@ -237,7 +244,6 @@ private:
         char const * param_str_;
         int         param_num_;
         int         type_;
-        String      str_;
 
         BindType(
                 int param,
@@ -246,14 +252,6 @@ private:
                 param_str_(nullptr),
                 ptr_(blob),
                 type_(SQLITE_BLOB) { };
-
-        BindType(
-                int param,
-                String const & text):
-                param_num_(param),
-                param_str_(nullptr),
-                str_(text),
-                type_(SQLITE_TEXT) { };
 
         BindType(
                 int param,

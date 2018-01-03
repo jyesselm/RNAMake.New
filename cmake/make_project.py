@@ -9,10 +9,11 @@ depends = {
     'primitives' : ['util'],
     'data_structures' : ['util'],
     'secondary_structure' : ['primitives'],
-    'all_atom' : ['secondary_structure']
+    'all_atom' : ['secondary_structure'],
+    'resource_management' : ['all_atom']
 }
 
-libs = "base math util primitives data_structures secondary_structure all_atom"
+libs = "base math util primitives data_structures secondary_structure all_atom resource_management"
 #libs = "base math util primitives data_structures secondary_structure"
 all_lib_paths = libs.split()
 

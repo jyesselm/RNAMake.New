@@ -15,10 +15,7 @@ TEST_CASE( "Test Basic Sqlite3 connections ", "[Sqlite3Connection]" ) {
 
     SECTION("test basic features of connection") {
 
-        try { std::remove("test.db"); }
-        catch (String const & e) {}
-
-        auto db = util::sqlite::Database("test.db");
+        auto db = util::sqlite::Database(":memory:");
         auto q = util::sqlite::Connection(db);
 
         q.exec("CREATE TABLE data_table (word TEXT, id INT, PRIMARY KEY(id));");
@@ -42,14 +39,16 @@ TEST_CASE( "Test Basic Sqlite3 connections ", "[Sqlite3Connection]" ) {
             //stop from weird casting ...
             REQUIRE_THROWS_AS(int id = row->at(0), util::sqlite::SqliteException);
         }
+
+        SECTION("test get table details") {
+            auto tb = q.get_table_details("data_table");
+
+        }
     }
 
-    SECTION("test create table") {
+    /*SECTION("test create table") {
 
-        try { std::remove("test2.db"); }
-        catch (String const & e) {}
-
-        auto db = util::sqlite::Database("test2.db");
+        auto db = util::sqlite::Database(":memory:");
         auto conn = util::sqlite::Connection(db);
 
         auto td = util::sqlite::TableDetails("data_table");
@@ -92,10 +91,10 @@ TEST_CASE( "Test Basic Sqlite3 connections ", "[Sqlite3Connection]" ) {
 
         auto row = conn.get_first_row("SELECT * FROM data_table");
         REQUIRE(row->at(0).get_str() == "hello");
-    }
+    }*/
 
     SECTION("test bindings with compressed str") {
-        auto db = util::sqlite::Database(":memory:");
+        /*auto db = util::sqlite::Database(":memory:");
         auto conn = util::sqlite::Connection(db);
 
         auto td = util::sqlite::TableDetails("data_table");
@@ -119,13 +118,10 @@ TEST_CASE( "Test Basic Sqlite3 connections ", "[Sqlite3Connection]" ) {
         auto sql_str = row->at(0).get_str();
         std::vector<uint8_t> blob = row->at(0);
         auto sql_data = String(blob.begin(), blob.end());
-        std::cout << sql_data << std::endl;
 
         auto decompressed_data = gzip::decompress(sql_data.data(), sql_data.size());
-        std::cout << compressed_data << std::endl;
-        std::cout << sql_data << std::endl;
-        std::cout << decompressed_data << std::endl;
-
+        REQUIRE(sql_data == compressed_data);
+        */
     }
 
 }

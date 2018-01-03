@@ -12,6 +12,7 @@ include_directories(/usr/include/python2.7)
 
 # Include paths for RNAMake src
 include_directories(/Users/jyesselm/projects/RNAMake.New/src/)
+include_directories(/Users/jyesselm/projects/RNAMake.New/src/gzip/)
 include_directories(/Users/jyesselm/projects/RNAMake.New/unittests/)
 
 # pybind11 setup 
@@ -257,4 +258,21 @@ target_link_libraries(all_atom_pose_unittest all_atom_lib)
 
 add_executable(all_atom_basic_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_basic_unittest.cc)
 target_link_libraries(all_atom_basic_unittest all_atom_lib)
+
+###########################################################################
+# resource_management
+###########################################################################
+
+set(resource_management_files
+	/Users/jyesselm/projects/RNAMake.New/src/resource_management/sqlite_library.cc
+)
+
+add_library(resource_management_lib ${resource_management_files})
+target_link_libraries(resource_management_lib all_atom_lib  pybind11::module)
+
+add_library(resource_management MODULE ${resource_management_files})
+target_link_libraries(resource_management all_atom_lib  pybind11::module)
+
+add_executable(sqlite_library_unittest /Users/jyesselm/projects/RNAMake.New/unittests/resource_management/sqlite_library_unittest.cc)
+target_link_libraries(sqlite_library_unittest resource_management_lib)
 
