@@ -265,6 +265,7 @@ target_link_libraries(all_atom_basic_unittest all_atom_lib)
 
 set(resource_management_files
 	/Users/jyesselm/projects/RNAMake.New/src/resource_management/sqlite_library.cc
+	/Users/jyesselm/projects/RNAMake.New/src/resource_management/resource_builder.cc
 )
 
 add_library(resource_management_lib ${resource_management_files})
@@ -272,6 +273,9 @@ target_link_libraries(resource_management_lib all_atom_lib  pybind11::module)
 
 add_library(resource_management MODULE ${resource_management_files})
 target_link_libraries(resource_management all_atom_lib  pybind11::module)
+
+add_executable(resource_builder_unittest /Users/jyesselm/projects/RNAMake.New/unittests/resource_management/resource_builder_unittest.cc)
+target_link_libraries(resource_builder_unittest resource_management_lib)
 
 add_executable(sqlite_library_unittest /Users/jyesselm/projects/RNAMake.New/unittests/resource_management/sqlite_library_unittest.cc)
 target_link_libraries(sqlite_library_unittest resource_management_lib)

@@ -197,6 +197,9 @@ private:
     double sugar_dist_1_, sugar_dist_2_;
 };
 
+typedef std::shared_ptr<SegmentFactory> SegmentFactoryOP;
+
+
 }
 
 #endif //RNAMAKE_NEW_SEGMENT_FACTORY_H
