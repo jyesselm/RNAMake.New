@@ -9,7 +9,7 @@
 #include <all_atom/segment_factory.h>
 
 TEST_CASE( "Test all atom segment", "[AllAtomSegments]" ) {
-    auto rts = std::make_shared<all_atom::ResidueTypeSet>();
+    auto rts = all_atom::ResidueTypeSet();
     auto seg_factory = all_atom::SegmentFactory(rts);
     auto path = base::unittest_resources_path() + "/all_atom/HELIX.IDEAL.2/HELIX.IDEAL.2.pdb";
     auto seg = seg_factory.segment_from_pdb(path, util::SegmentType::HELIX, false);
@@ -17,11 +17,10 @@ TEST_CASE( "Test all atom segment", "[AllAtomSegments]" ) {
     auto segs = seg_factory.all_segments_from_pdb(path, util::SegmentType::HELIX, false);
 
     int i = -1;
-    /*for(auto & seg: segs) {
+    for(auto & seg: segs) {
         i++;
         seg_factory.align_segment_to_ref_frame(*seg);
-        seg->write_pdb("test."+std::to_string(i)+".pdb");
+        //seg->write_pdb("test."+std::to_string(i)+".pdb");
 
-    }*/
-
+    }
 }

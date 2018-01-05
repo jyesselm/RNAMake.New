@@ -13,7 +13,7 @@
 
 
 TEST_CASE( "Test Parsing PDB formatted files ", "[PDBParser]" ) {
-    auto rts = std::make_shared<all_atom::ResidueTypeSet>();
+    auto rts = all_atom::ResidueTypeSet();
 
     SECTION("test rebuilding missing phosphates") {
         auto parser = all_atom::PDBParser(rts);

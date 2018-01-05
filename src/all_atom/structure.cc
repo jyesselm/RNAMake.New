@@ -216,7 +216,7 @@ get_structure_from_residues(
 StructureOP
 get_structure_from_pdb(
         String const & pdb_name,
-        ResidueTypeSetOP rts,
+        ResidueTypeSet const & rts,
         SetType set_type) {
 
     auto pdb_parser = PDBParser(rts);

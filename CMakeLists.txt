@@ -12,7 +12,6 @@ include_directories(/usr/include/python2.7)
 
 # Include paths for RNAMake src
 include_directories(/Users/jyesselm/projects/RNAMake.New/src/)
-include_directories(/Users/jyesselm/projects/RNAMake.New/src/gzip/)
 include_directories(/Users/jyesselm/projects/RNAMake.New/unittests/)
 
 # pybind11 setup 

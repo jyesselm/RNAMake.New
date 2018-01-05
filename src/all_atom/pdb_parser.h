@@ -50,7 +50,7 @@ typedef std::shared_ptr<PDBParserResidues> PDBParserResiduesOP;
 class PDBParser {
 public:
     PDBParser(
-            ResidueTypeSetCOP rts) :
+            ResidueTypeSet const & rts) :
             rts_(rts),
             atom_name_corrections_(std::map<String, String>()),
             ions_(std::map<String, int>()) {
@@ -116,7 +116,7 @@ private:
 
 
 private:
-    ResidueTypeSetCOP rts_;
+    ResidueTypeSet const & rts_;
     std::map<String, ResidueOP> ref_residues_;
     std::map<String, String> atom_name_corrections_;
     std::map<String, int> ions_;

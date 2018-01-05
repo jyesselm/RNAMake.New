@@ -8,8 +8,8 @@
 #include <base/paths.h>
 #include <util/sqlite/connection.h>
 
-#include <gzip/compress.hpp>
-#include <gzip/decompress.hpp>
+#include <base/gzip/compress.hpp>
+#include <base/gzip/decompress.hpp>
 
 TEST_CASE( "Test Basic Sqlite3 connections ", "[Sqlite3Connection]" ) {
 
@@ -46,7 +46,7 @@ TEST_CASE( "Test Basic Sqlite3 connections ", "[Sqlite3Connection]" ) {
         }
     }
 
-    /*SECTION("test create table") {
+    SECTION("test create table") {
 
         auto db = util::sqlite::Database(":memory:");
         auto conn = util::sqlite::Connection(db);
@@ -91,10 +91,10 @@ TEST_CASE( "Test Basic Sqlite3 connections ", "[Sqlite3Connection]" ) {
 
         auto row = conn.get_first_row("SELECT * FROM data_table");
         REQUIRE(row->at(0).get_str() == "hello");
-    }*/
+    }
 
     SECTION("test bindings with compressed str") {
-        /*auto db = util::sqlite::Database(":memory:");
+        auto db = util::sqlite::Database(":memory:");
         auto conn = util::sqlite::Connection(db);
 
         auto td = util::sqlite::TableDetails("data_table");
@@ -107,7 +107,7 @@ TEST_CASE( "Test Basic Sqlite3 connections ", "[Sqlite3Connection]" ) {
 
         auto str = String("hello hello hello hello hello");
         int size = str.length();
-        auto compressed_data = gzip::compress(str.c_str(), size, level, strategy);
+        auto compressed_data = base::gzip::compress(str.c_str(), size, level, strategy);
         std::vector<uint8_t> myVector(compressed_data.begin(), compressed_data.end());
 
 
@@ -119,9 +119,8 @@ TEST_CASE( "Test Basic Sqlite3 connections ", "[Sqlite3Connection]" ) {
         std::vector<uint8_t> blob = row->at(0);
         auto sql_data = String(blob.begin(), blob.end());
 
-        auto decompressed_data = gzip::decompress(sql_data.data(), sql_data.size());
+        auto decompressed_data = base::gzip::decompress(sql_data.data(), sql_data.size());
         REQUIRE(sql_data == compressed_data);
-        */
     }
 
 }

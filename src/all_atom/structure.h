@@ -220,7 +220,7 @@ get_structure_from_residues(
 StructureOP
 get_structure_from_pdb(
         String const &,
-        ResidueTypeSetOP,
+        ResidueTypeSet const &,
         SetType);
 
 base::VectorContainerOP<Basepair>

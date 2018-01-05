@@ -78,7 +78,7 @@ PYBIND11_PLUGIN(all_atom) {
             .def(py::init<char, int, char, char, ResidueTypeCOP, Atoms const &, util::Uuid const &>());
 
     py::class_<PDBParser, std::shared_ptr<PDBParser>>(m, "PDBParser")
-            .def(py::init<ResidueTypeSetCOP>())
+            .def(py::init<ResidueTypeSet const &>())
             .def("parse", &PDBParser::parse);
 
     py::class_<PDBParserResidues, std::shared_ptr<PDBParserResidues>>(m, "PDBParserResidues")

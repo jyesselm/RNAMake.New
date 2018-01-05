@@ -92,7 +92,7 @@ PDBParser::_setup_ref_residue(
     auto & atoms = atoms_.begin()->second;
     auto spl = base::split_str_by_delimiter(key, "|");
     auto res_name = spl[0][0];
-    auto res_type = rts_->get_residue_type(spl[0]);
+    auto res_type = rts_.get_residue_type(spl[0]);
     auto res_num = std::stoi(spl[1]);
     auto chain_id = spl[2][0];
     auto i_code = spl[3][0];
@@ -264,9 +264,9 @@ PDBParser::parse(
     _parse_atoms_from_pdb_file(pdb_file);
     for(auto const & kv : atoms_) {
         auto spl = base::split_str_by_delimiter(kv.first, "|");
-        auto has_res_type = rts_->contains_residue_type(spl[0]);
+        auto has_res_type = rts_.contains_residue_type(spl[0]);
         if(has_res_type) {
-            auto res_type = rts_->get_residue_type(spl[0]);
+            auto res_type = rts_.get_residue_type(spl[0]);
             if     (res_type->get_set_type() == SetType::RNA) {
                 auto r = _setup_residue(kv.first, kv.second, res_type);
                 if(r == nullptr) { continue; }

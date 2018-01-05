@@ -14,7 +14,7 @@
 
 
 TEST_CASE( "Parse all pdbs in set ", "[PDBParser]" ) {
-    auto rts = std::make_shared<all_atom::ResidueTypeSet>();
+    auto rts = all_atom::ResidueTypeSet();
     auto path = String("/Users/jyesselm/projects/REDESIGN/resources/non-redundant-rnas/");
 
     DIR *pDIR;

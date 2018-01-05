@@ -76,7 +76,7 @@ public:
 
 public:
     SegmentFactory(
-            ResidueTypeSetCOP rts):
+            ResidueTypeSet const & rts):
             rts_(rts),
             x3dna_(util::X3dna()),
             pdb_parser_(PDBParser(rts)) {
@@ -185,7 +185,7 @@ private:
 
 
 private:
-    ResidueTypeSetCOP rts_;
+    ResidueTypeSet const & rts_;
     Aligner aligner_;
     util::X3dna x3dna_;
     PDBParser pdb_parser_;

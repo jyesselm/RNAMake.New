@@ -48,7 +48,6 @@ def get_cmake_lists_header():
     s += "include_directories(/usr/include/python2.7)\n\n"
     s += "# Include paths for RNAMake src\n"
     s += "include_directories(%s)\n" % (base_dir + "/src/")
-    s += "include_directories(%s)\n" % (base_dir + "/src/gzip/")
     s += "include_directories(%s)\n\n" % (base_dir + "/unittests/")
     s += "# pybind11 setup \n"
     s += "find_library(PYBIND11 pybind11)\n"
@@ -57,6 +56,7 @@ def get_cmake_lists_header():
     s += "add_subdirectory(pybind11/)\n\n"
     s += "# sqlite libraries\n"
     s += "find_library(SQLITE3_LIBRARY sqlite3)\n\n"
+    s += "find_package(ZLIB)\n\n"
     s += "find_package(Boost)\n\n"
     s += """if (Boost_FOUND)
         set(Boost_USE_MULTITHREADED true)
@@ -119,10 +119,12 @@ def get_build_library_declaration(lib):
     s += "target_link_libraries(%s" % (lib + "_lib")
     for depend in depends[lib]:
         s += " " + depend + "_lib "
-    if lib != "util":
-        s += " pybind11::module)\n\n"
-    else:
+    if lib == "util":
         s += " ${SQLITE3_LIBRARY} pybind11::module)\n\n"
+    elif lib == "base":
+        s += " ${ZLIB_LIBRARY} pybind11::module)\n\n"
+    else:
+        s += " pybind11::module)\n\n"
     return s
 
 
@@ -132,10 +134,12 @@ def get_build_module_declaration(lib):
 
     for depend in depends[lib]:
         s += " " + depend + "_lib "
-    if lib != "util":
-        s += " pybind11::module)\n\n"
-    else:
+    if lib == "util":
         s += " ${SQLITE3_LIBRARY} pybind11::module)\n\n"
+    elif lib == "base":
+        s += " ${ZLIB_LIBRARY} pybind11::module)\n\n"
+    else:
+        s += " pybind11::module)\n\n"
 
     """s += "add_custom_command(\n"
     s += "\t TARGET " + lib + "_copy POST_BUILD COMMAND " + \
