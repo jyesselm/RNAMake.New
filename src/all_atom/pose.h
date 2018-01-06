@@ -43,7 +43,6 @@ public:
             small_molecules_(p.small_molecules_),
             dot_bracket_(p.dot_bracket_) {}
 
-    inline
     Pose(
             json::JSON & j,
             ResidueTypeSet const & rts):
@@ -51,6 +50,95 @@ public:
             proteins_(Structure(j["proteins"], rts)),
             small_molecules_(Structure(j["small_molecules"], rts)) {
         structure_ = Structure(j["structure"], rts);
+        name_ = std::make_shared<base::SimpleString const>(j["name"].ToString());
+        dot_bracket_ = std::make_shared<base::SimpleString const>(j["dot_bracket"].ToString());
+
+        basepairs_ = Basepairs();
+        ends_ = Basepairs();
+        end_ids_ = base::SimpleStringCOPs();
+
+        auto & j_bps = j["basepairs"];
+        auto & j_ends = j["ends"];
+        auto & j_end_ids = j["end_ids"];
+
+        for(int i = 0; i < j_bps.size(); i++) {
+            auto & r1 = get_residue(j_bps[i][1].ToInt(), (char)j_bps[i][2].ToInt(), (char)j_bps[i][3].ToInt());
+            auto & r2 = get_residue(j_bps[i][4].ToInt(), (char)j_bps[i][5].ToInt(), (char)j_bps[i][6].ToInt());
+            basepairs_.push_back(Basepair(j_bps[0], r1.get_uuid(), r2.get_uuid(), util::Uuid()));
+        }
+
+        for(int i = 0; i < j_ends.size(); i++) {
+            auto & r1 = get_residue(j_ends[i][1].ToInt(), (char)j_ends[i][2].ToInt(), (char)j_ends[i][3].ToInt());
+            auto & r2 = get_residue(j_ends[i][4].ToInt(), (char)j_ends[i][5].ToInt(), (char)j_ends[i][6].ToInt());
+            ends_.push_back(Basepair(j_ends[0], r1.get_uuid(), r2.get_uuid(), util::Uuid()));
+        }
+
+        for(int i = 0; i < j_end_ids.size(); i++) {
+            end_ids_.push_back(std::make_shared<base::SimpleString const>(j_end_ids[i].ToString()));
+        }
+
+    }
+
+public:
+    inline
+    bool
+    operator ==(Pose const & p) const {
+        return is_equal(p);
+    }
+
+    inline
+    bool
+    operator !=(Pose const & p) const  {
+        return !is_equal(p);
+    }
+
+public:
+    bool
+    is_equal(
+            Pose const & p,
+            bool check_uuid = true) const {
+        if(basepairs_.size() != p.basepairs_.size()) { return false; }
+        if(ends_.size() != p.ends_.size()) { return false; }
+        if(*name_ != *p.name_) { return false; }
+        if(*dot_bracket_ != *p.dot_bracket_) { return false; }
+        if(! structure_.is_equal(p.structure_, check_uuid)) { return false; }
+        if(! proteins_.is_equal(p.proteins_, check_uuid)) { return false; }
+        if(! small_molecules_.is_equal(p.small_molecules_, check_uuid)) { return false; }
+        return true;
+    }
+
+public:
+public: // non const methods
+    void
+    move(
+            math::Point const & p) {
+        structure_.move(p);
+        proteins_.move(p);
+        small_molecules_.move(p);
+        for(auto & bp : basepairs_) { bp.move(p); }
+        for(auto & bp : ends_) { bp.move(p); }
+
+    }
+
+    void
+    transform(
+            math::Matrix const & r,
+            math::Vector const & t,
+            math::Point & dummy) {
+        structure_.transform(r, t, dummy);
+        proteins_.transform(r, t, dummy);
+        small_molecules_.transform(r, t, dummy);
+        for(auto & bp : basepairs_) { bp.transform(r, t, dummy); }
+        for(auto & bp : ends_) { bp.transform(r, t, dummy); }
+    }
+
+    inline
+    void
+    transform(
+            math::Matrix const & r,
+            math::Vector const & t) {
+        auto dummy = math::Point();
+        transform(r, t, dummy);
     }
 
 public:
@@ -91,10 +179,7 @@ public:
                 "proteins", proteins_.get_json(),
                 "small_molecules", small_molecules_.get_json(),
                 "dot_bracket", dot_bracket_->get_str() };
-
     }
-
-
 
 protected:
     Structure proteins_;

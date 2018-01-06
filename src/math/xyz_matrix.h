@@ -143,6 +143,19 @@ public: //creation
         zz_ = std::stod(v[8]);
     }
 
+    inline
+    xyzMatrix(
+            json::JSON & j) :
+            xx_(j[0].ToFloat()),
+            xy_(j[1].ToFloat()),
+            xz_(j[2].ToFloat()),
+            yx_(j[3].ToFloat()),
+            yy_(j[4].ToFloat()),
+            yz_(j[5].ToFloat()),
+            zx_(j[6].ToFloat()),
+            zy_(j[7].ToFloat()),
+            zz_(j[8].ToFloat()) {}
+
     /// @brief Destructor
     inline
     ~xyzMatrix() {}

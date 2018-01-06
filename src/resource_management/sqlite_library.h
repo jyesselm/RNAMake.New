@@ -28,7 +28,10 @@ public:
             String const &,
             String const &);
 
-private:
+    virtual
+    ~SqliteLibrary() {}
+
+protected:
     void
     _generate_query(
             Strings const &,
@@ -37,6 +40,9 @@ private:
     bool
     _is_valid_key(
             String const &);
+
+    String
+    _args_to_str();
 
 protected:
     util::sqlite::Database db_;

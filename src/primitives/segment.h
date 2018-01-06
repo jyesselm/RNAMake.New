@@ -14,6 +14,11 @@ template<typename BPtype, typename Structuretype, typename Chaintype, typename R
 class Segment : public Pose<BPtype, Structuretype, Chaintype, Restype> {
 private:
     typedef Pose<BPtype, Structuretype, Chaintype, Restype> BaseClass;
+    typedef std::vector<Restype>                 Residues;
+    typedef base::VectorContainerOP<Restype>     ResiduesOP;
+    //typedef std::vector<BPtype>                  Basepairs;
+    typedef base::VectorContainerOP<BPtype>      BasepairsOP;
+
 
 public:
     inline
@@ -29,6 +34,9 @@ public:
             segment_type_(segment_type),
             aligned_end_index_(aligned_end_index) {}
 
+protected:
+    // let dervived classes fill in members
+    Segment(): BaseClass() {}
 public:
     inline
     Index

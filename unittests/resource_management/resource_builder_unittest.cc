@@ -6,6 +6,7 @@
 #include "../common.hpp"
 
 #include <base/paths.h>
+#include <base/logger.h>
 #include <all_atom/segment_factory.h>
 #include <resource_management/resource_builder.h>
 

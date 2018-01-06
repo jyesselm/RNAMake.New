@@ -135,6 +135,11 @@ is_char_in_string(
     else                         { return true; }
 }
 
+String
+quoted_string( String const & s ) {
+    return String("'") + s + String("'");
+}
+
 }
 
 

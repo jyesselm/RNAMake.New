@@ -44,6 +44,62 @@ public:
             small_molecules_(seg.small_molecules_),
             dot_bracket_(seg.dot_bracket_) {}
 
+    Segment(
+            json::JSON & j,
+            ResidueTypeSet const & rts):
+            BaseClass(),
+            proteins_(Structure(j["proteins"], rts)),
+            small_molecules_(Structure(j["small_molecules"], rts)) {
+
+        structure_ = Structure(j["structure"], rts);
+        name_ = std::make_shared<base::SimpleString const>(j["name"].ToString());
+        dot_bracket_ = std::make_shared<base::SimpleString const>(j["dot_bracket"].ToString());
+        segment_type_ = static_cast<util::SegmentType>(j["segment_type"].ToInt());
+        aligned_end_index_ = j["aligned_end_index"].ToInt();
+        basepairs_ = Basepairs();
+        ends_ = Basepairs();
+        end_ids_ = base::SimpleStringCOPs();
+
+        auto & j_bps = j["basepairs"];
+        auto & j_ends = j["ends"];
+        auto & j_end_ids = j["end_ids"];
+
+        for(int i = 0; i < j_bps.size(); i++) {
+            auto & r1 = get_residue(j_bps[i][1].ToInt(), (char)j_bps[i][2].ToInt(), (char)j_bps[i][3].ToInt());
+            auto & r2 = get_residue(j_bps[i][4].ToInt(), (char)j_bps[i][5].ToInt(), (char)j_bps[i][6].ToInt());
+            basepairs_.push_back(Basepair(j_bps[0], r1.get_uuid(), r2.get_uuid(), util::Uuid()));
+        }
+
+        for(int i = 0; i < j_ends.size(); i++) {
+            auto & r1 = get_residue(j_ends[i][1].ToInt(), (char)j_ends[i][2].ToInt(), (char)j_ends[i][3].ToInt());
+            auto & r2 = get_residue(j_ends[i][4].ToInt(), (char)j_ends[i][5].ToInt(), (char)j_ends[i][6].ToInt());
+            ends_.push_back(Basepair(j_ends[0], r1.get_uuid(), r2.get_uuid(), util::Uuid()));
+        }
+
+        for(int i = 0; i < j_end_ids.size(); i++) {
+            end_ids_.push_back(std::make_shared<base::SimpleString const>(j_end_ids[i].ToString()));
+        }
+    }
+
+public:
+    bool
+    is_equal(
+            Segment const & s,
+            bool check_uuid = true) const {
+        if(segment_type_ != s.segment_type_) { return false; }
+        if(aligned_end_index_ != s.aligned_end_index_) { return false; }
+        if(basepairs_.size() != s.basepairs_.size()) { return false; }
+        if(ends_.size() != s.ends_.size()) { return false; }
+        if(*name_ != *s.name_) { return false; }
+        if(*dot_bracket_ != *s.dot_bracket_) { return false; }
+        if(! structure_.is_equal(s.structure_, check_uuid)) { return false; }
+        if(! proteins_.is_equal(s.proteins_, check_uuid)) { return false; }
+        if(! small_molecules_.is_equal(s.small_molecules_, check_uuid)) { return false; }
+        return true;
+    }
+
+
+
 public: // non const methods
     void
     move(
@@ -76,8 +132,6 @@ public: // non const methods
         auto dummy = math::Point();
         transform(r, t, dummy);
     }
-
-
 
 public:
     bool
@@ -185,6 +239,40 @@ public:
     }
 
 public:
+    json::JSON
+    get_json() const {
+        auto j_bps = json::Array();
+        auto j_ends = json::Array();
+        auto j_end_ids = json::Array();
+
+        for(auto const & bp : basepairs_) {
+            auto bp_res = get_bp_res(bp);
+            j_bps.append(json::Array(bp.get_json(), bp_res->at(0).get_num(), bp_res->at(0).get_chain_id(),
+                                     bp_res->at(0).get_i_code(), bp_res->at(1).get_num(),
+                                     bp_res->at(1).get_chain_id(), bp_res->at(1).get_i_code()));
+        }
+
+        for(auto const & bp : ends_) {
+            auto bp_res = get_bp_res(bp);
+            j_ends.append(json::Array(bp.get_json(), bp_res->at(0).get_num(), bp_res->at(0).get_chain_id(),
+                                      bp_res->at(0).get_i_code(), bp_res->at(1).get_num(),
+                                      bp_res->at(1).get_chain_id(), bp_res->at(1).get_i_code()));
+        }
+
+        for(auto const & end_id : end_ids_) { j_end_ids.append(end_id->get_str()); }
+
+        return json::JSON{
+                "structure", structure_.get_json(),
+                "basepairs", j_bps,
+                "ends", j_ends,
+                "end_ids", j_end_ids,
+                "name", name_->get_str(),
+                "proteins", proteins_.get_json(),
+                "small_molecules", small_molecules_.get_json(),
+                "dot_bracket", dot_bracket_->get_str(),
+                "segment_type", (int)segment_type_,
+                "aligned_end_index", aligned_end_index_};
+    }
 
     String
     get_pdb_str(

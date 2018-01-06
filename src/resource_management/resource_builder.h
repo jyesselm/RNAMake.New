@@ -30,23 +30,32 @@ public:
             String const & motif_dirs_path):
             seg_f_(seg_f),
             motif_dirs_path_(motif_dirs_path),
-            motif_table_(util::sqlite::TableDetails("data_table")) {
-        motif_table_.add_column("data", "BLOB");
-        motif_table_.add_column("name", "TEXT");
-        motif_table_.add_column("end_name", "TEXT");
-        motif_table_.add_column("end_id", "TEXT");
-        motif_table_.add_column("id", "INT", true);
+            motif_table_(_generate_motif_table_details()) {
+
     }
 
 public:
     void
     build_ideal_helices();
 
+private:
+    util::sqlite::TableDetails
+    _generate_motif_table_details() {
+        auto motif_table = util::sqlite::TableDetails("data_table");
+        motif_table.add_column("data", "BLOB");
+        motif_table.add_column("name", "TEXT");
+        motif_table.add_column("end_name", "TEXT");
+        motif_table.add_column("end_id", "TEXT");
+        motif_table.add_column("id", "INT", true);
+        return motif_table;
+    }
 
 private:
     all_atom::SegmentFactory & seg_f_;
     String motif_dirs_path_;
     util::sqlite::TableDetails motif_table_;
+    std::vector<uint8_t> blob_;
+    String compressed_str_;
 
 };
 

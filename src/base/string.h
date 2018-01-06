@@ -52,7 +52,9 @@ is_char_in_string(
         char,
         String const &);
 
-
+String
+quoted_string(
+        String const &);
 
 }
 

@@ -39,7 +39,7 @@ SqliteLibrary::_generate_query(
         query_string_ += col_name + " ";
         if(i != retrieved_columns.size()) { query_string_ += ","; }
     }
-    query_string_ += " FROM " + table_details_.name() + "WHERE ";
+    query_string_ += " FROM " + table_details_.name() + " WHERE ";
     i = 0;
     for(auto const & kv : restraint_col_and_vals) {
         i++;

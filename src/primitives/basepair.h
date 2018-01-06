@@ -68,6 +68,9 @@ public:
     virtual
     ~Basepair() {}
 
+protected:
+    Basepair() { }
+
 public:
     /**
     * equal operator checks whether the unique indentifier is the same

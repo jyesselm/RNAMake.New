@@ -21,6 +21,14 @@ TEST_CASE( "Test all atom segment", "[AllAtomSegments]" ) {
         i++;
         seg_factory.align_segment_to_ref_frame(*seg);
         //seg->write_pdb("test."+std::to_string(i)+".pdb");
-
     }
+
+    auto j = seg->get_json();
+    auto seg2 = all_atom::Segment(j, rts);
+    REQUIRE(seg2.is_equal(*seg, false));
+
+    auto p = math::Point(2, 2, 2);
+    seg2.move(p);
+    REQUIRE(!seg2.is_equal(*seg, false));
+
 }

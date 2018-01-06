@@ -23,6 +23,8 @@ add_subdirectory(pybind11/)
 # sqlite libraries
 find_library(SQLITE3_LIBRARY sqlite3)
 
+find_package(ZLIB)
+
 find_package(Boost)
 
 if (Boost_FOUND)
@@ -51,10 +53,10 @@ set(base_files
 )
 
 add_library(base_lib ${base_files})
-target_link_libraries(base_lib pybind11::module)
+target_link_libraries(base_lib ${ZLIB_LIBRARY} pybind11::module)
 
 add_library(base MODULE ${base_files})
-target_link_libraries(base pybind11::module)
+target_link_libraries(base ${ZLIB_LIBRARY} pybind11::module)
 
 add_executable(logger_unittest /Users/jyesselm/projects/RNAMake.New/unittests/base/logger_unittest.cc)
 target_link_libraries(logger_unittest base_lib)
@@ -263,6 +265,7 @@ target_link_libraries(all_atom_basic_unittest all_atom_lib)
 ###########################################################################
 
 set(resource_management_files
+	/Users/jyesselm/projects/RNAMake.New/src/resource_management/segment_sqlite_library.cc
 	/Users/jyesselm/projects/RNAMake.New/src/resource_management/sqlite_library.cc
 	/Users/jyesselm/projects/RNAMake.New/src/resource_management/resource_builder.cc
 )

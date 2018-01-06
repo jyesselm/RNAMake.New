@@ -85,11 +85,11 @@ public: // Creation
 	}
 
 	inline
-	xyzVector(json::JSON & j) {
-		x_ = j[0].ToFloat();
-		y_ = j[1].ToFloat();
-		z_ = j[2].ToFloat();
-	}
+	xyzVector(
+			json::JSON & j):
+            x_(j[0].ToFloat()),
+            y_(j[1].ToFloat()),
+            z_(j[2].ToFloat()) {}
 
 public:
 

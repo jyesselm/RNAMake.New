@@ -34,6 +34,23 @@ public:
             c1_prime_coords_(c1_prime_coords),
             x3dna_type_(x3dna_type) {}
 
+    inline
+    Basepair(
+            json::JSON & j,
+            util::Uuid const & res1_uuid,
+            util::Uuid const & res2_uuid,
+            util::Uuid const & uuid):
+            primitives::Basepair() {
+        center_ = math::Point(j[0]);
+        ref_frame_ = math::Matrix(j[1]);
+        c1_prime_coords_ = math::Points(2);
+        c1_prime_coords_[0] = math::Point(j[2]);
+        c1_prime_coords_[1] = math::Point(j[3]);
+        bp_type_ = static_cast<primitives::BasepairType>(j[4].ToInt());
+        x3dna_type_ = static_cast<util::X3dnaBPType>(j[5].ToInt());
+        name_ = std::make_shared<base::SimpleString>(j[6].ToString());
+    }
+
     /*inline
     Basepair(
             Basepair const & bp):
