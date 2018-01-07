@@ -5,7 +5,7 @@
 #ifndef RNAMAKE_NEW_ALL_ATOM_ALIGNER_H
 #define RNAMAKE_NEW_ALL_ATOM_ALIGNER_H
 
-#include <base/logger.h>
+#include <base/log.h>
 #include <primitives/aligner.h>
 #include <all_atom/segment.h>
 
@@ -38,9 +38,8 @@ public:
 
         sugar_dist_ = ref_bp.get_res1_c1_prime_coord().distance(seg.get_aligned_end().get_res1_c1_prime_coord());
         if(sugar_dist_ > 5) {
-            LOG_WARNING("SegmentAligener",
-                        "difference in sugar c1' coords between reference and aligned is greater than 5. "
-                        "This could lead to alignment issues!");
+            LOGW << "difference in sugar c1' coords between reference and aligned is greater than 5. " <<
+                    "This could lead to alignment issues!";
             return;
         }
 

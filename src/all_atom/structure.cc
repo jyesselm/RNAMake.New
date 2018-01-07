@@ -2,7 +2,7 @@
 // Created by Joseph Yesselman on 11/28/17.
 //
 
-#include <base/logger.h>
+#include <base/log.h>
 #include <all_atom/structure.h>
 #include <all_atom/pdb_parser.h>
 
@@ -244,11 +244,11 @@ get_basepairs_from_x3dna(
             res1 = &s.get_residue(xbp.res1.num, xbp.res1.chain_id, xbp.res1.i_code);
         }
         catch(StructureException) {
-            LOG_WARNING(
-                    "Structure", "cannot find RNA residue in basepair with num: " +
+
+            LOGW << "Structure", "cannot find RNA residue in basepair with num: " +
                     std::to_string(xbp.res1.num)  + " chain_id: " +
                     String(xbp.res1.chain_id, 1) + " i_code: " +  String(xbp.res1.i_code, 1) +
-                    "in structure SKIPPING!");
+                    "in structure SKIPPING!";
             continue;
         }
 
@@ -256,11 +256,10 @@ get_basepairs_from_x3dna(
             res2 = &s.get_residue(xbp.res2.num, xbp.res2.chain_id, xbp.res2.i_code);
         }
         catch(StructureException) {
-            LOG_WARNING(
-                    "Structure", "cannot find RNA residue in basepair with num: " +
+            LOGW << "Structure", "cannot find RNA residue in basepair with num: " +
                     std::to_string(xbp.res2.num)  + " chain_id: " +
                     String(xbp.res2.chain_id, 1) + " i_code: " +  String(xbp.res2.i_code, 1) +
-                    "in structure SKIPPING!");
+                    "in structure SKIPPING!";
             continue;
         }
 

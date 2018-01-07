@@ -2,7 +2,7 @@
 // Created by Joseph Yesselman on 12/30/17.
 //
 
-#include <base/logger.h>
+#include <base/log.h>
 #include <util/sqlite/connection.h>
 
 
@@ -31,7 +31,7 @@ create_table(
     table_str += ")";
     conn.exec(table_str);
 
-    LOG_INFO("sqlite3", "creating table: " + table_str + " in database: " + conn.get_database_name());
+    LOGI << "creating table: " + table_str + " in database: " + conn.get_database_name();
 }
 
 void

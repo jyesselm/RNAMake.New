@@ -2,7 +2,7 @@
 // Created by Joseph Yesselman on 12/15/17.
 //
 
-#include <base/logger.h>
+#include <base/log.h>
 #include <all_atom/pose.h>
 
 namespace all_atom {
@@ -12,7 +12,7 @@ get_pose_from_pdb(
         String const & path,
         PDBParser & pdb_parser) {
 
-    LOG_INFO("Pose", "generating a pose from pdb file: " + path);
+    LOGI << "generating a pose from pdb file: " + path;
 
     auto filename = base::filename(path);
     auto name = std::make_shared<base::SimpleString>(filename.substr(0, filename.length() - 4));
@@ -54,16 +54,13 @@ get_pose_from_pdb(
         }
     }
 
-    LOG_INFO("Pose", filename + " has " + std::to_string(protein_structure->get_num_residues()) +
-                     " protein residue(s) in " + std::to_string(protein_structure->get_num_chains()) +
-                     " chain(s)");
-    LOG_INFO("Pose", filename + " has " + std::to_string(small_molecules->get_num_residues()) +
-                     " small_molecules");
-    LOG_INFO("Pose", filename + " has " + std::to_string(rna_structure->get_num_residues()) +
-                     " RNA residue(s) in " + std::to_string(rna_structure->get_num_chains()) + " chain(s)");
-    LOG_INFO("Pose", filename + " has " + std::to_string(bps.size() + ends.size()) + " basepairs with " +
-                      std::to_string(ends.size()) + " basepair ends, sites to connect other structure too");
-
+    LOGI << filename + " has " + std::to_string(protein_structure->get_num_residues()) +
+            " protein residue(s) in " + std::to_string(protein_structure->get_num_chains()) + " chain(s)";
+    LOGI << filename + " has " + std::to_string(small_molecules->get_num_residues()) + " small_molecules";
+    LOGI << filename + " has " + std::to_string(rna_structure->get_num_residues()) +
+            " RNA residue(s) in " + std::to_string(rna_structure->get_num_chains()) + " chain(s)";
+    LOGI << filename + " has " + std::to_string(bps.size() + ends.size()) + " basepairs with " +
+            std::to_string(ends.size()) + " basepair ends, sites to connect other structure too";
 
     return std::make_shared<Pose>(*rna_structure, bps, ends, end_ids, name,
                                   *protein_structure, *small_molecules, dot_bracket);

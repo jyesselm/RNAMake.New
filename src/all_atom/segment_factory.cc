@@ -3,7 +3,7 @@
 //
 
 #include <base/paths.h>
-#include <base/logger.h>
+#include <base/log.h>
 #include <util/segment_type.h>
 #include <all_atom/segment_factory.h>
 
@@ -19,9 +19,7 @@ SegmentFactory::segment_from_pdb(
     auto org_struc = me->rna;
     auto org_ends = me->ends;
 
-    LOG_INFO("SegmentFactory",
-             "creating segment from pdb: " + pdb_path + " with aligned end: " +
-             me->ends[0].get_name()->get_str() );
+    LOGI << "creating segment from pdb: " + pdb_path + " with aligned end: " + me->ends[0].get_name()->get_str();
 
     _standardize_motif_elements(*me, 0);
     _align_motif_elements_to_frame(ref_motif_->get_end(0), *me, 0);
@@ -55,9 +53,7 @@ SegmentFactory::all_segments_from_pdb(
     for(int i = 0; i < org_me->ends.size(); i++) {
         auto me = std::make_shared<SegmentElements>(*org_me);
 
-        LOG_INFO("SegmentFactory",
-                 "creating segment from pdb: " + pdb_path + " with aligned end: " +
-                 me->ends[i].get_name()->get_str());
+        LOGI << "creating segment from pdb: " + pdb_path + " with aligned end: " + me->ends[i].get_name()->get_str();
 
         _standardize_motif_elements(*me, i);
         _align_motif_elements_to_frame(ref_motif_->get_end(0), *me, i);
@@ -103,8 +99,7 @@ SegmentFactory::_standardize_motif_elements(
         _align_motif_elements_to_frame(base_helix_->get_end(1), m_elements, end_index);
         steric_clashes_2 =  _num_steric_clashes(m_elements, *base_helix_);
         if(steric_clashes_2 > 2) {
-            LOG_WARNING("SegmentFactory",
-                        " there is no aligment without clashes this may lead to issues during building!");
+            LOGW << " there is no aligment without clashes this may lead to issues during building!";
         }
         if(steric_clashes_2 > steric_clashes_1) {
             m_elements.ends[end_index].invert_reference_frame();
@@ -125,9 +120,8 @@ SegmentFactory::_standardize_motif_elements(
         steric_clashes_2 += base_helix_->get_num_steric_clashes(*aligned_helix);
 
         if(steric_clashes_2 > 2) {
-            LOG_WARNING("SegmentFactory",
-                        "basepair end: " + m_elements.ends[i].get_name()->get_str() +
-                        " generates clashes when helix is added this may lead to issues during building!");
+            LOGW << "basepair end: " + m_elements.ends[i].get_name()->get_str() +
+                    " generates clashes when helix is added this may lead to issues during building!";
         }
         if(steric_clashes_2 > steric_clashes_1) {
             m_elements.ends[i].invert_reference_frame();
@@ -157,9 +151,8 @@ SegmentFactory::_align_motif_elements_to_frame(
     sugar_dist_2_ = ref_bp.get_res1_c1_prime_coord().distance(m_elements.ends[end_index].get_res2_c1_prime_coord());
 
     if(sugar_dist_1_ > 5 && sugar_dist_2_ > 5) {
-        LOG_WARNING("SegmentFactory",
-                    "difference in sugar c1' coords between reference and aligned is greater than 5. "
-                    "This could lead to alignment issues!");
+        LOGW << "difference in sugar c1' coords between reference and aligned is greater than 5. " <<
+                "This could lead to alignment issues!";
         return;
     }
 
@@ -225,9 +218,8 @@ SegmentFactory::_align_segment_to_frame(
     sugar_dist_2_ = ref_bp.get_res1_c1_prime_coord().distance(seg.get_aligned_end().get_res2_c1_prime_coord());
 
     if(sugar_dist_1_ > 5 && sugar_dist_2_ > 5) {
-        LOG_WARNING("SegmentFactory",
-                    "difference in sugar c1' coords between reference and aligned is greater than 5. "
-                            "This could lead to alignment issues!");
+        LOGW << "difference in sugar c1' coords between reference and aligned is greater than 5. " <<
+                "This could lead to alignment issues!";
         return;
     }
 

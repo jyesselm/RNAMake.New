@@ -11,7 +11,7 @@
 //RNAMake Headers
 #include <base/string.h>
 #include <base/file_io.h>
-#include <base/logger.h>
+#include <base/log.h>
 #include <math/xyz_vector.h>
 #include <all_atom/residue.h>
 #include <all_atom/pdb_parser.h>
@@ -208,8 +208,7 @@ PDBParser::_setup_residue(
     for(auto const & a : atoms) {
         // not a valid atom for this residue
         if(! res_type->is_valid_atom_name(a.get_str_name())) {
-            LOG_WARNING("PDB_Parser", a.get_str_name() + " does not belong to residue " +
-                                      res_type->get_name() + ": IGNORING!");
+            LOGW <<  a.get_str_name() + " does not belong to residue " + res_type->get_name() + ": IGNORING!";
             continue;
         }
         auto index = res_type->get_atom_index(a.get_str_name());
@@ -226,9 +225,7 @@ PDBParser::_setup_residue(
 
         if (missing_phosphate) {
             if (!_replace_missing_phosphate_backbone(atom_ptrs, res_type)) {
-                LOG_WARNING(
-                        "PDB_Parser",
-                        "tried to fill in missing phosphate backbone for residue " + spl[0] + " " + spl[1]);
+                LOGW << "tried to fill in missing phosphate backbone for residue " + spl[0] + " " + spl[1];
             }
         }
     }
@@ -237,10 +234,8 @@ PDBParser::_setup_residue(
     auto i = 0;
     for(auto const & a_ptr : atom_ptrs) {
         if(a_ptr == nullptr) {
-            LOG_WARNING(
-                    "PDB_Parser",
-                    "cannot setup residue: " + spl[1] + " " + spl[0] + " missing atom: " +
-                    res_type->get_atom_name_at_pos(i) + " skipping this residue!");
+            LOGW << "cannot setup residue: " + spl[1] + " " + spl[0] + " missing atom: " +
+                    res_type->get_atom_name_at_pos(i) + " skipping this residue!";
             return nullptr;
         }
         reordered_atoms.push_back(std::move(*a_ptr));

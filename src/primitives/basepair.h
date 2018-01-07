@@ -105,6 +105,9 @@ public:
     base::SimpleStringCOP
     get_name() const { return name_; }
 
+    String
+    get_name_str() { return name_->get_str(); }
+
     inline
     util::Uuid const &
     get_res1_uuid() const { return res1_uuid_; }
