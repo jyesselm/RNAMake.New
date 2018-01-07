@@ -5,6 +5,8 @@
 *.so
 *.idea
 *.ninja*
+.DS_Store
+*.cbp
 CMakeCache.txt
 CMakeFiles
 

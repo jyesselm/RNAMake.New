@@ -6,15 +6,13 @@
 #include <iostream>
 #include "../common.hpp"
 
-#include <base/logger.h>
 #include <base/paths.h>
 #include <all_atom/residue_type_set.h>
 #include <all_atom/pdb_parser.h>
 #include <all_atom/structure.h>
 
 TEST_CASE( "Test all_atom structure ", "[AllAtomStructure]" ) {
-    auto rts = std::make_shared<all_atom::ResidueTypeSet>();
-
+    auto rts = all_atom::ResidueTypeSet();
     auto parser = all_atom::PDBParser(rts);
     auto path = base::unittest_resources_path() + "/all_atom/p4p6.pdb";
     auto residues = parser.parse(path);

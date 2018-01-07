@@ -291,6 +291,7 @@ SegmentFactory::_setup_ref_motif() {
 
     auto end_ids = base::SimpleStringCOPs();
     _setup_end_ids(me->rna, me->basepairs, me->ends, end_ids);
+    me->ends[0].swap_residue_positions();
 
     auto dot_bracket_str = primitives::get_dot_bracket_from_end_id(end_ids[0]->get_str());
     auto dot_bracket = std::make_shared<base::SimpleString>(dot_bracket_str);

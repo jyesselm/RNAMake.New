@@ -47,7 +47,6 @@ set(base_files
 	/Users/jyesselm/projects/RNAMake.New/src/base/string.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/json.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/base.cc
-	/Users/jyesselm/projects/RNAMake.New/src/base/logger.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/simple_string.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/paths.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/log.cc

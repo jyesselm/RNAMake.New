@@ -38,7 +38,16 @@ public:
     void
     build_ideal_helices();
 
+    void
+    build_basic_libraries();
+
 private:
+    void
+    _insert_segment_to_motif_table(
+            all_atom::Segment const &,
+            int,
+            util::sqlite::Connection &);
+
     util::sqlite::TableDetails
     _generate_motif_table_details() {
         auto motif_table = util::sqlite::TableDetails("data_table");
@@ -49,6 +58,12 @@ private:
         motif_table.add_column("id", "INT", true);
         return motif_table;
     }
+
+    void
+    _build_basic_library(
+            String const &,
+            util::SegmentType,
+            std::map<String, int> const &);
 
 private:
     all_atom::SegmentFactory & seg_f_;

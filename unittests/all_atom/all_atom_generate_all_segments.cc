@@ -7,12 +7,13 @@
 #include <fstream>
 #include "../common.hpp"
 
-#include <base/logger.h>
 #include <base/file_io.h>
 #include <all_atom/segment_factory.h>
 
 TEST_CASE( "Parse all pdbs to poses", "[PDBParser]" ) {
-    auto rts = std::make_shared<all_atom::ResidueTypeSet>();
+    init_unittest_safe_logging();
+
+    auto rts = all_atom::ResidueTypeSet();
     auto seg_factory = all_atom::SegmentFactory(rts);
     auto paths = Strings{
                     "/Users/jyesselm/projects/RNAMake/rnamake/resources/motifs/two_ways/",

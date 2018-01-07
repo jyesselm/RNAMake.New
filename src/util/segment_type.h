@@ -13,7 +13,8 @@ enum class SegmentType {
     HELIX                  = 2,
     TWOWAY_JUNCTION        = 3,
     NWAY_JUNCTION          = 4,
-    HAIRPIN                = 5
+    HAIRPIN                = 5,
+    TERTIARY_CONTACT       = 6
 };
 
 }

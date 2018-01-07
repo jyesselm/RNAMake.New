@@ -5,7 +5,6 @@
 #include <iostream>
 #include "../common.hpp"
 
-#include <base/logger.h>
 #include <math/numerical.h>
 #include <util/random_number_generator.h>
 #include <all_atom/residue_type_set.h>
@@ -14,7 +13,7 @@
 #include <all_atom/pose.h>
 
 TEST_CASE( "Test all atom pose", "[Basepair]" ) {
-    auto rts = std::make_shared<all_atom::ResidueTypeSet>();
+    auto rts = all_atom::ResidueTypeSet();
     auto parser = all_atom::PDBParser(rts);
 
     auto path = base::unittest_resources_path() + "/all_atom/p4p6.pdb";

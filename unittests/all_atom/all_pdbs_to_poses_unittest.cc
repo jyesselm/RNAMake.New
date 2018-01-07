@@ -7,13 +7,15 @@
 #include <fstream>
 #include "../common.hpp"
 
-#include <base/logger.h>
+#include <base/log.h>
 #include <all_atom/residue_type_set.h>
 #include <all_atom/pdb_parser.h>
 #include <all_atom/pose.h>
 
 TEST_CASE( "Parse all pdbs to poses", "[PDBParser]" ) {
-    auto rts = std::make_shared<all_atom::ResidueTypeSet>();
+    base::init_logging();
+
+    auto rts = all_atom::ResidueTypeSet();
     auto pdb_parser = all_atom::PDBParser(rts);
     auto path = String("/Users/jyesselm/projects/REDESIGN/resources/non-redundant-rnas/");
 

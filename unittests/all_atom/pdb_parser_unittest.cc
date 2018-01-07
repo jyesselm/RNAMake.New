@@ -6,13 +6,15 @@
 #include <iostream>
 #include "../common.hpp"
 
-#include <base/logger.h>
+#include <base/log.h>
 #include <base/paths.h>
 #include <all_atom/residue_type_set.h>
 #include <all_atom/pdb_parser.h>
 
 
 TEST_CASE( "Test Parsing PDB formatted files ", "[PDBParser]" ) {
+    base::init_logging();
+
     auto rts = all_atom::ResidueTypeSet();
 
     SECTION("test rebuilding missing phosphates") {

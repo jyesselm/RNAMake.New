@@ -7,16 +7,30 @@
 #include <fstream>
 #include "../common.hpp"
 
-#include <base/logger.h>
+#include <base/log.h>
 #include <all_atom/pdb_parser.h>
 #include <all_atom/pose.h>
 
 #include <util/sqlite/connection.h>
 
+struct UnitestData : BasicUnitestData {
+    UnitestData():
+            BasicUnitestData(),
+            rts(all_atom::ResidueTypeSet()),
+            parser(all_atom::PDBParser(rts)){
+    }
+
+    all_atom::ResidueTypeSet rts;
+    all_atom::PDBParser parser;
+};
+
+typedef UnitestSingleton<UnitestData> Singleton;
+
 TEST_CASE( "testing basic all atom classes", "[AllAtom]" ) {
 
-    auto rts = all_atom::ResidueTypeSet();
-    auto parser = all_atom::PDBParser(rts);
+    // variables I dont want to keep remaking!
+    auto & rts    = Singleton::get().rts;
+    auto & parser = Singleton::get().parser;
     auto path = base::unittest_resources_path() + "/all_atom/p4p6.pdb";
     auto residues = parser.parse(path);
 

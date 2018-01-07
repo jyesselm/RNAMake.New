@@ -7,13 +7,15 @@
 #include <fstream>
 #include "../common.hpp"
 
-#include <base/logger.h>
+#include <base/log.h>
 #include <all_atom/residue_type_set.h>
 #include <all_atom/pdb_parser.h>
 #include <all_atom/structure.h>
 
 
 TEST_CASE( "Parse all pdbs in set ", "[PDBParser]" ) {
+    base::init_logging();
+
     auto rts = all_atom::ResidueTypeSet();
     auto path = String("/Users/jyesselm/projects/REDESIGN/resources/non-redundant-rnas/");
 

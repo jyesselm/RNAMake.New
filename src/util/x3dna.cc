@@ -12,7 +12,7 @@
 //RNAMake Headers
 #include <base/file_io.h>
 #include <base/paths.h>
-#include <base/logger.h>
+#include <base/log.h>
 #include <util/x3dna.h>
 
 namespace util {
@@ -79,9 +79,7 @@ X3dna::_generate_ref_frame(
     if (result != 0) {
         generated_ref_frames_ = true;
         no_ref_frames_ = true;
-        LOG_WARNING("X3dna",
-                    "no ref_frames.dat generated from X3dna this is likely due to there being no "
-                    "basepairs in this pdb");
+        LOGW << "no ref_frames.dat generated from X3dna this is likely due to there being no basepairs in this pdb";
         return;
     }
 
@@ -271,7 +269,7 @@ X3dna::_parse_dssr_res_str(
     auto spl = base::split_str_by_delimiter(res_str, ".");
 
     if(spl.size() != 2) {
-        LOG_WARNING("X3dna", "dssr res string: " + res_str + " does not have a . in it not valid, SKIPPING!");
+        LOGW << "dssr res string: " + res_str + " does not have a . in it not valid, SKIPPING!";
         return nullptr;
 
     }
@@ -289,7 +287,7 @@ X3dna::_parse_dssr_res_str(
     }
 
     if(i == -1) {
-        LOG_WARNING("X3dna", "dssr res string: " + res_str + " could not be successfully parsed, SKIPPING!");
+        LOGW << "dssr res string: " + res_str + " could not be successfully parsed, SKIPPING!";
         return nullptr;
     }
 
@@ -331,7 +329,7 @@ X3dna::get_basepairs(
             bp_type = get_x3dna_by_type(bp_type_str);
         }
         catch(X3dnaException)  {
-            LOG_WARNING("X3dna", "invalid 3dna basepair type: " + bp_type_str + " skipping basepair!");
+            LOGW << "invalid 3dna basepair type: " + bp_type_str + " skipping basepair!";
             continue;
         }
 

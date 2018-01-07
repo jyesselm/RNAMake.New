@@ -7,9 +7,10 @@
 namespace base {
 
 void
-init_logging() {
+init_logging(
+        LogLevel log_level) {
     static plog::ColorConsoleAppender<plog::CustomFormatter> consoleAppender;
-    plog::init(plog::verbose, &consoleAppender);
+    plog::init((plog::Severity)log_level, &consoleAppender);
 }
 
 }
