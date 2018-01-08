@@ -31,7 +31,7 @@ public:
             seg_f_(seg_f),
             motif_dirs_path_(motif_dirs_path),
             motif_table_(_generate_motif_table_details()) {
-
+        start_insert_str_ = "INSERT INTO data_table (id, data, name, end_name, end_id) VALUES (";
     }
 
 public:
@@ -71,6 +71,8 @@ private:
     util::sqlite::TableDetails motif_table_;
     std::vector<uint8_t> blob_;
     String compressed_str_;
+    String start_insert_str_;
+
 
 };
 

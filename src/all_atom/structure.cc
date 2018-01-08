@@ -245,7 +245,7 @@ get_basepairs_from_x3dna(
         }
         catch(StructureException) {
 
-            LOGW << "Structure", "cannot find RNA residue in basepair with num: " +
+            LOGW << "cannot find RNA residue in basepair with num: " +
                     std::to_string(xbp.res1.num)  + " chain_id: " +
                     String(xbp.res1.chain_id, 1) + " i_code: " +  String(xbp.res1.i_code, 1) +
                     "in structure SKIPPING!";
@@ -256,7 +256,7 @@ get_basepairs_from_x3dna(
             res2 = &s.get_residue(xbp.res2.num, xbp.res2.chain_id, xbp.res2.i_code);
         }
         catch(StructureException) {
-            LOGW << "Structure", "cannot find RNA residue in basepair with num: " +
+            LOGW << "cannot find RNA residue in basepair with num: " +
                     std::to_string(xbp.res2.num)  + " chain_id: " +
                     String(xbp.res2.chain_id, 1) + " i_code: " +  String(xbp.res2.i_code, 1) +
                     "in structure SKIPPING!";

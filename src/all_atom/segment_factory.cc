@@ -19,6 +19,8 @@ SegmentFactory::segment_from_pdb(
     auto org_struc = me->rna;
     auto org_ends = me->ends;
 
+    _check_common_segment_issues(*me, segment_type);
+
     LOGI << "creating segment from pdb: " + pdb_path + " with aligned end: " + me->ends[0].get_name()->get_str();
 
     _standardize_motif_elements(*me, 0);
@@ -34,7 +36,7 @@ SegmentFactory::segment_from_pdb(
 
     _align_motif_elements_back_to_org_frame(org_ends, org_struc, *me);
     auto aligned_end = 0;
-    if(segment_type == util::SegmentType::HAIRPIN) { aligned_end = -1; }
+    //if(segment_type == util::SegmentType::HAIRPIN) { aligned_end = -1; }
 
     return std::make_shared<Segment>(me->rna, me->basepairs, me->ends, me->end_ids, me->name,
                                      me->proteins, me->small_molecules, dot_bracket,
@@ -49,6 +51,8 @@ SegmentFactory::all_segments_from_pdb(
 
     auto segments = SegmentOPs();
     auto org_me = _get_segment_elements_from_pdb(pdb_path, rebuild_x3dna_files);
+
+    _check_common_segment_issues(*org_me, segment_type);
 
     for(int i = 0; i < org_me->ends.size(); i++) {
         auto me = std::make_shared<SegmentElements>(*org_me);
@@ -68,7 +72,7 @@ SegmentFactory::all_segments_from_pdb(
 
         _align_motif_elements_back_to_org_frame(org_me->ends, org_me->rna, *me);
         auto aligned_end = 0;
-        if (segment_type == util::SegmentType::HAIRPIN) { aligned_end = -1; }
+        //if (segment_type == util::SegmentType::HAIRPIN) { aligned_end = -1; }
 
         auto seg = std::make_shared<Segment>(me->rna, me->basepairs, me->ends, me->end_ids, me->name,
                                              me->proteins, me->small_molecules, dot_bracket,
@@ -86,6 +90,30 @@ SegmentFactory::align_segment_to_ref_frame(
 }
 
 void
+SegmentFactory::_check_common_segment_issues(
+        SegmentElements const & me,
+        util::SegmentType segment_type) {
+
+    if(segment_type == util::SegmentType::TWOWAY_JUNCTION && me.ends.size() != 2) {
+        throw SegmentFactoryException(
+                me.name->get_str()  + ": contains " + std::to_string(me.ends.size()) +
+                " but must contain 2 ends as declared as a TWOWAY_JUNCTION!");
+    }
+    if(segment_type == util::SegmentType::HELIX && me.ends.size() != 2) {
+        throw SegmentFactoryException(
+                me.name->get_str() + ": contains " + std::to_string(me.ends.size()) +
+                " but must contain 2 ends as declared as a HELIX!");
+    }
+
+    if(segment_type == util::SegmentType::HELIX && me.rna.get_num_chains() != 2) {
+        throw SegmentFactoryException(
+                me.name->get_str() + ": contains " + std::to_string(me.rna.get_num_chains()) +
+                " but must contain 2 chains as declared as a HELIX!");
+    }
+
+}
+
+void
 SegmentFactory::_standardize_motif_elements(
         SegmentElements & m_elements,
         Index end_index) {
@@ -99,7 +127,7 @@ SegmentFactory::_standardize_motif_elements(
         _align_motif_elements_to_frame(base_helix_->get_end(1), m_elements, end_index);
         steric_clashes_2 =  _num_steric_clashes(m_elements, *base_helix_);
         if(steric_clashes_2 > 2) {
-            LOGW << " there is no aligment without clashes this may lead to issues during building!";
+            LOGW << m_elements.name->get_str() + ": there is no aligment without clashes this may lead to issues during building!";
         }
         if(steric_clashes_2 > steric_clashes_1) {
             m_elements.ends[end_index].invert_reference_frame();

@@ -117,6 +117,11 @@ private:
             String const &,
             bool);
 
+    void
+    _check_common_segment_issues(
+            SegmentElements const &,
+            util::SegmentType);
+
 private:
 
     void

@@ -443,7 +443,7 @@ public: // other getters
     get_name() { return name_; }
 
     String
-    get_name_str() { return name_->get_str(); }
+    get_name_str() const { return name_->get_str(); }
 
 
 protected:

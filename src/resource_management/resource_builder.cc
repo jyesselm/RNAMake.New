@@ -32,7 +32,6 @@ ResourceBuilder::build_ideal_helices() {
     util::sqlite::create_table(conn, motif_table_);
 
     auto i = 0;
-    auto start_insert_str = String("INSERT INTO data_table (id, data, name, end_name, end_id) VALUES (");
     auto insert_str = String("");
 
     while ((entry = readdir(pDIR)) != NULL) {
@@ -45,18 +44,7 @@ ResourceBuilder::build_ideal_helices() {
         auto segs = seg_f_.all_segments_from_pdb(path, util::SegmentType::HELIX, false);
 
         seg_f_.align_segment_to_ref_frame(*segs[0]);
-
-        auto j = segs[0]->get_json();
-        auto j_str = j.dump_minimized();
-        compressed_str_ = base::gzip::compress(j_str.c_str(), j_str.size());
-        blob_ = std::vector<uint8_t>(compressed_str_.begin(), compressed_str_.end());
-
-        conn.bind(1, blob_);
-        insert_str  = start_insert_str + base::quoted_string(std::to_string(i)) + ", ?, ";
-        insert_str += base::quoted_string(segs[0]->get_name()->get_str()) + ", ";
-        insert_str += base::quoted_string(segs[0]->get_end(0).get_name()->get_str()) + ", ";
-        insert_str += base::quoted_string(segs[0]->get_end_id(0)->get_str()) + ");";
-        conn.exec(insert_str);
+        _insert_segment_to_motif_table(*segs[0], i, conn);
         i++;
     }
 
@@ -97,6 +85,7 @@ ResourceBuilder::build_basic_libraries() {
 
     for(auto const & kv : paths) {
         if(kv.second != util::SegmentType::TERTIARY_CONTACT) {
+            if(kv.second != util::SegmentType::HELIX) { continue; }
             _build_basic_library(kv.first, kv.second, excluded_motifs);
 
         }
@@ -105,12 +94,26 @@ ResourceBuilder::build_basic_libraries() {
 
 }
 
-
 void
 ResourceBuilder::_insert_segment_to_motif_table(
         all_atom::Segment const & seg,
         int id,
         util::sqlite::Connection & conn) {
+
+    auto insert_str = String("");
+    auto j = seg.get_json();
+    auto j_str = j.dump_minimized();
+    compressed_str_ = base::gzip::compress(j_str.c_str(), j_str.size());
+    blob_ = std::vector<uint8_t>(compressed_str_.begin(), compressed_str_.end());
+
+    conn.bind(1, blob_);
+    insert_str  = start_insert_str_ + base::quoted_string(std::to_string(id)) + ", ?, ";
+    insert_str += base::quoted_string(seg.get_name_str()) + ", ";
+    insert_str += base::quoted_string(seg.get_end(0).get_name()->get_str()) + ", ";
+    insert_str += base::quoted_string(seg.get_end_id(0)->get_str()) + ");";
+    conn.exec(insert_str);
+
+
 }
 
 void
@@ -127,17 +130,28 @@ ResourceBuilder::_build_basic_library(
     try { std::remove(lib_path.c_str()); }
     catch(...) { }
 
+    auto db = util::sqlite::Database(lib_path);
+    auto conn = util::sqlite::Connection(db);
+    util::sqlite::create_table(conn, motif_table_);
+
     DIR *pDIR = opendir(path.c_str());
     struct dirent *entry;
+    auto i = 0;
 
     while ((entry = readdir(pDIR)) != NULL) {
         auto fname = String(entry->d_name);
-        if(fname.length() < 5) { continue;}
+        if(fname.length() < 10) { continue;}
+        if(excluded_motifs.find(fname) != excluded_motifs.end()) { continue; }
 
-        auto path = path + fname + "/" + fname + ".pdb";
-        auto segs = seg_f_.all_segments_from_pdb(path, seg_type, false);
+        auto pdb_path = path + fname + "/" + fname + ".pdb";
+        auto segs = seg_f_.all_segments_from_pdb(pdb_path, seg_type, false);
 
-        for(auto & seg : segs ) { seg_f_.align_segment_to_ref_frame(*seg); }
+        for(auto & seg : segs ) {
+            seg_f_.align_segment_to_ref_frame(*seg);
+            _insert_segment_to_motif_table(*seg, i, conn);
+            seg->write_pdb("test."+std::to_string(i)+".pdb");
+            i++;
+        }
 
     }
 
