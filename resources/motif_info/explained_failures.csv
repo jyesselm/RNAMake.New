@@ -24,3 +24,44 @@ HELIX.377D.1,missing O2' at end basepairs
 HELIX.3BSU.1,DNA/RNA hybrid
 HELIX.3BSU.0,DNA/RNA hybrid
 HELIX.377D.0,DNA/RNA hybrid
+HELIX.4C8Y.0,one end missing O2' thus only one end
+HELIX.1J9H.0,one end missing O2' thus only one end
+HELIX.1FUF.0,one missing O2' 3 chains
+HELIX.1J9H.1,one end missing O2' thus only one end
+HELIX.1FUF.1,one missing O2' 3 chains
+HELIX.3ZP8.0,one end missing O2' thus only one end
+HELIX.4ILL.1,one end missing O2' thus only one end
+HELIX.2Y9H.3,one missing O2' 3 chains
+HELIX.2Y9H.4,one end missing O2' thus only one end
+HELIX.398D.1,one end missing O2' thus only one end
+HELIX.2Y9H.5,one end missing O2' thus only one end
+HELIX.2Y9H.2,one missing O2' 3 chains
+HELIX.398D.0,one end missing O2' thus only one end
+HELIX.3AVX.0,one end missing O2' thus only one end
+HELIX.2Y8W.0,one end missing O2' thus only one end
+HELIX.1EHZ.3,one end missing O2' thus only one end
+HELIX.1J9H.3,one end missing O2' thus only one end
+HELIX.1J9H.2,one end missing O2' thus only one end
+HELIX.2Y8Y.0,one end missing O2' thus only one end
+HELIX.1EHZ.2,one end missing O2' thus only one end
+HELIX.2NZ4.0,one end missing O2' thus only one end
+HELIX.1F7U.2,one end missing O2' thus only one end
+HELIX.2Y9H.0,one missing O2' 3 chains
+HELIX.2Y9H.1,one missing O2' 3 chains
+HELIX.2Y9H.6,one missing O2' 3 chains
+HELIX.3NKB.0,one end missing O2' thus only one end
+HELIX.2XLI.0,one end missing O2' thus only one end
+TWOWAY.1J9H.3,one end missing O2' thus only one end
+TWOWAY.1J9H.2,one end missing O2' thus only one end
+TWOWAY.409D.0,missing N2s on Gs
+TWOWAY.409D.1,missing N2s on Gs
+TWOWAY.1JBS.0,one end has a U-U pair CHECK
+TWOWAY.1JBS.1,one end has a U-U pair CHECK
+TWOWAY.1J9H.0,one end missing O2' thus only one end
+TWOWAY.1J9H.1,one end missing O2' thus only one end
+TWOWAY.354D.0,one end missing an residue CHECK
+TWOWAY.409D.2,missing N2s on Gs
+HAIRPIN.1JBS.1,one missing O2' 2 chains
+HAIRPIN.1JBS.0,one missing O2' 2 chains
+HAIRPIN.1C0A.0,one missing O2' 2 chains
+HAIRPIN.1F7U.0,missing N2s on Gs

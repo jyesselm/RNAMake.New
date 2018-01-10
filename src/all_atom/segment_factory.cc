@@ -94,11 +94,20 @@ SegmentFactory::_check_common_segment_issues(
         SegmentElements const & me,
         util::SegmentType segment_type) {
 
+    // TWOWAY JUNCTION errors
     if(segment_type == util::SegmentType::TWOWAY_JUNCTION && me.ends.size() != 2) {
         throw SegmentFactoryException(
                 me.name->get_str()  + ": contains " + std::to_string(me.ends.size()) +
                 " but must contain 2 ends as declared as a TWOWAY_JUNCTION!");
     }
+
+    if(segment_type == util::SegmentType::TWOWAY_JUNCTION && me.rna.get_num_chains() != 2) {
+        throw SegmentFactoryException(
+                me.name->get_str() + ": contains " + std::to_string(me.rna.get_num_chains()) +
+                " but must contain 2 chains as declared as a TWOWAY_JUNCTION!");
+    }
+
+    // HELIX errors
     if(segment_type == util::SegmentType::HELIX && me.ends.size() != 2) {
         throw SegmentFactoryException(
                 me.name->get_str() + ": contains " + std::to_string(me.ends.size()) +
@@ -110,6 +119,67 @@ SegmentFactory::_check_common_segment_issues(
                 me.name->get_str() + ": contains " + std::to_string(me.rna.get_num_chains()) +
                 " but must contain 2 chains as declared as a HELIX!");
     }
+
+    // HAIRPIN errors
+    if(segment_type == util::SegmentType::HAIRPIN && me.ends.size() != 1) {
+        throw SegmentFactoryException(
+                me.name->get_str() + ": contains " + std::to_string(me.ends.size()) +
+                " but must contain 1 ends as declared as a HAIRPIN!");
+    }
+
+    if(segment_type == util::SegmentType::HAIRPIN && me.rna.get_num_chains() != 1) {
+        throw SegmentFactoryException(
+                me.name->get_str() + ": contains " + std::to_string(me.rna.get_num_chains()) +
+                " but must contain 1 chain as declared as a HAIRPIN!");
+    }
+
+    // NWAY errors
+    if(segment_type == util::SegmentType::NWAY_JUNCTION && me.ends.size() < 3) {
+        throw SegmentFactoryException(
+                me.name->get_str() + ": contains " + std::to_string(me.ends.size()) +
+                " but must contain atleast 3 ends as declared as a NWAY_JUNCTION!");
+    }
+
+    // TC_HAIRPIN_HAIRPIN errors
+    if(segment_type == util::SegmentType::TC_HAIRPIN_HAIRPIN && me.ends.size() != 2) {
+        throw SegmentFactoryException(
+                me.name->get_str() + ": contains " + std::to_string(me.ends.size()) +
+                " but must contain 2 ends as declared as a TERIARY CONTACT between HAIRPIN/HAIRPIN!");
+    }
+
+    if(segment_type == util::SegmentType::TC_HAIRPIN_HAIRPIN && me.rna.get_num_chains() != 2) {
+        throw SegmentFactoryException(
+                me.name->get_str() + ": contains " + std::to_string(me.rna.get_num_chains())  +
+                " but must contain 2 chains as declared as a TERIARY CONTACT between HAIRPIN/HAIRPIN!");
+    }
+
+    // TC_JUNCTION_HAIRPIN errors
+    if(segment_type == util::SegmentType::TC_JUNCTION_HAIRPIN && me.ends.size() != 3) {
+        throw SegmentFactoryException(
+                me.name->get_str() + ": contains " + std::to_string(me.ends.size()) +
+                " but must contain 3 ends as declared as a TERIARY CONTACT between JUNCTION/HAIRPIN!");
+    }
+
+    if(segment_type == util::SegmentType::TC_JUNCTION_HAIRPIN && me.rna.get_num_chains() != 3) {
+        throw SegmentFactoryException(
+                me.name->get_str() + ": contains " + std::to_string(me.rna.get_num_chains())  +
+                " but must contain 3 chains as declared as a TERIARY CONTACT between JUNCTION/HAIRPIN!");
+    }
+
+    // TC_JUNCTION_JUNCTION errors
+    if(segment_type == util::SegmentType::TC_JUNCTION_JUNCTION && me.ends.size() != 4) {
+        throw SegmentFactoryException(
+                me.name->get_str() + ": contains " + std::to_string(me.ends.size()) +
+                " but must contain 4 ends as declared as a TERIARY CONTACT between JUNCTION/JUNCTION!");
+    }
+
+    if(segment_type == util::SegmentType::TC_JUNCTION_JUNCTION && me.rna.get_num_chains() != 4) {
+        throw SegmentFactoryException(
+                me.name->get_str() + ": contains " + std::to_string(me.rna.get_num_chains())  +
+                " but must contain 4 chains as declared as a TERIARY CONTACT between JUNCTION/JUNCTION!");
+    }
+
+
 
 }
 

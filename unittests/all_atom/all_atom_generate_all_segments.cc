@@ -20,7 +20,9 @@ TEST_CASE( "Parse all pdbs to poses", "[PDBParser]" ) {
             "/Users/jyesselm/projects/RNAMake/rnamake/resources/motifs/hairpins/",
             "/Users/jyesselm/projects/RNAMake/rnamake/resources/motifs/helices/",
             "/Users/jyesselm/projects/RNAMake/rnamake/resources/motifs/junctions/",
-            "/Users/jyesselm/projects/RNAMake/rnamake/resources/motifs/tertiary_contacts/"
+            "/Users/jyesselm/projects/RNAMake/rnamake/resources/motifs/tertiary_contact_hairpin_hairpin/",
+            "/Users/jyesselm/projects/RNAMake/rnamake/resources/motifs/tertiary_contact_junction_hairpin/",
+            "/Users/jyesselm/projects/RNAMake/rnamake/resources/motifs/tertiary_contact_junction_junction/"
     };
 
     auto seg_types = std::vector<util::SegmentType> {
@@ -28,7 +30,9 @@ TEST_CASE( "Parse all pdbs to poses", "[PDBParser]" ) {
             util::SegmentType::HAIRPIN,
             util::SegmentType::HELIX,
             util::SegmentType::NWAY_JUNCTION,
-            util::SegmentType::TERTIARY_CONTACT
+            util::SegmentType::TC_HAIRPIN_HAIRPIN,
+            util::SegmentType::TC_JUNCTION_HAIRPIN,
+            util::SegmentType ::TC_JUNCTION_JUNCTION
     };
 
     auto explained_failure = std::map<String, int>();
@@ -85,12 +89,26 @@ TEST_CASE( "Parse all pdbs to poses", "[PDBParser]" ) {
     explained_failure["HELIX.2Y9H.6"] = 1;   // one missing O2' 3 chains
     explained_failure["HELIX.3NKB.0"] = 1;   // one end missing O2' thus only one end
     explained_failure["HELIX.2XLI.0"] = 1;   // one end missing O2' thus only one end
+    explained_failure["TWOWAY.1J9H.3"] = 1;  // one end missing O2' thus only one end
+    explained_failure["TWOWAY.1J9H.2"] = 1;  // one end missing O2' thus only one end
+    explained_failure["TWOWAY.409D.0"] = 1;  // missing N2s on Gs
+    explained_failure["TWOWAY.409D.1"] = 1;  // missing N2s on Gs
+    explained_failure["TWOWAY.1JBS.0"] = 1;  // one end has a U-U pair CHECK
+    explained_failure["TWOWAY.1JBS.1"] = 1;  // one end has a U-U pair CHECK
+    explained_failure["TWOWAY.1J9H.0"] = 1;  // one end missing O2' thus only one end
+    explained_failure["TWOWAY.1J9H.1"] = 1;  // one end missing O2' thus only one end
+    explained_failure["TWOWAY.354D.0"] = 1;  // one end missing an residue CHECK
+    explained_failure["TWOWAY.409D.2"] = 1;  // missing N2s on Gs
+    explained_failure["HAIRPIN.1JBS.1"] = 1; // one missing O2' 2 chains
+    explained_failure["HAIRPIN.1JBS.0"] = 1; // one missing O2' 2 chains
+    explained_failure["HAIRPIN.1C0A.0"] = 1; // one missing O2' 2 chains
+    explained_failure["HAIRPIN.1F7U.0"] = 1; // missing N2s on Gs
 
 
     int i = -1;
     for(auto const & path : paths) {
         i++;
-        if(seg_types[i] != util::SegmentType::HELIX) { continue; }
+        if(seg_types[i] != util::SegmentType::TC_JUNCTION_JUNCTION) { continue; }
 
         DIR *pDIR;
         struct dirent *entry;
@@ -101,7 +119,7 @@ TEST_CASE( "Parse all pdbs to poses", "[PDBParser]" ) {
 
         while ((entry = readdir(pDIR)) != NULL) {
             auto fname = String(entry->d_name);
-            if (fname.size() < 10) { continue; }
+            if (fname.size() < 5) { continue; }
             if (explained_failure.find(fname) != explained_failure.end()) { continue; }
             auto pdb_path = path + "/" + fname + "/" + fname + ".pdb";
             if (!base::is_dir(path + "/" + fname)) { continue; }

@@ -14,7 +14,10 @@ enum class SegmentType {
     TWOWAY_JUNCTION        = 3,
     NWAY_JUNCTION          = 4,
     HAIRPIN                = 5,
-    TERTIARY_CONTACT       = 6
+    TERTIARY_CONTACT       = 6,
+    TC_JUNCTION_JUNCTION   = 7,
+    TC_JUNCTION_HAIRPIN    = 8,
+    TC_HAIRPIN_HAIRPIN     = 9
 };
 
 }

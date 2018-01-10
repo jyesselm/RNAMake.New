@@ -55,11 +55,13 @@ ResourceBuilder::build_ideal_helices() {
 void
 ResourceBuilder::build_basic_libraries() {
     auto paths = std::map<String, util::SegmentType>{
-            {  motif_dirs_path_ + "/two_ways/" , util::SegmentType::TWOWAY_JUNCTION },
-            {  motif_dirs_path_ + "/hairpins/" , util::SegmentType::HAIRPIN },
-            {  motif_dirs_path_ + "/helices/"  , util::SegmentType::HELIX },
-            {  motif_dirs_path_ + "/junctions/", util::SegmentType::NWAY_JUNCTION },
-            {  motif_dirs_path_ + "/tertiary_contacts/", util::SegmentType::TERTIARY_CONTACT }
+            { motif_dirs_path_ + "/two_ways/" , util::SegmentType::TWOWAY_JUNCTION },
+            { motif_dirs_path_ + "/hairpins/" , util::SegmentType::HAIRPIN },
+            { motif_dirs_path_ + "/helices/"  , util::SegmentType::HELIX },
+            { motif_dirs_path_ + "/junctions/", util::SegmentType::NWAY_JUNCTION },
+            { motif_dirs_path_ + "/tertiary_contact_hairpin_hairpin/", util::SegmentType::TC_HAIRPIN_HAIRPIN },
+            { motif_dirs_path_ + "/tertiary_contact_junction_hairpin/", util::SegmentType::TC_JUNCTION_HAIRPIN },
+            { motif_dirs_path_ + "/tertiary_contact_junction_junction/", util::SegmentType::TC_JUNCTION_JUNCTION},
     };
 
     auto excluded_motifs = std::map<String, int>();
@@ -84,12 +86,7 @@ ResourceBuilder::build_basic_libraries() {
     }
 
     for(auto const & kv : paths) {
-        if(kv.second != util::SegmentType::TERTIARY_CONTACT) {
-            if(kv.second != util::SegmentType::HELIX) { continue; }
-            _build_basic_library(kv.first, kv.second, excluded_motifs);
-
-        }
-
+        _build_basic_library(kv.first, kv.second, excluded_motifs);
     }
 
 }
@@ -140,6 +137,10 @@ ResourceBuilder::_build_basic_library(
 
     while ((entry = readdir(pDIR)) != NULL) {
         auto fname = String(entry->d_name);
+        if(seg_type == util::SegmentType::HELIX) {
+            auto spl = base::split_str_by_delimiter(fname, ".");
+            if (spl[1] == "IDEAL" || spl[1] == "LE") { continue; }
+        }
         if(fname.length() < 10) { continue;}
         if(excluded_motifs.find(fname) != excluded_motifs.end()) { continue; }
 
@@ -157,9 +158,8 @@ ResourceBuilder::_build_basic_library(
 
     closedir(pDIR);
     delete entry;
-    exit(0);
-
 }
+
 
 
 }
