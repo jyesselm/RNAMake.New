@@ -28,7 +28,7 @@ public:
         base::SimpleStringCOPs end_ids;
         Structure rna, proteins, small_molecules;
         Basepairs basepairs;
-        Basepairs ends;
+        Indexes end_indexes;
 
         inline
         SegmentElements(
@@ -37,14 +37,31 @@ public:
                 Structure const & protein_struc,
                 Structure const & small_molecule_struc,
                 Basepairs const & bps,
-                Basepairs const & nends):
+                Indexes const & nend_indexes):
                 name(nname),
                 end_ids(base::SimpleStringCOPs()),
                 rna(rna_struc),
                 proteins(protein_struc),
                 small_molecules(small_molecule_struc),
                 basepairs(bps),
-                ends(nends) {}
+                end_indexes(nend_indexes) {}
+
+        inline
+        Basepair &
+        get_end(
+                Index end_index) {
+            return basepairs[end_indexes[end_index]];
+        }
+
+        inline
+        Basepairs
+        get_ends() {
+            auto ends = Basepairs();
+            for(auto const & ei : end_indexes) {
+                ends.push_back(basepairs[ei]);
+            }
+            return ends;
+        }
 
         inline
         void
@@ -54,7 +71,6 @@ public:
             proteins.move(p);
             small_molecules.move(p);
             for(auto & bp : basepairs) { bp.move(p); }
-            for(auto & bp : ends) { bp.move(p); }
         }
 
         inline
@@ -67,7 +83,6 @@ public:
             proteins.transform(r, t, dummy);
             small_molecules.transform(r, t, dummy);
             for(auto & bp : basepairs) { bp.transform(r, t, dummy); }
-            for(auto & bp : ends) { bp.transform(r, t, dummy); }
         }
 
     };
@@ -128,7 +143,7 @@ private:
     _setup_end_ids(
             Structure const &,
             Basepairs const &,
-            Basepairs const &,
+            Indexes const &,
             base::SimpleStringCOPs &);
 
     StructureOP
@@ -136,18 +151,15 @@ private:
             Structure const &);
 
     void
-    _get_aligned_ends(
+    _get_aligned_end_indexes(
             Structure const &,
-            Basepairs &);
-
-    void
-    _remove_ends_from_basepairs(
-            Basepairs const &,
+            Indexes &,
             Basepairs &);
 
     void
     _remove_beads_from_end_res(
             Basepairs const &,
+            Indexes const &,
             Structure &);
 
     void

@@ -125,14 +125,14 @@ PYBIND11_PLUGIN(secondary_structure) {
             .def("__getitem__", &BasepairsVC::operator[]);
 
     py::class_<Pose, std::shared_ptr<Pose>>(m, "Pose")
-            .def(py::init<Structure const &, std::vector<Basepair> const &, std::vector<Basepair> const &,
+            .def(py::init<Structure const &, std::vector<Basepair> const &, Indexes const &,
             base::SimpleStringCOPs const &, base::SimpleStringCOP const &>())
             .def("__iter__", [](const Pose & s) {
                 return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
             .def("iter_basepairs", [](const Pose & s) {
                 return py::make_iterator(s.bps_begin(), s.bps_end()); }, py::keep_alive<0, 1>())
             .def("iter_ends", [](const Pose & s) {
-                return py::make_iterator(s.ends_begin(), s.ends_end()); }, py::keep_alive<0, 1>())
+                return py::make_iterator(s.end_indexes_begin(), s.end_indexes_begin()); }, py::keep_alive<0, 1>())
             .def("get_residue",
                  (Residue const & (Pose::*)(int) const) &Pose::get_residue)
             .def("get_residue",
@@ -178,7 +178,6 @@ PYBIND11_PLUGIN(secondary_structure) {
             .def("get_num_basepairs", &Pose::get_num_basepairs)
             .def("get_num_ends", &Pose::get_num_ends)
             .def("get_name", &Pose::get_name)
-            .def("get_str", &Pose::get_str)
             .def("set_residue_name", &Pose::set_residue_name)
             .def("set_sequence", &Pose::set_sequence)
             .def(py::self == py::self)

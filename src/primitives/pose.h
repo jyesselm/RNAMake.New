@@ -48,19 +48,19 @@ public:
     Pose(
             Structuretype const & structure,
             std::vector<BPtype> const & basepairs,
-            std::vector<BPtype> const & ends,
+            Indexes const & end_indexes,
             base::SimpleStringCOPs const & end_ids,
             base::SimpleStringCOP name):
             structure_(structure),
             basepairs_(basepairs),
-            ends_(ends),
+            end_indexes_(end_indexes),
             end_ids_(end_ids),
             name_(name) {
 
         expects<PoseException>(
-                end_ids_.size() == ends_.size(),
-                "RNAStructure must have the same number of ends as end_ids has " +
-                std::to_string(ends_.size()) + " ends and " + std::to_string(end_ids.size()) +
+                end_ids_.size() == end_indexes_.size(),
+                "Pose must have the same number of ends as end_ids has " +
+                std::to_string(end_indexes_.size()) + " ends and " + std::to_string(end_ids.size()) +
                 "end ids");
     }
 
@@ -68,7 +68,7 @@ public:
             Pose const & rs):
             structure_(rs.structure_),
             basepairs_(rs.basepairs_),
-            ends_(rs.ends_),
+            end_indexes_(rs.end_indexes_),
             end_ids_(rs.end_ids_),
             name_(rs.name_) {}
 
@@ -96,8 +96,8 @@ public: //iterators
     const_bp_iterator bps_end() const { return basepairs_.end(); }
 
     // end iterator
-    const_bp_iterator ends_begin() const { return ends_.begin(); }
-    const_bp_iterator ends_end() const { return ends_.end(); }
+    Indexes::const_iterator end_indexes_begin() const { return end_indexes_.begin(); }
+    Indexes::const_iterator end_indexes_end() const { return end_indexes_.end(); }
 
 public: //structure wrappers
     inline
@@ -261,7 +261,8 @@ public: // get end interace
     get_end(
             util::Uuid const & bp_uuid) const{
         auto bps = std::vector<BPtype const *>();
-        for (auto const & bp : ends_) {
+        for (auto const & ei : end_indexes_) {
+            auto & bp = basepairs_[ei];
             if (bp.get_uuid() == bp_uuid) { bps.push_back(&bp); }
             if (bp.get_res1_uuid() == bp_uuid ||
                 bp.get_res2_uuid() == bp_uuid) { bps.push_back(&bp); }
@@ -282,7 +283,8 @@ public: // get end interace
             util::Uuid const & uuid2) const {
 
         auto bps = std::vector<BPtype const *>();
-        for (auto const & bp : ends_) {
+        for (auto const & ei : end_indexes_) {
+            auto & bp = basepairs_[ei];
             if (bp.get_res1_uuid() == uuid1 &&
                 bp.get_res2_uuid() == uuid2) { bps.push_back(&bp); }
             if (bp.get_res1_uuid() == uuid2 &&
@@ -302,7 +304,8 @@ public: // get end interace
     get_end(
             base::SimpleStringCOP name) const {
         auto bps = std::vector<BPtype const *>();
-        for (auto const & bp : ends_) {
+        for (auto const & ei : end_indexes_) {
+            auto & bp = basepairs_[ei];
             if (bp.get_name() == name) { bps.push_back(&bp); }
         }
 
@@ -319,7 +322,8 @@ public: // get end interace
     get_end(
             String const & name) const {
         auto bps = std::vector<BPtype const *>();
-        for (auto const & bp : ends_) {
+        for (auto const & ei : end_indexes_) {
+            auto & bp = basepairs_[ei];
             if (bp.get_name()->get_str() == name) { bps.push_back(&bp); }
         }
 
@@ -338,50 +342,50 @@ public: // get end interace
             Index index) const {
 
         expects<PoseException>(
-                index < ends_.size(),
+                index < end_indexes_.size(),
                 "trying to get end: " + std::to_string(index) + " there are only " +
-                std::to_string(ends_.size()));
+                std::to_string(end_indexes_.size()));
 
-        return ends_[index];
+        return basepairs_[end_indexes_[index]];
     }
 
 public: // get end by end id
     // avoid confliction with getting by name ... not pretty
     BPtype const &
     get_end_by_id(
-            String const & end_id) const {
+            String const & nend_id) const {
         auto bps = std::vector<BPtype const *>();
         int i = -1;
-        for (auto const & bp : ends_) {
+        for (auto const & end_id : end_ids_) {
             i++;
-            if (end_ids_[i]->get_str() == end_id) { bps.push_back(&bp); }
+            if (end_id->get_str() == nend_id) { bps.push_back(&basepairs_[end_indexes_[i]]); }
         }
 
         if (bps.size() > 1) {
-            throw PoseException("got more than one basepair matching this end_id: " + end_id);
+            throw PoseException("got more than one basepair matching this end_id: " + nend_id);
         }
         if (bps.size() == 1) { return *bps[0]; }
         else {
-            throw PoseException("cannot find end with end_id: " + end_id);
+            throw PoseException("cannot find end with end_id: " + nend_id);
         }
     }
 
     BPtype const &
     get_end_by_id(
-            base::SimpleStringCOP end_id) const {
+            base::SimpleStringCOP nend_id) const {
         auto bps = std::vector<BPtype const *>();
         int i = -1;
-        for (auto const & bp : ends_) {
+        for (auto const & end_id : end_ids_) {
             i++;
-            if (end_ids_[i] == end_id) { bps.push_back(&bp); }
+            if (nend_id == end_id) { bps.push_back(&basepairs_[end_indexes_[i]]); }
         }
 
         if (bps.size() > 1) {
-            throw PoseException("got more than one basepair matching this end_id: " + end_id->get_str());
+            throw PoseException("got more than one basepair matching this end_id: " + nend_id->get_str());
         }
         if (bps.size() == 1) { return *bps[0]; }
         else {
-            throw PoseException("cannot find end with end_id: " + end_id->get_str());
+            throw PoseException("cannot find end with end_id: " + nend_id->get_str());
         }
     }
 
@@ -404,7 +408,8 @@ public: // other getters
             base::SimpleStringCOP name) const {
         auto & bp = get_end(name);
         int i = 0;
-        for(auto const & end : ends_) {
+        for(auto const & ei : end_indexes_) {
+            auto & end = basepairs_[ei];
             if(bp == end) { return i; }
             i++;
         }
@@ -437,7 +442,7 @@ public: // other getters
     get_num_basepairs() const{ return basepairs_.size(); }
 
     size_t
-    get_num_ends() const{ return ends_.size(); }
+    get_num_ends() const{ return end_indexes_.size(); }
 
     base::SimpleStringCOP
     get_name() { return name_; }
@@ -449,7 +454,7 @@ public: // other getters
 protected:
     Structuretype structure_;
     std::vector<BPtype> basepairs_;
-    std::vector<BPtype> ends_;
+    Indexes end_indexes_;
     base::SimpleStringCOPs end_ids_;
     base::SimpleStringCOP name_;
 
@@ -460,8 +465,8 @@ typedef std::shared_ptr<PrimitivePose> PrimitivePoseOP;
 
 
 template<typename BPtype, typename Structuretype>
-base::VectorContainerOP<BPtype>
-get_ends_from_basepairs(
+base::VectorContainerOP<Index>
+get_end_indexes_from_basepairs(
         Structuretype const & s,
         std::vector<BPtype> const & bps) {
     auto start_chain_end_uuids = std::vector<util::Uuid>();
@@ -472,22 +477,23 @@ get_ends_from_basepairs(
         if(s.is_residue_end_of_chain(r))   { end_chain_end_uuids.push_back(r.get_uuid()); }
     }
 
-    auto ends = std::vector<BPtype>();
+    auto end_indexes = Indexes();
+    auto i = -1;
     for(auto const & bp : bps) {
+        i++;
         if(bp.get_bp_type() == BasepairType::NC) { continue; }
 
         if     (std::find(start_chain_end_uuids.begin(), start_chain_end_uuids.end(), bp.get_res1_uuid()) != start_chain_end_uuids.end() &&
                 std::find(end_chain_end_uuids.begin(), end_chain_end_uuids.end(), bp.get_res2_uuid()) != end_chain_end_uuids.end()) {
-            ends.push_back(bp);
+            end_indexes.push_back(i);
         }
         else if(std::find(start_chain_end_uuids.begin(), start_chain_end_uuids.end(), bp.get_res2_uuid()) != start_chain_end_uuids.end() &&
                 std::find(end_chain_end_uuids.begin(), end_chain_end_uuids.end(), bp.get_res1_uuid()) != end_chain_end_uuids.end()) {
-            ends.push_back(bp);
+            end_indexes.push_back(i);
         }
-
     }
 
-    return std::make_shared<base::VectorContainer<BPtype>>(ends);
+    return std::make_shared<base::VectorContainer<Index>>(end_indexes);
 
 }
 
@@ -495,7 +501,6 @@ template<typename BPtype, typename Restype>
 BPtype const *
 get_res_wc_or_gu_basepair(
         std::vector<BPtype> const & basepairs,
-        std::vector<BPtype> const & ends,
         Restype const & r) {
 
     for(auto const & bp : basepairs) {
@@ -505,15 +510,6 @@ get_res_wc_or_gu_basepair(
             return &bp;
         }
     }
-
-    for(auto const & bp : ends) {
-        if(bp.get_bp_type() == BasepairType::NC) { continue; }
-        if(bp.get_res1_uuid() == r.get_uuid() ||
-            bp.get_res2_uuid() == r.get_uuid()) {
-            return &bp;
-        }
-    }
-
     return nullptr;
 
 }
@@ -523,7 +519,6 @@ String
 generate_end_id(
         Structuretype const & s,
         std::vector<BPtype> const & bps,
-        std::vector<BPtype> const & ends,
         BPtype const & end) {
 
     auto open_chains = std::vector<Chaintype const *>();
@@ -564,7 +559,7 @@ generate_end_id(
 
         for (auto const & r : *c) {
             dot_bracket = '.';
-            bp = get_res_wc_or_gu_basepair(bps, ends, r);
+            bp = get_res_wc_or_gu_basepair(bps, r);
             if (bp != nullptr && bp->get_bp_type() != BasepairType::NC) {
                 auto & partner_res_uuid = bp->get_partner(r.get_uuid());
                 auto & partner_res = s.get_residue(partner_res_uuid);
@@ -598,7 +593,7 @@ generate_end_id(
             if(seen_chains.find(&c) != seen_chains.end()) { continue; }
             score = 0;
             for(auto const & r : c) {
-                bp = get_res_wc_or_gu_basepair(bps, ends, r);
+                bp = get_res_wc_or_gu_basepair(bps, r);
                 if(bp != nullptr && seen_bps.find(bp) == seen_bps.end()) { score += 1; }
             }
             if(score > best_score) { best_score = score; }
@@ -608,7 +603,7 @@ generate_end_id(
             if(seen_chains.find(&c) != seen_chains.end()) { continue; }
             score = 0;
             for(auto const & r : c) {
-                bp = get_res_wc_or_gu_basepair(bps, ends, r);
+                bp = get_res_wc_or_gu_basepair(bps, r);
                 if(bp != nullptr && seen_bps.find(bp) == seen_bps.end()) { score += 1; }
             }
             if(score == best_score) { best_chains.push_back(&c);  }
@@ -621,7 +616,7 @@ generate_end_id(
             pos = 1000;
             for(auto const & r : *c) {
                 i++;
-                bp = get_res_wc_or_gu_basepair(bps, ends, r);
+                bp = get_res_wc_or_gu_basepair(bps, r);
                 if(bp != nullptr && seen_bps.find(bp) != seen_bps.end()) {
                     pos = i;
                     break;
@@ -669,8 +664,7 @@ template<typename Structuretype, typename Chaintype, typename BPtype, typename R
 String
 generate_secondary_structure(
         Structuretype const & s,
-        std::vector<BPtype> const & bps,
-        std::vector<BPtype> const & ends) {
+        std::vector<BPtype> const & bps) {
 
     auto open_chains = std::vector<Chaintype const *>();
     auto chains = s.get_chains();
@@ -702,7 +696,7 @@ generate_secondary_structure(
 
         for (auto const & r : *c) {
             dot_bracket = '.';
-            bp = get_res_wc_or_gu_basepair(bps, ends, r);
+            bp = get_res_wc_or_gu_basepair(bps, r);
             if (bp != nullptr && bp->get_bp_type() != BasepairType::NC) {
                 auto & partner_res_uuid = bp->get_partner(r.get_uuid());
                 auto & partner_res = s.get_residue(partner_res_uuid);
@@ -736,7 +730,7 @@ generate_secondary_structure(
             if(seen_chains.find(&c) != seen_chains.end()) { continue; }
             score = 0;
             for(auto const & r : c) {
-                bp = get_res_wc_or_gu_basepair(bps, ends, r);
+                bp = get_res_wc_or_gu_basepair(bps, r);
                 if(bp != nullptr && seen_bps.find(bp) == seen_bps.end()) { score += 1; }
             }
             if(score > best_score) { best_score = score; }
@@ -746,7 +740,7 @@ generate_secondary_structure(
             if(seen_chains.find(&c) != seen_chains.end()) { continue; }
             score = 0;
             for(auto const & r : c) {
-                bp = get_res_wc_or_gu_basepair(bps, ends, r);
+                bp = get_res_wc_or_gu_basepair(bps, r);
                 if(bp != nullptr && seen_bps.find(bp) == seen_bps.end()) { score += 1; }
             }
             if(score == best_score) { best_chains.push_back(&c);  }
@@ -759,7 +753,7 @@ generate_secondary_structure(
             pos = 1000;
             for(auto const & r : *c) {
                 i++;
-                bp = get_res_wc_or_gu_basepair(bps, ends, r);
+                bp = get_res_wc_or_gu_basepair(bps, r);
                 if(bp != nullptr && seen_bps.find(bp) != seen_bps.end()) {
                     pos = i;
                     break;

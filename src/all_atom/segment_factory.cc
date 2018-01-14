@@ -17,28 +17,27 @@ SegmentFactory::segment_from_pdb(
 
     auto me = _get_segment_elements_from_pdb(pdb_path, rebuild_x3dna_files);
     auto org_struc = me->rna;
-    auto org_ends = me->ends;
+    auto org_ends = me->get_ends();
 
     _check_common_segment_issues(*me, segment_type);
 
-    LOGI << "creating segment from pdb: " + pdb_path + " with aligned end: " + me->ends[0].get_name()->get_str();
+    LOGI << "creating segment from pdb: " + pdb_path + " with aligned end: " + me->get_end(0).get_name_str();
 
     _standardize_motif_elements(*me, 0);
     _align_motif_elements_to_frame(ref_motif_->get_end(0), *me, 0);
 
     me->rna = *(_get_aligned_structure(me->rna));
-    _get_aligned_ends(me->rna, me->ends);
-    _remove_beads_from_end_res(me->ends, me->rna);
-    _setup_end_ids(me->rna, me->basepairs, me->ends, me->end_ids);
+    _get_aligned_end_indexes(me->rna, me->end_indexes, me->basepairs);
+    _remove_beads_from_end_res(me->basepairs, me->end_indexes, me->rna);
+    _setup_end_ids(me->rna, me->basepairs, me->end_indexes, me->end_ids);
 
     auto dot_bracket_str = primitives::get_dot_bracket_from_end_id(me->end_ids[0]->get_str());
     auto dot_bracket = std::make_shared<base::SimpleString>(dot_bracket_str);
 
     _align_motif_elements_back_to_org_frame(org_ends, org_struc, *me);
     auto aligned_end = 0;
-    //if(segment_type == util::SegmentType::HAIRPIN) { aligned_end = -1; }
 
-    return std::make_shared<Segment>(me->rna, me->basepairs, me->ends, me->end_ids, me->name,
+    return std::make_shared<Segment>(me->rna, me->basepairs, me->end_indexes, me->end_ids, me->name,
                                      me->proteins, me->small_molecules, dot_bracket,
                                      segment_type, aligned_end);
 }
@@ -54,27 +53,27 @@ SegmentFactory::all_segments_from_pdb(
 
     _check_common_segment_issues(*org_me, segment_type);
 
-    for(int i = 0; i < org_me->ends.size(); i++) {
+    for(int i = 0; i < org_me->end_indexes.size(); i++) {
         auto me = std::make_shared<SegmentElements>(*org_me);
 
-        LOGI << "creating segment from pdb: " + pdb_path + " with aligned end: " + me->ends[i].get_name()->get_str();
+        LOGI << "creating segment from pdb: " + pdb_path + " with aligned end: " + me->get_end(i).get_name_str();
 
         _standardize_motif_elements(*me, i);
         _align_motif_elements_to_frame(ref_motif_->get_end(0), *me, i);
 
         me->rna = *(_get_aligned_structure(me->rna));
-        _get_aligned_ends(me->rna, me->ends);
-        _remove_beads_from_end_res(me->ends, me->rna);
-        _setup_end_ids(me->rna, me->basepairs, me->ends, me->end_ids);
+        _get_aligned_end_indexes(me->rna, me->end_indexes, me->basepairs);
+        _remove_beads_from_end_res(me->basepairs, me->end_indexes, me->rna);
+        _setup_end_ids(me->rna, me->basepairs, me->end_indexes, me->end_ids);
 
         auto dot_bracket_str = primitives::get_dot_bracket_from_end_id(me->end_ids[0]->get_str());
         auto dot_bracket = std::make_shared<base::SimpleString>(dot_bracket_str);
 
-        _align_motif_elements_back_to_org_frame(org_me->ends, org_me->rna, *me);
+        _align_motif_elements_back_to_org_frame(org_me->get_ends(), org_me->rna, *me);
         auto aligned_end = 0;
         //if (segment_type == util::SegmentType::HAIRPIN) { aligned_end = -1; }
 
-        auto seg = std::make_shared<Segment>(me->rna, me->basepairs, me->ends, me->end_ids, me->name,
+        auto seg = std::make_shared<Segment>(me->rna, me->basepairs, me->end_indexes, me->end_ids, me->name,
                                              me->proteins, me->small_molecules, dot_bracket,
                                              segment_type, aligned_end);
         segments.push_back(seg);
@@ -95,9 +94,9 @@ SegmentFactory::_check_common_segment_issues(
         util::SegmentType segment_type) {
 
     // TWOWAY JUNCTION errors
-    if(segment_type == util::SegmentType::TWOWAY_JUNCTION && me.ends.size() != 2) {
+    if(segment_type == util::SegmentType::TWOWAY_JUNCTION && me.end_indexes.size() != 2) {
         throw SegmentFactoryException(
-                me.name->get_str()  + ": contains " + std::to_string(me.ends.size()) +
+                me.name->get_str()  + ": contains " + std::to_string(me.end_indexes.size()) +
                 " but must contain 2 ends as declared as a TWOWAY_JUNCTION!");
     }
 
@@ -108,9 +107,9 @@ SegmentFactory::_check_common_segment_issues(
     }
 
     // HELIX errors
-    if(segment_type == util::SegmentType::HELIX && me.ends.size() != 2) {
+    if(segment_type == util::SegmentType::HELIX && me.end_indexes.size() != 2) {
         throw SegmentFactoryException(
-                me.name->get_str() + ": contains " + std::to_string(me.ends.size()) +
+                me.name->get_str() + ": contains " + std::to_string(me.end_indexes.size()) +
                 " but must contain 2 ends as declared as a HELIX!");
     }
 
@@ -121,9 +120,9 @@ SegmentFactory::_check_common_segment_issues(
     }
 
     // HAIRPIN errors
-    if(segment_type == util::SegmentType::HAIRPIN && me.ends.size() != 1) {
+    if(segment_type == util::SegmentType::HAIRPIN && me.end_indexes.size() != 1) {
         throw SegmentFactoryException(
-                me.name->get_str() + ": contains " + std::to_string(me.ends.size()) +
+                me.name->get_str() + ": contains " + std::to_string(me.end_indexes.size()) +
                 " but must contain 1 ends as declared as a HAIRPIN!");
     }
 
@@ -134,16 +133,16 @@ SegmentFactory::_check_common_segment_issues(
     }
 
     // NWAY errors
-    if(segment_type == util::SegmentType::NWAY_JUNCTION && me.ends.size() < 3) {
+    if(segment_type == util::SegmentType::NWAY_JUNCTION && me.end_indexes.size() < 3) {
         throw SegmentFactoryException(
-                me.name->get_str() + ": contains " + std::to_string(me.ends.size()) +
+                me.name->get_str() + ": contains " + std::to_string(me.end_indexes.size()) +
                 " but must contain atleast 3 ends as declared as a NWAY_JUNCTION!");
     }
 
     // TC_HAIRPIN_HAIRPIN errors
-    if(segment_type == util::SegmentType::TC_HAIRPIN_HAIRPIN && me.ends.size() != 2) {
+    if(segment_type == util::SegmentType::TC_HAIRPIN_HAIRPIN && me.end_indexes.size() != 2) {
         throw SegmentFactoryException(
-                me.name->get_str() + ": contains " + std::to_string(me.ends.size()) +
+                me.name->get_str() + ": contains " + std::to_string(me.end_indexes.size()) +
                 " but must contain 2 ends as declared as a TERIARY CONTACT between HAIRPIN/HAIRPIN!");
     }
 
@@ -154,9 +153,9 @@ SegmentFactory::_check_common_segment_issues(
     }
 
     // TC_JUNCTION_HAIRPIN errors
-    if(segment_type == util::SegmentType::TC_JUNCTION_HAIRPIN && me.ends.size() != 3) {
+    if(segment_type == util::SegmentType::TC_JUNCTION_HAIRPIN && me.end_indexes.size() != 3) {
         throw SegmentFactoryException(
-                me.name->get_str() + ": contains " + std::to_string(me.ends.size()) +
+                me.name->get_str() + ": contains " + std::to_string(me.end_indexes.size()) +
                 " but must contain 3 ends as declared as a TERIARY CONTACT between JUNCTION/HAIRPIN!");
     }
 
@@ -167,9 +166,9 @@ SegmentFactory::_check_common_segment_issues(
     }
 
     // TC_JUNCTION_JUNCTION errors
-    if(segment_type == util::SegmentType::TC_JUNCTION_JUNCTION && me.ends.size() != 4) {
+    if(segment_type == util::SegmentType::TC_JUNCTION_JUNCTION && me.end_indexes.size() != 4) {
         throw SegmentFactoryException(
-                me.name->get_str() + ": contains " + std::to_string(me.ends.size()) +
+                me.name->get_str() + ": contains " + std::to_string(me.end_indexes.size()) +
                 " but must contain 4 ends as declared as a TERIARY CONTACT between JUNCTION/JUNCTION!");
     }
 
@@ -193,36 +192,36 @@ SegmentFactory::_standardize_motif_elements(
     auto steric_clashes_1 =  _num_steric_clashes(m_elements, *base_helix_);
     auto steric_clashes_2 = 0;
     if(steric_clashes_1 > 2) {
-        m_elements.ends[end_index].invert_reference_frame();
+        m_elements.get_end(end_index).invert_reference_frame();
         _align_motif_elements_to_frame(base_helix_->get_end(1), m_elements, end_index);
         steric_clashes_2 =  _num_steric_clashes(m_elements, *base_helix_);
         if(steric_clashes_2 > 2) {
             LOGW << m_elements.name->get_str() + ": there is no aligment without clashes this may lead to issues during building!";
         }
         if(steric_clashes_2 > steric_clashes_1) {
-            m_elements.ends[end_index].invert_reference_frame();
+            m_elements.get_end(end_index).invert_reference_frame();
         }
     }
 
     // fix all base pair ends so new segments can be built on them
-    for(int i = 0; i < m_elements.ends.size(); i++) {
+    for(int i = 0; i < m_elements.end_indexes.size(); i++) {
         if(i == end_index) { continue; }
-        auto aligned_helix = _get_aligned_segment(m_elements.ends[i], *added_helix_);
+        auto aligned_helix = _get_aligned_segment(m_elements.get_end(i), *added_helix_);
         steric_clashes_1  = _num_steric_clashes(m_elements, *aligned_helix);
         steric_clashes_1 += base_helix_->get_num_steric_clashes(*aligned_helix);
         if(steric_clashes_1 < 2) { continue; }
 
-        m_elements.ends[i].invert_reference_frame();
-        aligned_helix = _get_aligned_segment(m_elements.ends[i], *added_helix_);
+        m_elements.get_end(i).invert_reference_frame();
+        aligned_helix = _get_aligned_segment(m_elements.get_end(i), *added_helix_);
         steric_clashes_2  = _num_steric_clashes(m_elements, *aligned_helix);
         steric_clashes_2 += base_helix_->get_num_steric_clashes(*aligned_helix);
 
         if(steric_clashes_2 > 2) {
-            LOGW << "basepair end: " + m_elements.ends[i].get_name()->get_str() +
+            LOGW << "basepair end: " + m_elements.get_end(i).get_name()->get_str() +
                     " generates clashes when helix is added this may lead to issues during building!";
         }
         if(steric_clashes_2 > steric_clashes_1) {
-            m_elements.ends[i].invert_reference_frame();
+            m_elements.get_end(i).invert_reference_frame();
         }
 
     }
@@ -237,16 +236,16 @@ SegmentFactory::_align_motif_elements_to_frame(
         Index end_index) {
 
     auto rot = dot(ref_bp.get_ref_frame().get_transposed(),
-                   m_elements.ends[end_index].get_ref_frame());
+                   m_elements.get_end(end_index).get_ref_frame());
     rot.unitarize();
     auto r_t = rot.get_transposed();
     auto t = -ref_bp.get_center();
     m_elements.transform(r_t, t);
-    m_elements.move(ref_bp.get_center() - m_elements.ends[end_index].get_center());
+    m_elements.move(ref_bp.get_center() - m_elements.get_end(end_index).get_center());
 
     // do additional sugar alignment
-    sugar_dist_1_ = ref_bp.get_res1_c1_prime_coord().distance(m_elements.ends[end_index].get_res1_c1_prime_coord());
-    sugar_dist_2_ = ref_bp.get_res1_c1_prime_coord().distance(m_elements.ends[end_index].get_res2_c1_prime_coord());
+    sugar_dist_1_ = ref_bp.get_res1_c1_prime_coord().distance(m_elements.get_end(end_index).get_res1_c1_prime_coord());
+    sugar_dist_2_ = ref_bp.get_res1_c1_prime_coord().distance(m_elements.get_end(end_index).get_res2_c1_prime_coord());
 
     if(sugar_dist_1_ > 5 && sugar_dist_2_ > 5) {
         LOGW << "difference in sugar c1' coords between reference and aligned is greater than 5. " <<
@@ -255,12 +254,12 @@ SegmentFactory::_align_motif_elements_to_frame(
     }
 
     if(sugar_dist_1_ < 5) {
-        sugar_diff_1_ =  ref_bp.get_res1_c1_prime_coord() - m_elements.ends[end_index].get_res1_c1_prime_coord();
-        sugar_diff_2_ =  ref_bp.get_res2_c1_prime_coord() - m_elements.ends[end_index].get_res2_c1_prime_coord();
+        sugar_diff_1_ =  ref_bp.get_res1_c1_prime_coord() - m_elements.get_end(end_index).get_res1_c1_prime_coord();
+        sugar_diff_2_ =  ref_bp.get_res2_c1_prime_coord() - m_elements.get_end(end_index).get_res2_c1_prime_coord();
     }
     else {
-        sugar_diff_1_ =  ref_bp.get_res1_c1_prime_coord() - m_elements.ends[end_index].get_res1_c1_prime_coord();
-        sugar_diff_2_ =  ref_bp.get_res2_c1_prime_coord() - m_elements.ends[end_index].get_res2_c1_prime_coord();
+        sugar_diff_1_ =  ref_bp.get_res1_c1_prime_coord() - m_elements.get_end(end_index).get_res1_c1_prime_coord();
+        sugar_diff_2_ =  ref_bp.get_res2_c1_prime_coord() - m_elements.get_end(end_index).get_res2_c1_prime_coord();
     }
     avg_sugar_diff_ = (sugar_diff_1_ + sugar_diff_2_) / 2;
     m_elements.move(avg_sugar_diff_);
@@ -275,7 +274,7 @@ SegmentFactory::_align_motif_elements_back_to_org_frame(
 
     Basepair *  org_aligned_end = nullptr;
     for(auto & end : org_ends) {
-        if(end.get_name() == me.ends[0].get_name()) {
+        if(end.get_name() == me.get_end(0).get_name()) {
             org_aligned_end = new Basepair(end);
         }
     }
@@ -388,13 +387,13 @@ SegmentFactory::_setup_ref_motif() {
     auto me = _get_segment_elements_from_pdb(path, false);
 
     auto end_ids = base::SimpleStringCOPs();
-    _setup_end_ids(me->rna, me->basepairs, me->ends, end_ids);
-    me->ends[0].swap_residue_positions();
+    _setup_end_ids(me->rna, me->basepairs, me->end_indexes, end_ids);
+    me->basepairs[0].swap_residue_positions();
 
     auto dot_bracket_str = primitives::get_dot_bracket_from_end_id(end_ids[0]->get_str());
     auto dot_bracket = std::make_shared<base::SimpleString>(dot_bracket_str);
 
-    return std::make_shared<Pose>(me->rna, me->basepairs, me->ends, end_ids, me->name,
+    return std::make_shared<Pose>(me->rna, me->basepairs, me->end_indexes, end_ids, me->name,
                                   me->proteins, me->small_molecules, dot_bracket);
 }
 
@@ -406,16 +405,16 @@ SegmentFactory::_setup_base_helix() {
     _align_motif_elements_to_frame(ref_motif_->get_end(0), *me, 0);
 
     auto aligned_s = _get_aligned_structure(me->rna);
-    _get_aligned_ends(*aligned_s, me->ends);
-    _remove_beads_from_end_res(me->ends, *aligned_s);
+    _get_aligned_end_indexes(*aligned_s, me->end_indexes, me->basepairs);
+    _remove_beads_from_end_res(me->basepairs, me->end_indexes, *aligned_s);
 
     auto end_ids = base::SimpleStringCOPs();
-    _setup_end_ids(*aligned_s, me->basepairs, me->ends, end_ids);
+    _setup_end_ids(*aligned_s, me->basepairs, me->end_indexes, end_ids);
 
     auto dot_bracket_str = primitives::get_dot_bracket_from_end_id(end_ids[0]->get_str());
     auto dot_bracket = std::make_shared<base::SimpleString>(dot_bracket_str);
 
-    return std::make_shared<Segment>(*aligned_s, me->basepairs, me->ends, end_ids, me->name,
+    return std::make_shared<Segment>(*aligned_s, me->basepairs, me->end_indexes, end_ids, me->name,
                                      me->proteins, me->small_molecules, dot_bracket,
                                      util::SegmentType::HELIX, 0);
 }
@@ -447,16 +446,15 @@ SegmentFactory::_get_segment_elements_from_pdb(
     if(!rebuild_x3dna_files) { x3dna_.set_rebuild_files(false); }
     auto x3dna_basepairs = x3dna_.get_basepairs(pdb_path);
     auto bps = get_basepairs_from_x3dna(x3dna_basepairs, *rna_structure)->get_data();
-    auto ends = get_ends_from_basepairs(*rna_structure, bps)->get_data();
-    _remove_ends_from_basepairs(ends, bps);
+    auto end_indexes = get_end_indexes_from_basepairs(*rna_structure, bps)->get_data();
 
-    if(ends.size() == 0) {
+    if(end_indexes.size() == 0) {
         throw SegmentFactoryException("Segments must contain at least one basepair end!");
     }
 
     x3dna_.set_rebuild_files(true);
     return std::make_shared<SegmentElements>(name, *rna_structure, *protein_structure, *small_molecules,
-                                             bps, ends);
+                                             bps, end_indexes);
 
 
 }
@@ -465,11 +463,11 @@ void
 SegmentFactory::_setup_end_ids(
         Structure const & s,
         Basepairs const & bps,
-        Basepairs const & ends,
+        Indexes const & end_indexes,
         base::SimpleStringCOPs & end_ids) {
 
-    for(auto const & end : ends) {
-        auto end_id = generate_end_id(s, bps, ends, end);
+    for(auto const & ei : end_indexes) {
+        auto end_id = generate_end_id(s, bps, bps[ei]);
         end_ids.push_back(std::make_shared<base::SimpleString>(end_id));
     }
 }
@@ -518,55 +516,42 @@ SegmentFactory::_get_aligned_structure(
 }
 
 void
-SegmentFactory::_get_aligned_ends(
+SegmentFactory::_get_aligned_end_indexes(
         Structure const & s,
-        Basepairs & ends) {
+        Indexes & end_indexes,
+        Basepairs & bps) {
 
     auto best = 1000;
-    auto ref_center = ref_motif_->get_end(0).get_center();
-    auto i = -1;
     auto pos = -1;
-    for(auto const & end : ends) {
+    auto i = -1;
+    auto ref_center = ref_motif_->get_end(0).get_center();
+    for(auto const & ei : end_indexes) {
         i++;
-        auto dist =   ref_center.distance(end.get_center());
+        auto dist =   ref_center.distance(bps[ei].get_center());
         if(dist < best) {
             best = dist;
             pos = i;
         }
     }
 
-    if(pos != 0) { std::swap(ends[0], ends[pos]); }
+    if(pos != 0) { std::swap(end_indexes[0], end_indexes[pos]); }
 
     // res1 should always be the start of a chain not res2
-    for(auto & end : ends) {
-        auto & r = s.get_residue(end.get_res2_uuid());
-        if(s.is_residue_start_of_chain(r)) { end.swap_residue_positions(); }
+    for(auto & ei : end_indexes) {
+        auto & r = s.get_residue(bps[ei].get_res2_uuid());
+        if(s.is_residue_start_of_chain(r)) { bps[ei].swap_residue_positions(); }
     }
 
-}
-
-void
-SegmentFactory::_remove_ends_from_basepairs(
-        Basepairs const & ends,
-        Basepairs & bps) {
-
-    for(auto const & e : ends) {
-        for(auto i = 0; i < bps.size(); i++) {
-            if(e == bps[i]) {
-                bps.erase(std::remove(bps.begin(), bps.end(), bps[i]), bps.end());
-                break;
-            }
-        }
-    }
 }
 
 void
 SegmentFactory::_remove_beads_from_end_res(
-        Basepairs const & ends,
+        Basepairs const & bps,
+        Indexes const & end_indexes,
         Structure & s) {
 
-    s.remove_residue_beads(ends[0].get_res1_uuid());
-    s.remove_residue_beads(ends[0].get_res2_uuid());
+    s.remove_residue_beads(bps[end_indexes[0]].get_res1_uuid());
+    s.remove_residue_beads(bps[end_indexes[0]].get_res2_uuid());
 
 }
 

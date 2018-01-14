@@ -25,20 +25,20 @@ public:
     Pose(
             Structure const & structure,
             Basepairs const & basepairs,
-            Basepairs const & ends,
+            Indexes const & end_indexes,
             base::SimpleStringCOPs const & end_ids,
             base::SimpleStringCOP name,
             Structure const & proteins,
             Structure const & small_molecules,
             base::SimpleStringCOP dot_bracket):
-            BaseClass(structure, basepairs, ends, end_ids, name),
+            BaseClass(structure, basepairs, end_indexes, end_ids, name),
             proteins_(proteins),
             small_molecules_(small_molecules),
             dot_bracket_(dot_bracket) {}
     inline
     Pose(
             Pose const & p):
-            BaseClass(p.structure_, p.basepairs_, p.ends_, p.end_ids_, p.name_),
+            BaseClass(p.structure_, p.basepairs_, p.end_indexes_, p.end_ids_, p.name_),
             proteins_(p.proteins_),
             small_molecules_(p.small_molecules_),
             dot_bracket_(p.dot_bracket_) {}
@@ -54,11 +54,11 @@ public:
         dot_bracket_ = std::make_shared<base::SimpleString const>(j["dot_bracket"].ToString());
 
         basepairs_ = Basepairs();
-        ends_ = Basepairs();
+        end_indexes_ = Indexes();
         end_ids_ = base::SimpleStringCOPs();
 
         auto & j_bps = j["basepairs"];
-        auto & j_ends = j["ends"];
+        auto & j_end_indexes = j["end_indexes"];
         auto & j_end_ids = j["end_ids"];
 
         for(int i = 0; i < j_bps.size(); i++) {
@@ -67,10 +67,8 @@ public:
             basepairs_.push_back(Basepair(j_bps[0], r1.get_uuid(), r2.get_uuid(), util::Uuid()));
         }
 
-        for(int i = 0; i < j_ends.size(); i++) {
-            auto & r1 = get_residue(j_ends[i][1].ToInt(), (char)j_ends[i][2].ToInt(), (char)j_ends[i][3].ToInt());
-            auto & r2 = get_residue(j_ends[i][4].ToInt(), (char)j_ends[i][5].ToInt(), (char)j_ends[i][6].ToInt());
-            ends_.push_back(Basepair(j_ends[0], r1.get_uuid(), r2.get_uuid(), util::Uuid()));
+        for(int i = 0; i < j_end_indexes.size(); i++) {
+            end_indexes_.push_back(j_end_indexes[i].ToInt());
         }
 
         for(int i = 0; i < j_end_ids.size(); i++) {
@@ -98,7 +96,7 @@ public:
             Pose const & p,
             bool check_uuid = true) const {
         if(basepairs_.size() != p.basepairs_.size()) { return false; }
-        if(ends_.size() != p.ends_.size()) { return false; }
+        if(end_indexes_.size() != p.end_indexes_.size()) { return false; }
         if(*name_ != *p.name_) { return false; }
         if(*dot_bracket_ != *p.dot_bracket_) { return false; }
         if(! structure_.is_equal(p.structure_, check_uuid)) { return false; }
@@ -116,8 +114,6 @@ public: // non const methods
         proteins_.move(p);
         small_molecules_.move(p);
         for(auto & bp : basepairs_) { bp.move(p); }
-        for(auto & bp : ends_) { bp.move(p); }
-
     }
 
     void
@@ -129,7 +125,6 @@ public: // non const methods
         proteins_.transform(r, t, dummy);
         small_molecules_.transform(r, t, dummy);
         for(auto & bp : basepairs_) { bp.transform(r, t, dummy); }
-        for(auto & bp : ends_) { bp.transform(r, t, dummy); }
     }
 
     inline
@@ -151,7 +146,7 @@ public:
     json::JSON
     get_json() const {
         auto j_bps = json::Array();
-        auto j_ends = json::Array();
+        auto j_end_indexes = json::Array();
         auto j_end_ids = json::Array();
 
         for(auto const & bp : basepairs_) {
@@ -161,19 +156,13 @@ public:
                                      bp_res->at(1).get_chain_id(), bp_res->at(1).get_i_code()));
         }
 
-        for(auto const & bp : ends_) {
-            auto bp_res = get_bp_res(bp);
-            j_ends.append(json::Array(bp.get_json(), bp_res->at(0).get_num(), bp_res->at(0).get_chain_id(),
-                                     bp_res->at(0).get_i_code(), bp_res->at(1).get_num(),
-                                     bp_res->at(1).get_chain_id(), bp_res->at(1).get_i_code()));
-        }
-
         for(auto const & end_id : end_ids_) { j_end_ids.append(end_id->get_str()); }
+        for(auto const & ei : end_indexes_) { j_end_indexes.append(ei); }
 
         return json::JSON{
                 "structure", structure_.get_json(),
                 "basepairs", j_bps,
-                "ends", j_ends,
+                "end_indexes", j_end_indexes,
                 "end_ids", j_end_ids,
                 "name", name_->get_str(),
                 "proteins", proteins_.get_json(),
@@ -190,11 +179,11 @@ protected:
 typedef std::shared_ptr<Pose> PoseOP;
 
 inline
-base::VectorContainerOP<Basepair>
-get_ends_from_basepairs(
+base::VectorContainerOP<Index>
+get_end_indexes_from_basepairs(
         Structure const & s,
         Basepairs const & bps) {
-    return primitives::get_ends_from_basepairs<Basepair, Structure>(s, bps);
+    return primitives::get_end_indexes_from_basepairs<Basepair, Structure>(s, bps);
 }
 
 inline
@@ -202,18 +191,16 @@ String
 generate_end_id(
         Structure const & s,
         Basepairs const & bps,
-        Basepairs const & ends,
         Basepair const & end) {
-    return primitives::generate_end_id<Structure, Chain, Basepair, Residue>(s, bps, ends, end);
+    return primitives::generate_end_id<Structure, Chain, Basepair, Residue>(s, bps, end);
 }
 
 inline
 String
 generate_secondary_structure(
         Structure const & s,
-        Basepairs const & bps,
-        Basepairs const & ends) {
-    return primitives::generate_secondary_structure<Structure, Chain, Basepair, Residue>(s, bps, ends);
+        Basepairs const & bps) {
+    return primitives::generate_secondary_structure<Structure, Chain, Basepair, Residue>(s, bps);
 }
 
 PoseOP

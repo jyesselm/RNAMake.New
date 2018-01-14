@@ -39,8 +39,7 @@ int main(int argc, char *argv[]) {
         auto string = primitives::generate_end_id<primitives::PrimitiveStructure,
                                                   primitives::PrimitiveChain,
                                                   primitives::PrimitiveBasepair,
-                                                  primitives::PrimitiveResidue>(s, bps, ends, end);
-        std::cout << string << std::endl;
+                                                  primitives::PrimitiveResidue>(s, bps, end);
 
         break;
     }

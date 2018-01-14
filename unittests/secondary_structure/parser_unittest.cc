@@ -39,7 +39,7 @@ TEST_CASE( "Test Secondary Structure Parser ", "[SecondaryStructureParser]" ) {
         auto rs = p.parse_to_pose("GAC&GUC", "(((&)))");
         REQUIRE(rs->get_num_residues() == 6);
         REQUIRE(rs->get_num_ends() == 2);
-        REQUIRE(rs->get_num_basepairs() == 1);
+        REQUIRE(rs->get_num_basepairs() == 3);
     }
 
 }

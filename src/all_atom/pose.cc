@@ -30,7 +30,7 @@ get_pose_from_pdb(
     }
 
     auto bps = Basepairs();
-    auto ends = Basepairs();
+    auto end_indexes = Indexes();
     auto end_ids = base::SimpleStringCOPs();
     auto dot_bracket = base::SimpleStringCOP(nullptr);
 
@@ -39,17 +39,18 @@ get_pose_from_pdb(
         auto x = util::X3dna();
         auto x3dna_basepairs = x.get_basepairs(path);
         bps = get_basepairs_from_x3dna(x3dna_basepairs, *rna_structure)->get_data();
-        ends = get_ends_from_basepairs(*rna_structure, bps)->get_data();
-        for(auto const & end : ends) {
-            auto end_id = generate_end_id(*rna_structure, bps, ends, end);
+        end_indexes = get_end_indexes_from_basepairs(*rna_structure, bps)->get_data();
+        for(auto const & ei : end_indexes) {
+            auto end_id = generate_end_id(*rna_structure, bps, bps[ei]);
             end_ids.push_back(std::make_shared<base::SimpleString>(end_id));
         }
 
-        if(ends.size() == 0) {
-            dot_bracket = std::make_shared<base::SimpleString>(
-                             generate_secondary_structure(*rna_structure, bps, ends));
+        if(end_indexes.size() == 0) {
+            dot_bracket = std::make_shared<base::SimpleString>(generate_secondary_structure(*rna_structure, bps));
         }
         else {
+            dot_bracket = std::make_shared<base::SimpleString>(
+                    primitives::get_dot_bracket_from_end_id(end_ids[0]->get_str()));
 
         }
     }
@@ -59,10 +60,10 @@ get_pose_from_pdb(
     LOGI << filename + " has " + std::to_string(small_molecules->get_num_residues()) + " small_molecules";
     LOGI << filename + " has " + std::to_string(rna_structure->get_num_residues()) +
             " RNA residue(s) in " + std::to_string(rna_structure->get_num_chains()) + " chain(s)";
-    LOGI << filename + " has " + std::to_string(bps.size() + ends.size()) + " basepairs with " +
-            std::to_string(ends.size()) + " basepair ends, sites to connect other structure too";
+    LOGI << filename + " has " + std::to_string(bps.size() + end_indexes.size()) + " basepairs with " +
+            std::to_string(end_indexes.size()) + " basepair ends, sites to connect other structure too";
 
-    return std::make_shared<Pose>(*rna_structure, bps, ends, end_ids, name,
+    return std::make_shared<Pose>(*rna_structure, bps, end_indexes, end_ids, name,
                                   *protein_structure, *small_molecules, dot_bracket);
 }
 

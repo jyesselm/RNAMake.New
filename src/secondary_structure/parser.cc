@@ -95,25 +95,15 @@ Parser::_generate_pose(
         catch(StructureException) { continue; }
         current_basepairs.push_back(bp);
     }
-    auto ends = primitives::get_ends_from_basepairs<Basepair, Structure>(s, current_basepairs)->get_data();
-    for(auto const & e : ends) {
-        for(auto i = 0; i < current_basepairs.size(); i++) {
-            if(e == current_basepairs[i]) {
-                current_basepairs.erase(std::remove(current_basepairs.begin(),
-                                                    current_basepairs.end(),
-                                                    current_basepairs[i]),
-                                        current_basepairs.end());
-                break;
-            }
-        }
-    }
+    auto end_indexes = get_end_indexes_from_basepairs(s, current_basepairs)->get_data();
+
     auto end_ids = base::SimpleStringCOPs();
-    for(auto const & end : ends) {
-        auto end_id = primitives::generate_end_id<Structure, Chain, Basepair, Residue>(s, current_basepairs, ends, end);
+    for(auto const & ei : end_indexes) {
+        auto end_id = generate_end_id(s, current_basepairs, current_basepairs[ei]);
         end_ids.push_back(std::make_shared<base::SimpleString const>(end_id));
     }
     auto name = std::make_shared<base::SimpleString const>("from_secondary_structure");
-    auto p = std::make_shared<Pose>(s, current_basepairs, ends, end_ids, name);
+    auto p = std::make_shared<Pose>(s, current_basepairs, end_indexes, end_ids, name);
     return p;
 
 }

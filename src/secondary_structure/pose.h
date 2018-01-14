@@ -22,70 +22,45 @@ public:
     Pose(
             Structure const & s,
             std::vector<Basepair> const & basepairs,
-            std::vector<Basepair> const & ends,
+            Indexes const & end_indexes,
             base::SimpleStringCOPs const & end_ids,
-            base::SimpleStringCOP name):
-            BaseClass(s, basepairs, ends, end_ids, name) {}
+            base::SimpleStringCOP name) :
+            BaseClass(s, basepairs, end_indexes, end_ids, name) {}
 
     inline
     Pose(
             Pose const & rs) : BaseClass(rs) {}
 
-    /*inline
-    RNAStructure(
-            String const & s) {
-        auto spl = base::split_str_by_delimiter(s, "&");
-
-    }*/
-
 public:
 
     bool
-    operator ==(
+    operator==(
             Pose const & rs) const {
 
-        if(structure_ != rs.structure_) { return false; }
-        if(basepairs_.size() != rs.basepairs_.size())  { return false; }
-        if(*name_ != *rs.name_) { return false; }
-        if(ends_.size() != rs.ends_.size()) { return false; }
-        if(end_ids_.size() != rs.end_ids_.size()) { return false; }
+        if (structure_ != rs.structure_) { return false; }
+        if (basepairs_.size() != rs.basepairs_.size()) { return false; }
+        if (*name_ != *rs.name_) { return false; }
+        if (end_indexes_.size() != rs.end_indexes_.size()) { return false; }
+        if (end_ids_.size() != rs.end_ids_.size()) { return false; }
 
-        for(auto i = 0; i < basepairs_.size(); i++) {
-            if(basepairs_[i] != rs.basepairs_[i]) { return false; }
+        for (auto i = 0; i < basepairs_.size(); i++) {
+            if (basepairs_[i] != rs.basepairs_[i]) { return false; }
         }
-        for(auto i = 0; i < ends_.size(); i++) {
-            if(ends_[i] != rs.ends_[i]) { return false; }
-        }
-        for(auto i = 0; i < end_ids_.size(); i++) {
-            if(*end_ids_[i] != *rs.end_ids_[i]) { return false; }
+        for (auto i = 0; i < end_ids_.size(); i++) {
+            if (*end_ids_[i] != *rs.end_ids_[i]) { return false; }
         }
         return true;
     }
 
     inline
     bool
-    operator != (
+    operator!=(
             Pose const & rs) const {
         return !(*this == rs);
     }
 
 
 public:
-    inline
-    String
-    get_str() {
-        auto s = String("");
-        s += structure_.get_str() + "&";
-        for(auto const & bp : basepairs_) { s += *_get_basepair_str(bp); }
-        s += "&";
-        for(auto const & end : ends_) { s += *_get_basepair_str(end); }
-        s += "&";
-        for(auto const & end_id : end_ids_) { s += end_id->get_str() + " "; }
-        s += "&";
-        s += name_->get_str() + "&";
-        return s;
-    }
-
     inline
     String
     get_dot_bracket() const {
@@ -96,7 +71,7 @@ public:
 public: //setters
     void
     set_sequence(
-           String const & sequence) {
+            String const & sequence) {
         structure_.set_sequence(sequence);
     }
 
@@ -109,14 +84,16 @@ public: //setters
     }
 
 private:
-    std::unique_ptr<String>
+    /*std::unique_ptr<String>
     _get_basepair_str(
             Basepair const & bp) {
         auto s = std::unique_ptr<String>(new String(""));
         auto res = get_bp_res(bp);
         *s += bp.get_str() + ";";
-        *s += std::to_string(res->at(0).get_num()) + "|" + res->at(0).get_chain_id() + "|" + res->at(0).get_i_code() + ";";
-        *s += std::to_string(res->at(1).get_num()) + "|" + res->at(1).get_chain_id() + "|" + res->at(1).get_i_code() + "@";
+        *s += std::to_string(res->at(0).get_num()) + "|" + res->at(0).get_chain_id() + "|" + res->at(0).get_i_code() +
+              ";";
+        *s += std::to_string(res->at(1).get_num()) + "|" + res->at(1).get_chain_id() + "|" + res->at(1).get_i_code() +
+              "@";
         return s;
     }
 
@@ -134,14 +111,30 @@ private:
         auto & res2 = structure_.get_residue(std::stoi(r2_info[0]), r2_info[1][0], r2_info[2][0]);
         return new Basepair(bp_spl[0], util::Uuid(), res1.get_uuid(), res2.get_uuid());
 
-    }
-
+    }*/
 
 
 };
 
 typedef std::shared_ptr<Pose> PoseOP;
 typedef std::unique_ptr<Pose> PoseUP;
+
+inline
+base::VectorContainerOP<Index>
+get_ends_from_basepairs(
+        Structure const & s,
+        Basepairs const & bps) {
+    return primitives::get_end_indexes_from_basepairs<Basepair, Structure>(s, bps);
+}
+
+inline
+String
+generate_end_id(
+        Structure const & s,
+        Basepairs const & bps,
+        Basepair const & end) {
+    return primitives::generate_end_id<Structure, Chain, Basepair, Residue>(s, bps, end);
+}
 
 }
 

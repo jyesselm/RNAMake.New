@@ -168,22 +168,14 @@ public:
     bool
     operator == (
             Residue const & r) const {
-        if(name_ != r.name_) { return false; }
-        if(num_ != r.num_) { return false; }
-        if(chain_id_ != r.chain_id_) { return false; }
-        if(i_code_ != r.i_code_) { return false; }
-        if(uuid_ != r.uuid_) { return false; }
-        for(int i = 0; i < atoms_.size(); i++) {
-            if(atoms_[i] != r.atoms_[i]) { return false;}
-        }
-        return true;
+        return is_equal(r);
     }
 
     inline
     bool
     operator != (
             Residue const & r) const {
-        return !(*this == r);
+        return !is_equal(r);
     }
 
     friend

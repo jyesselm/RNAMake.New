@@ -165,7 +165,7 @@ class BasepairUnittest(unittest.TestCase):
         self.failUnless(name == 'A2C-B1')
 
 
-class RNAStructureUnittest(unittest.TestCase):
+class PoseUnittest(unittest.TestCase):
 
     def setUp(self):
         self.r1 = Residue('A', 1, 'A', ' ', Uuid()) # 0
@@ -188,22 +188,22 @@ class RNAStructureUnittest(unittest.TestCase):
 
         self.s = Structure([self.r1, self.r2, self.r3,
                             self.r4, self.r5, self.r6], [3, 6])
-        bps = [self.bp3]
-        ends = [self.bp1, self.bp2]
+        bps = [self.bp1, self.bp2, self.bp3]
+        self.ends_indexes = [0, 1]
         self.all_bps = [self.bp1, self.bp2, self.bp3]
         self.end_ids = []
         for end in ends:
             self.end_ids.append(SimpleString(generate_end_id(self.s, bps, ends, end)))
 
-        self.rs = RNAStructure(self.s, bps, ends, self.end_ids, SimpleString("test"))
+        self.rs = Pose(self.s, bps, ends, self.end_ids, SimpleString("test"))
 
     def test_improper_init(self):
         bps = []
         ends = [self.bp1, self.bp2]
 
         # need same number of ends and end_ids
-        with self.assertRaises(RNAStructureException):
-            RNAStructure(self.s, bps, ends, [], SimpleString("test"))
+        with self.assertRaises(PoseException):
+            Pose(self.s, bps, ends, [], SimpleString("test"))
 
     def test_generate_end_id(self):
         bps = []
@@ -234,7 +234,7 @@ class RNAStructureUnittest(unittest.TestCase):
         self.failUnless(end == self.bp1)
 
         # triyng to get an end that does not exist
-        with self.assertRaises(RNAStructureException):
+        with self.assertRaises(PoseException):
             self.rs.get_end(2)
 
         # get by name
@@ -243,21 +243,21 @@ class RNAStructureUnittest(unittest.TestCase):
         self.failUnless(end == self.bp1)
 
         # trying to get with fake name
-        with self.assertRaises(RNAStructureException):
+        with self.assertRaises(PoseException):
             self.rs.get_end("FAKE")
 
         # by uuid
         end = self.rs.get_end(self.bp1.get_uuid())
         self.failUnless(end == self.bp1)
 
-        with self.assertRaises(RNAStructureException):
+        with self.assertRaises(PoseException):
             self.failUnless(self.rs.get_end(Uuid()))
 
         # by res ids
         end = self.rs.get_end(self.r1.get_uuid(), self.r6.get_uuid())
         self.failUnless(end == self.bp1)
 
-        with self.assertRaises(RNAStructureException):
+        with self.assertRaises(PoseException):
             self.failUnless(self.rs.get_end(Uuid(), Uuid()))
 
     def test_get_end_by_id(self):
@@ -273,14 +273,14 @@ class RNAStructureUnittest(unittest.TestCase):
         self.failUnless(bps[0] == self.bp3)
         self.failUnless(len(bps) == 1)
 
-        with self.assertRaises(RNAStructureException):
+        with self.assertRaises(PoseException):
             self.failUnless(self.rs.get_basepairs(Uuid()))
 
         # by res ids
         bps = self.rs.get_basepairs(self.r2.get_uuid(), self.r5.get_uuid())
         self.failUnless(bps[0] == self.bp3)
 
-        with self.assertRaises(RNAStructureException):
+        with self.assertRaises(PoseException):
             self.failUnless(self.rs.get_basepairs(Uuid(), Uuid()))
 
         # get by name
@@ -294,7 +294,7 @@ class RNAStructureUnittest(unittest.TestCase):
         self.failUnless(bp == self.bp3)
 
         # triyng to get an end that does not exist
-        with self.assertRaises(RNAStructureException):
+        with self.assertRaises(PoseException):
             self.rs.get_basepair(2)
 
         # get by name
@@ -303,28 +303,28 @@ class RNAStructureUnittest(unittest.TestCase):
         self.failUnless(bp == self.bp3)
 
         # trying to get with fake name
-        with self.assertRaises(RNAStructureException):
+        with self.assertRaises(PoseException):
             self.rs.get_basepair("FAKE")
 
         # by uuid
         bp = self.rs.get_basepair(self.bp3.get_uuid())
         self.failUnless(bp == self.bp3)
 
-        with self.assertRaises(RNAStructureException):
+        with self.assertRaises(PoseException):
             self.failUnless(self.rs.get_basepair(Uuid()))
 
         # by res ids
             bp = self.rs.get_basepair(self.r2.get_uuid(), self.r5.get_uuid())
         self.failUnless(bp == self.bp3)
 
-        with self.assertRaises(RNAStructureException):
+        with self.assertRaises(PoseException):
             self.failUnless(self.rs.get_basepair(Uuid(), Uuid()))
 
     def test_get_end_id(self):
         end_id = self.rs.get_end_id(0).get_str()
         self.failUnless(end_id == 'AGU_LLL_ACU_RRR')
 
-        with self.assertRaises(RNAStructureException):
+        with self.assertRaises(PoseException):
             self.rs.get_end_id(3)
 
     def test_ends_from_basepairs(self):

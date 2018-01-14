@@ -23,7 +23,7 @@ public:
     Segment(
             Structure const & structure,
             Basepairs const & basepairs,
-            Basepairs const & ends,
+            Indexes const & end_indexes,
             base::SimpleStringCOPs const & end_ids,
             base::SimpleStringCOP name,
             Structure const & proteins,
@@ -31,14 +31,14 @@ public:
             base::SimpleStringCOP dot_bracket,
             util::SegmentType segment_type,
             Index aligned_end_index):
-            BaseClass(structure, basepairs, ends, end_ids, name, segment_type, aligned_end_index),
+            BaseClass(structure, basepairs, end_indexes, end_ids, name, segment_type, aligned_end_index),
             proteins_(proteins),
             small_molecules_(small_molecules),
             dot_bracket_(dot_bracket) {}
 
     Segment(
             Segment const & seg):
-            BaseClass(seg.structure_, seg.basepairs_, seg.ends_, seg.end_ids_, seg.name_,
+            BaseClass(seg.structure_, seg.basepairs_, seg.end_indexes_, seg.end_ids_, seg.name_,
                       seg.segment_type_, seg.aligned_end_index_),
             proteins_(seg.proteins_),
             small_molecules_(seg.small_molecules_),
@@ -57,11 +57,11 @@ public:
         segment_type_ = static_cast<util::SegmentType>(j["segment_type"].ToInt());
         aligned_end_index_ = j["aligned_end_index"].ToInt();
         basepairs_ = Basepairs();
-        ends_ = Basepairs();
+        end_indexes_ = Indexes();
         end_ids_ = base::SimpleStringCOPs();
 
         auto & j_bps = j["basepairs"];
-        auto & j_ends = j["ends"];
+        auto & j_end_indexes = j["end_indexes"];
         auto & j_end_ids = j["end_ids"];
 
         for(int i = 0; i < j_bps.size(); i++) {
@@ -70,10 +70,8 @@ public:
             basepairs_.push_back(Basepair(j_bps[0], r1.get_uuid(), r2.get_uuid(), util::Uuid()));
         }
 
-        for(int i = 0; i < j_ends.size(); i++) {
-            auto & r1 = get_residue(j_ends[i][1].ToInt(), (char)j_ends[i][2].ToInt(), (char)j_ends[i][3].ToInt());
-            auto & r2 = get_residue(j_ends[i][4].ToInt(), (char)j_ends[i][5].ToInt(), (char)j_ends[i][6].ToInt());
-            ends_.push_back(Basepair(j_ends[0], r1.get_uuid(), r2.get_uuid(), util::Uuid()));
+        for(int i = 0; i < j_end_indexes.size(); i++) {
+            end_indexes_.push_back(j_end_indexes[i].ToInt());
         }
 
         for(int i = 0; i < j_end_ids.size(); i++) {
@@ -89,7 +87,7 @@ public:
         if(segment_type_ != s.segment_type_) { return false; }
         if(aligned_end_index_ != s.aligned_end_index_) { return false; }
         if(basepairs_.size() != s.basepairs_.size()) { return false; }
-        if(ends_.size() != s.ends_.size()) { return false; }
+        if(end_indexes_.size() != s.end_indexes_.size()) { return false; }
         if(*name_ != *s.name_) { return false; }
         if(*dot_bracket_ != *s.dot_bracket_) { return false; }
         if(! structure_.is_equal(s.structure_, check_uuid)) { return false; }
@@ -108,7 +106,6 @@ public: // non const methods
         proteins_.move(p);
         small_molecules_.move(p);
         for(auto & bp : basepairs_) { bp.move(p); }
-        for(auto & bp : ends_) { bp.move(p); }
 
     }
 
@@ -121,7 +118,6 @@ public: // non const methods
         proteins_.transform(r, t, dummy);
         small_molecules_.transform(r, t, dummy);
         for(auto & bp : basepairs_) { bp.transform(r, t, dummy); }
-        for(auto & bp : ends_) { bp.transform(r, t, dummy); }
     }
 
     inline
@@ -242,7 +238,7 @@ public:
     json::JSON
     get_json() const {
         auto j_bps = json::Array();
-        auto j_ends = json::Array();
+        auto j_end_indexes = json::Array();
         auto j_end_ids = json::Array();
 
         for(auto const & bp : basepairs_) {
@@ -252,19 +248,13 @@ public:
                                      bp_res->at(1).get_chain_id(), bp_res->at(1).get_i_code()));
         }
 
-        for(auto const & bp : ends_) {
-            auto bp_res = get_bp_res(bp);
-            j_ends.append(json::Array(bp.get_json(), bp_res->at(0).get_num(), bp_res->at(0).get_chain_id(),
-                                      bp_res->at(0).get_i_code(), bp_res->at(1).get_num(),
-                                      bp_res->at(1).get_chain_id(), bp_res->at(1).get_i_code()));
-        }
-
         for(auto const & end_id : end_ids_) { j_end_ids.append(end_id->get_str()); }
+        for(auto const & ei : end_indexes_) { j_end_indexes.append(ei); }
 
         return json::JSON{
                 "structure", structure_.get_json(),
                 "basepairs", j_bps,
-                "ends", j_ends,
+                "end_indexes", j_end_indexes,
                 "end_ids", j_end_ids,
                 "name", name_->get_str(),
                 "proteins", proteins_.get_json(),
@@ -304,7 +294,7 @@ public:
 
     inline
     Basepair const &
-    get_aligned_end() { return ends_[aligned_end_index_]; }
+    get_aligned_end() { return basepairs_[end_indexes_[aligned_end_index_]]; }
 
 protected:
     Structure proteins_;

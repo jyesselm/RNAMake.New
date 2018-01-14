@@ -107,14 +107,14 @@ PYBIND11_PLUGIN(primitives) {
                     BasepairType const &, base::SimpleStringOP const &>());
 
     py::class_<PrimitivePose, PrimitivePoseOP>(m, "Pose")
-            .def(py::init<PrimitiveStructure const &, PrimitiveBasepairs const &, PrimitiveBasepairs const &,
+            .def(py::init<PrimitiveStructure const &, PrimitiveBasepairs const &, Indexes const &,
                            base::SimpleStringCOPs const &, base::SimpleStringCOP const &>())
             .def("__iter__", [](const PrimitivePose & s) {
                 return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
            .def("iter_basepairs", [](const PrimitivePose & s) {
                 return py::make_iterator(s.bps_begin(), s.bps_end()); }, py::keep_alive<0, 1>())
             .def("iter_ends", [](const PrimitivePose & s) {
-                return py::make_iterator(s.ends_begin(), s.ends_end()); }, py::keep_alive<0, 1>())
+                return py::make_iterator(s.end_indexes_begin(), s.end_indexes_end()); }, py::keep_alive<0, 1>())
             .def("get_residue",
                  (Residue const & (PrimitivePose::*)(int) const) &PrimitivePose::get_residue)
             .def("get_residue",
@@ -164,7 +164,7 @@ PYBIND11_PLUGIN(primitives) {
 
     m.def("generate_bp_name", &generate_bp_name<PrimitiveResidue>);
     m.def("generate_end_id", &generate_end_id<PrimitiveStructure, PrimitiveChain, PrimitiveBasepair, PrimitiveResidue>);
-    m.def("get_ends_from_basepairs", &get_ends_from_basepairs<PrimitiveBasepair, PrimitiveStructure>);
+    m.def("get_end_indexes_from_basepairs", &get_end_indexes_from_basepairs<PrimitiveBasepair, PrimitiveStructure>);
 
     py::register_exception<ResidueException>(m, "ResidueException");
     py::register_exception<ChainException>(m, "ChainException");

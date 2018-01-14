@@ -25,12 +25,12 @@ public:
     Segment(
             Structuretype const & structure,
             std::vector<BPtype> const & basepairs,
-            std::vector<BPtype> const & ends,
+            Indexes const & end_indexes,
             base::SimpleStringCOPs const & end_ids,
             base::SimpleStringCOP name,
             util::SegmentType segment_type,
             Index aligned_end_index):
-            BaseClass(structure, basepairs, ends, end_ids, name),
+            BaseClass(structure, basepairs, end_indexes, end_ids, name),
             segment_type_(segment_type),
             aligned_end_index_(aligned_end_index) {}
 

@@ -108,7 +108,7 @@ TEST_CASE( "Parse all pdbs to poses", "[PDBParser]" ) {
     int i = -1;
     for(auto const & path : paths) {
         i++;
-        if(seg_types[i] != util::SegmentType::TC_JUNCTION_JUNCTION) { continue; }
+        //if(seg_types[i] != util::SegmentType::TC_JUNCTION_JUNCTION) { continue; }
 
         DIR *pDIR;
         struct dirent *entry;

@@ -146,10 +146,7 @@ public:
             }
             i++;
         }
-        if(res.size() > 0) {
-            auto c = Chaintype(res);
-            chains.push_back(c);
-        }
+        if(res.size() > 0) { chains.push_back(Chaintype(res)); }
         return std::make_shared<Chains>(chains);
     }
 

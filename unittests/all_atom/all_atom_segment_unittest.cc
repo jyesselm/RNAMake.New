@@ -20,7 +20,7 @@ TEST_CASE( "Test all atom segment", "[AllAtomSegments]" ) {
     for(auto & seg: segs) {
         i++;
         seg_factory.align_segment_to_ref_frame(*seg);
-        //seg->write_pdb("test."+std::to_string(i)+".pdb");
+        seg->write_pdb("test."+std::to_string(i)+".pdb");
     }
 
     auto j = seg->get_json();

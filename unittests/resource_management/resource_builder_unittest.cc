@@ -18,7 +18,7 @@ TEST_CASE( "Test resource builder", "[ResourceBuilder]" ) {
 
     auto path  = "/Users/jyesselm/projects/RNAMake/rnamake/resources/motifs";
     auto rb    = resource_management::ResourceBuilder(seg_f, path);
-    //rb.build_ideal_helices();
+    rb.build_ideal_helices();
     rb.build_basic_libraries();
 
 }

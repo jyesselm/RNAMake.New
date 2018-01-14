@@ -27,9 +27,6 @@ TEST_CASE( "Test basic sqlite library", "[Sqlitelibrary]" ) {
 
         auto seg = seg_lib.get_segment(StringStringMap{{"name","HELIX.IDEAL.2"}});
         REQUIRE(seg->get_name_str() == "HELIX.IDEAL.2");
-
-
-
     }
 
 }

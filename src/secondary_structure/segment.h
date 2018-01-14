@@ -15,12 +15,12 @@ public:
     Segment(
             Structure const & s,
             Basepairs const & basepairs,
-            Basepairs const & ends,
+            Indexes const & end_indexes,
             base::SimpleStringCOPs const & end_ids,
             base::SimpleStringCOP name,
             util::SegmentType type,
             Index block_end):
-            secondary_structure::Pose(s, basepairs, ends, end_ids, name) {}
+            secondary_structure::Pose(s, basepairs, end_indexes, end_ids, name) {}
 
     Segment(
             Pose const & p,
