@@ -21,6 +21,7 @@ SegmentSqliteLibrary::get_segment(
     auto seg = all_atom::SegmentOP(nullptr);
     if(segments_.find(id) != segments_.end() ) {
         seg = std::make_shared<all_atom::Segment>(*segments_[id]);
+        seg->new_uuids();
     }
     else {
         std::vector<uint8_t> blob = row->at(1);

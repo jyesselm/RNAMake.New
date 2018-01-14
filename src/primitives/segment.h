@@ -29,7 +29,8 @@ public:
             base::SimpleStringCOPs const & end_ids,
             base::SimpleStringCOP name,
             util::SegmentType segment_type,
-            Index aligned_end_index):
+            Index aligned_end_index,
+            util::Uuid const & uuid):
             BaseClass(structure, basepairs, end_indexes, end_ids, name),
             segment_type_(segment_type),
             aligned_end_index_(aligned_end_index) {}
@@ -42,9 +43,13 @@ public:
     Index
     get_aligned_end_index() const{ return aligned_end_index_; }
 
+    util::Uuid const &
+    get_uuid() { return uuid_; }
+
 protected:
     util::SegmentType segment_type_;
     Index aligned_end_index_;
+    util::Uuid uuid_;
 };
 
 }

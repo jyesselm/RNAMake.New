@@ -39,7 +39,7 @@ SegmentFactory::segment_from_pdb(
 
     return std::make_shared<Segment>(me->rna, me->basepairs, me->end_indexes, me->end_ids, me->name,
                                      me->proteins, me->small_molecules, dot_bracket,
-                                     segment_type, aligned_end);
+                                     segment_type, aligned_end, util::Uuid());
 }
 
 SegmentOPs
@@ -75,7 +75,7 @@ SegmentFactory::all_segments_from_pdb(
 
         auto seg = std::make_shared<Segment>(me->rna, me->basepairs, me->end_indexes, me->end_ids, me->name,
                                              me->proteins, me->small_molecules, dot_bracket,
-                                             segment_type, aligned_end);
+                                             segment_type, aligned_end, util::Uuid());
         segments.push_back(seg);
 
     }
@@ -416,7 +416,7 @@ SegmentFactory::_setup_base_helix() {
 
     return std::make_shared<Segment>(*aligned_s, me->basepairs, me->end_indexes, end_ids, me->name,
                                      me->proteins, me->small_molecules, dot_bracket,
-                                     util::SegmentType::HELIX, 0);
+                                     util::SegmentType::HELIX, 0, util::Uuid());
 }
 
 SegmentFactory::SegmentElementsOP

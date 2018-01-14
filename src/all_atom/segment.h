@@ -10,6 +10,11 @@
 #include <all_atom/structure.h>
 #include <all_atom/basepair.h>
 
+// forward declaration to allow SegmentSqliteLibraryt to call new_uuids()
+namespace resource_management {
+    class SegmentSqliteLibrary;
+}
+
 namespace all_atom {
 
 class Segment : public primitives::Segment<Basepair, Structure, Chain, Residue>  {
@@ -18,6 +23,7 @@ public:
 
 public:
     friend class SegmentFactory;
+    friend class resource_management::SegmentSqliteLibrary;
 
 public:
     Segment(
@@ -30,8 +36,9 @@ public:
             Structure const & small_molecules,
             base::SimpleStringCOP dot_bracket,
             util::SegmentType segment_type,
-            Index aligned_end_index):
-            BaseClass(structure, basepairs, end_indexes, end_ids, name, segment_type, aligned_end_index),
+            Index aligned_end_index,
+            util::Uuid const & uuid ):
+            BaseClass(structure, basepairs, end_indexes, end_ids, name, segment_type, aligned_end_index, uuid),
             proteins_(proteins),
             small_molecules_(small_molecules),
             dot_bracket_(dot_bracket) {}
@@ -39,7 +46,7 @@ public:
     Segment(
             Segment const & seg):
             BaseClass(seg.structure_, seg.basepairs_, seg.end_indexes_, seg.end_ids_, seg.name_,
-                      seg.segment_type_, seg.aligned_end_index_),
+                      seg.segment_type_, seg.aligned_end_index_, seg.uuid_),
             proteins_(seg.proteins_),
             small_molecules_(seg.small_molecules_),
             dot_bracket_(seg.dot_bracket_) {}
@@ -51,6 +58,7 @@ public:
             proteins_(Structure(j["proteins"], rts)),
             small_molecules_(Structure(j["small_molecules"], rts)) {
 
+        uuid_ = util::Uuid();
         structure_ = Structure(j["structure"], rts);
         name_ = std::make_shared<base::SimpleString const>(j["name"].ToString());
         dot_bracket_ = std::make_shared<base::SimpleString const>(j["dot_bracket"].ToString());
@@ -295,6 +303,12 @@ public:
     inline
     Basepair const &
     get_aligned_end() { return basepairs_[end_indexes_[aligned_end_index_]]; }
+
+protected:
+    void
+    new_uuids() {
+
+    }
 
 protected:
     Structure proteins_;
