@@ -384,6 +384,10 @@ public: // non const
     void
     build_beads() { _build_beads(); }
 
+    inline
+    void
+    new_uuid() { uuid_ = util::Uuid(); }
+
 
 public: // getters
 

@@ -307,7 +307,25 @@ public:
 protected:
     void
     new_uuids() {
+        uuid_ = util::Uuid();
+        auto uuid_map = std::map<util::Uuid, int>();
+        int i = 0;
+        for(auto const & r : structure_) {
+            uuid_map[r.get_uuid()] = i;
+            i++;
+        }
+        structure_.new_uuids();
 
+        for(auto & bp : basepairs_) {
+            auto r1_pos = uuid_map[bp.get_res1_uuid()];
+            auto r2_pos = uuid_map[bp.get_res2_uuid()];
+            auto & r1 = structure_.get_residue(r1_pos);
+            auto & r2 = structure_.get_residue(r2_pos);
+            bp.new_uuids(r1.get_uuid(), r2.get_uuid());
+        }
+
+        proteins_.new_uuids();
+        small_molecules_.new_uuids();
     }
 
 protected:

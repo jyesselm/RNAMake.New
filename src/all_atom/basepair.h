@@ -108,6 +108,16 @@ public: // non const methods
         ref_frame_ = ref_frame_.get_flip_orientation();
     }
 
+    inline
+    void
+    new_uuids(
+            util::Uuid const & r1_uuid,
+            util::Uuid const & r2_uuid) {
+        res1_uuid_ = r1_uuid;
+        res2_uuid_ = r2_uuid;
+        uuid_ = util::Uuid();
+    }
+
 public:
     json::JSON
     get_json() const {

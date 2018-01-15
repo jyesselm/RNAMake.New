@@ -27,6 +27,11 @@ TEST_CASE( "Test basic sqlite library", "[Sqlitelibrary]" ) {
 
         auto seg = seg_lib.get_segment(StringStringMap{{"name","HELIX.IDEAL.2"}});
         REQUIRE(seg->get_name_str() == "HELIX.IDEAL.2");
+
+        auto seg2 = seg_lib.get_segment(StringStringMap{{"name","HELIX.IDEAL.2"}});
+        // all uuids have changed should not be equal if checking uuids
+        REQUIRE(!seg->is_equal(*seg2, true));
+        REQUIRE(seg->is_equal(*seg2, false));
     }
 
 }

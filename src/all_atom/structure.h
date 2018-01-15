@@ -130,6 +130,11 @@ public: // non const
         residues_[i].remove_beads();
     }
 
+    void
+    new_uuids() {
+        for(auto & r : residues_) { r.new_uuid(); }
+    }
+
 public: //getters
 
     String

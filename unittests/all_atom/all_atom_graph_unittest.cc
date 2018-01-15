@@ -17,13 +17,6 @@ TEST_CASE( "Test all atom segment", "[AllAtomSegments]" ) {
     auto seg_factory = all_atom::SegmentFactory(rts);
     auto path = base::unittest_resources_path() + "/all_atom/HELIX.IDEAL.2/HELIX.IDEAL.2.pdb";
     auto seg = seg_factory.segment_from_pdb(path, util::SegmentType::HELIX, false);
-    /*for(auto it = seg->ends_begin(); it != seg->ends_end(); it++) {
-        auto res = seg->get_bp_res(*it);
-        for(auto const & r : *res) {
-            std::cout << r << " ";
-        }
-        std::cout << std::endl;
-    }*/
 
     auto g = data_structures::SegmentGraph<all_atom::Segment, all_atom::Aligner>();
     g.add_segment(seg);
