@@ -164,8 +164,11 @@ target_link_libraries(primitive_memory_leak_unittest primitives_lib)
 set(data_structures_files
 	/Users/jyesselm/projects/RNAMake.New/src/data_structures/data_structures.cc
 	/Users/jyesselm/projects/RNAMake.New/src/data_structures/graph.cc
+	/Users/jyesselm/projects/RNAMake.New/src/data_structures/new_graph.cc
 	/Users/jyesselm/projects/RNAMake.New/src/data_structures/segment_graph.cc
 	/Users/jyesselm/projects/RNAMake.New/src/data_structures/directed_graph.cc
+	/Users/jyesselm/projects/RNAMake.New/src/data_structures/graph_adjacency_list.cc
+	/Users/jyesselm/projects/RNAMake.New/src/data_structures/graph_base.cc
 )
 
 add_library(data_structures_lib ${data_structures_files})
@@ -174,116 +177,12 @@ target_link_libraries(data_structures_lib util_lib  pybind11::module)
 add_library(data_structures MODULE ${data_structures_files})
 target_link_libraries(data_structures util_lib  pybind11::module)
 
+add_executable(graph_adjacency_list_unittest /Users/jyesselm/projects/RNAMake.New/unittests/data_structures/graph_adjacency_list_unittest.cc)
+target_link_libraries(graph_adjacency_list_unittest data_structures_lib)
+
+add_executable(new_graph_unittest /Users/jyesselm/projects/RNAMake.New/unittests/data_structures/new_graph_unittest.cc)
+target_link_libraries(new_graph_unittest data_structures_lib)
+
 add_executable(graph_unittest /Users/jyesselm/projects/RNAMake.New/unittests/data_structures/graph_unittest.cc)
 target_link_libraries(graph_unittest data_structures_lib)
-
-###########################################################################
-# secondary_structure
-###########################################################################
-
-set(secondary_structure_files
-	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/segment.cc
-	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/residue.cc
-	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/parser.cc
-	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/basepair.cc
-	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/structure.cc
-	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/pose.cc
-	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/chain.cc
-	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/secondary_structure.cc
-	/Users/jyesselm/projects/RNAMake.New/src/secondary_structure/aligner.cc
-)
-
-add_library(secondary_structure_lib ${secondary_structure_files})
-target_link_libraries(secondary_structure_lib primitives_lib  pybind11::module)
-
-add_library(secondary_structure MODULE ${secondary_structure_files})
-target_link_libraries(secondary_structure primitives_lib  pybind11::module)
-
-add_executable(parser_unittest /Users/jyesselm/projects/RNAMake.New/unittests/secondary_structure/parser_unittest.cc)
-target_link_libraries(parser_unittest secondary_structure_lib)
-
-add_executable(ss_rna_structure_graph_unittest /Users/jyesselm/projects/RNAMake.New/unittests/secondary_structure/ss_rna_structure_graph_unittest.cc)
-target_link_libraries(ss_rna_structure_graph_unittest secondary_structure_lib)
-
-###########################################################################
-# all_atom
-###########################################################################
-
-set(all_atom_files
-	/Users/jyesselm/projects/RNAMake.New/src/all_atom/segment.cc
-	/Users/jyesselm/projects/RNAMake.New/src/all_atom/segment_factory.cc
-	/Users/jyesselm/projects/RNAMake.New/src/all_atom/atom.cc
-	/Users/jyesselm/projects/RNAMake.New/src/all_atom/residue_type_set.cc
-	/Users/jyesselm/projects/RNAMake.New/src/all_atom/residue.cc
-	/Users/jyesselm/projects/RNAMake.New/src/all_atom/basepair.cc
-	/Users/jyesselm/projects/RNAMake.New/src/all_atom/structure.cc
-	/Users/jyesselm/projects/RNAMake.New/src/all_atom/pdb_parser.cc
-	/Users/jyesselm/projects/RNAMake.New/src/all_atom/pose.cc
-	/Users/jyesselm/projects/RNAMake.New/src/all_atom/chain.cc
-	/Users/jyesselm/projects/RNAMake.New/src/all_atom/aligner.cc
-	/Users/jyesselm/projects/RNAMake.New/src/all_atom/residue_type.cc
-	/Users/jyesselm/projects/RNAMake.New/src/all_atom/all_atom.cc
-)
-
-add_library(all_atom_lib ${all_atom_files})
-target_link_libraries(all_atom_lib secondary_structure_lib  pybind11::module)
-
-add_library(all_atom MODULE ${all_atom_files})
-target_link_libraries(all_atom secondary_structure_lib  pybind11::module)
-
-add_executable(all_atom_graph_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_graph_unittest.cc)
-target_link_libraries(all_atom_graph_unittest all_atom_lib)
-
-add_executable(all_atom_generate_all_segments /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_generate_all_segments.cc)
-target_link_libraries(all_atom_generate_all_segments all_atom_lib)
-
-add_executable(pdb_parser_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/pdb_parser_unittest.cc)
-target_link_libraries(pdb_parser_unittest all_atom_lib)
-
-add_executable(all_atom_basepair_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_basepair_unittest.cc)
-target_link_libraries(all_atom_basepair_unittest all_atom_lib)
-
-add_executable(parse_all_pdbs_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/parse_all_pdbs_unittest.cc)
-target_link_libraries(parse_all_pdbs_unittest all_atom_lib)
-
-add_executable(all_pdbs_to_poses_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_pdbs_to_poses_unittest.cc)
-target_link_libraries(all_pdbs_to_poses_unittest all_atom_lib)
-
-add_executable(all_atom_segment_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_segment_unittest.cc)
-target_link_libraries(all_atom_segment_unittest all_atom_lib)
-
-add_executable(all_atom_structure_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_structure_unittest.cc)
-target_link_libraries(all_atom_structure_unittest all_atom_lib)
-
-add_executable(all_atom_pose_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_pose_unittest.cc)
-target_link_libraries(all_atom_pose_unittest all_atom_lib)
-
-add_executable(all_atom_basic_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_basic_unittest.cc)
-target_link_libraries(all_atom_basic_unittest all_atom_lib)
-
-###########################################################################
-# resource_management
-###########################################################################
-
-set(resource_management_files
-	/Users/jyesselm/projects/RNAMake.New/src/resource_management/segment_sqlite_library.cc
-	/Users/jyesselm/projects/RNAMake.New/src/resource_management/sqlite_library.cc
-	/Users/jyesselm/projects/RNAMake.New/src/resource_management/resource_manager.cc
-	/Users/jyesselm/projects/RNAMake.New/src/resource_management/resource_builder.cc
-)
-
-add_library(resource_management_lib ${resource_management_files})
-target_link_libraries(resource_management_lib all_atom_lib  pybind11::module)
-
-add_library(resource_management MODULE ${resource_management_files})
-target_link_libraries(resource_management all_atom_lib  pybind11::module)
-
-add_executable(resource_manager_unittest /Users/jyesselm/projects/RNAMake.New/unittests/resource_management/resource_manager_unittest.cc)
-target_link_libraries(resource_manager_unittest resource_management_lib)
-
-add_executable(resource_builder_unittest /Users/jyesselm/projects/RNAMake.New/unittests/resource_management/resource_builder_unittest.cc)
-target_link_libraries(resource_builder_unittest resource_management_lib)
-
-add_executable(sqlite_library_unittest /Users/jyesselm/projects/RNAMake.New/unittests/resource_management/sqlite_library_unittest.cc)
-target_link_libraries(sqlite_library_unittest resource_management_lib)
 

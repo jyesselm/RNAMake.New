@@ -15,67 +15,10 @@
 #include <base/types.h>
 #include <base/assertions.h>
 #include <base/vector_container.h>
+#include <data_structures/graph_base.h>
 
 namespace data_structures {
 
-/*
- * Exception for graph
- */
-class GraphException : public std::runtime_error {
-public:
-    /**
-     * Standard constructor for ChainException
-     * @param   message   Error message for chain
-     */
-    GraphException(String const & message) :
-            std::runtime_error(message) {}
-};
-
-struct Edge {
-    Index node_i, node_j, edge_i, edge_j;
-
-    inline
-    Edge(
-            Index nnode_i,
-            Index nnode_j,
-            Index nedge_i,
-            Index nedge_j):
-            node_i(nnode_i),
-            node_j(nnode_j),
-            edge_i(nedge_i),
-            edge_j(nedge_j) {}
-
-    inline
-    bool
-    operator==(Edge & other) const {
-        return node_i == other.node_i && node_j == other.node_j &&
-               edge_i == other.edge_i && edge_j == other.edge_j;
-    }
-
-    Index
-    partner(
-            Index index) const {
-        expects<GraphException>(
-                index == node_i || index == node_j,
-                "cannot call partner if not a node in this edge");
-
-        if   (index == node_i) { return node_j; }
-        else                   { return node_i; }
-
-    }
-
-    Index
-    end_index(
-            Index index) const {
-        expects<GraphException>(
-                index == node_i || index == node_j,
-                "cannot call end_index if not a node in this edge");
-
-        if   (index == node_i) { return edge_i; }
-        else                   { return edge_j; }
-
-    }
-};
 
 template<typename DataType>
 class BaseGraph {
