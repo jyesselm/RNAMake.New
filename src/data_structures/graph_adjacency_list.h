@@ -57,8 +57,9 @@ public:
     add_node(
             DataType const & d,
             Size n_edges) {
-        nodes_[index_] = Node < DataType > {d, index_};
-        edges_[index_] = std::vector < Edge const * > (n_edges);
+        // required to avoid empty constructor on DataType
+        nodes_.insert(std::pair<int, Node<DataType>>( index_, Node<DataType>(d, index_)));
+        edges_[index_] = std::vector<Edge const *> (n_edges);
         index_ += 1;
         return index_ - 1;
     }

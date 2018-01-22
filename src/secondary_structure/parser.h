@@ -32,13 +32,13 @@ struct ChainGraphNode {
 class ChainGraph {
 public:
     ChainGraph():
-            graph_(data_structures::FixedNumEdgesGraph<ChainGraphNode>()) {}
+            graph_(data_structures::FixedEdgeDirectedGraph<ChainGraphNode>()) {}
 
     ~ChainGraph() {}
 
 public:
 
-    typedef typename data_structures::FixedNumEdgesGraph<ChainGraphNode>::const_iterator const_iterator;
+    typedef typename data_structures::FixedEdgeDirectedGraph<ChainGraphNode>::const_iterator const_iterator;
 
     const_iterator begin() const noexcept { return graph_.begin(); }
     const_iterator end() const noexcept   { return graph_.end();   }
@@ -49,7 +49,7 @@ public:
             std::vector<Residue const *> const & residues,
             ChainStructureType type) {
 
-        auto node = std::make_shared<ChainGraphNode>(residues, type);
+        auto node = ChainGraphNode(residues, type);
         // always three connections points
         // 0: parent connection, 1: child connection, 2:
         return graph_.add_node(node, 3);
@@ -61,18 +61,19 @@ public:
             std::vector<Residue const *> const & residues,
             ChainStructureType type,
             Index parent_index) {
-        auto node = std::make_shared<ChainGraphNode>(residues, type);
-        return graph_.add_node(node, 3, parent_index,
-                               EdgeConnectionType::CHILD, EdgeConnectionType::PARENT);
+        auto node = ChainGraphNode(residues, type);
+        return graph_.add_node(node, 3, EdgeConnectionType::CHILD,
+                               data_structures::NodeIndexandEdge{parent_index, EdgeConnectionType::PARENT});
 
     }
 
     Index
     get_index_of_residue(
             Residue const & residue) {
+        graph_.setup_transversal(0);
         for(auto const & n : graph_) {
-            for(auto const & r : n.data->residues) {
-                if(residue == *r) { return n.index; }
+            for(auto const & r : n->data.residues) {
+                if(residue == *r) { return n->index; }
             }
         }
         return -1;
@@ -83,17 +84,18 @@ public:
             Index n_i,
             Index n_j) {
         expects<data_structures::GraphException>(
-                (graph_.get_node(n_i)->type == ChainStructureType::PAIRED &&
-                 graph_.get_node(n_j)->type == ChainStructureType::PAIRED) ||
-                (graph_.get_node(n_i)->type == ChainStructureType::TERTIARY &&
-                 graph_.get_node(n_j)->type == ChainStructureType::TERTIARY),
+                (graph_.get_node_data(n_i).type == ChainStructureType::PAIRED &&
+                 graph_.get_node_data(n_j).type == ChainStructureType::PAIRED) ||
+                (graph_.get_node_data(n_i).type == ChainStructureType::TERTIARY &&
+                 graph_.get_node_data(n_j).type == ChainStructureType::TERTIARY),
                 "must be same type and cannot be unpaired");
-        graph_.add_edge(n_i, n_j, EdgeConnectionType::PAIR, EdgeConnectionType::PAIR);
+        graph_.add_edge(data_structures::NodeIndexandEdge{n_i, EdgeConnectionType::PAIR},
+                        data_structures::NodeIndexandEdge{n_j, EdgeConnectionType::PAIR});
     }
 
 
 private:
-    data_structures::FixedNumEdgesGraph<ChainGraphNode> graph_;
+    data_structures::FixedEdgeDirectedGraph<ChainGraphNode> graph_;
 
 };
 
@@ -149,7 +151,8 @@ private:
         auto name = primitives::generate_bp_name<Residue>(*r, partner);
 
         // create new basepair from pair
-        auto basepair = Basepair(r->get_uuid(), partner.get_uuid(), util::Uuid(),
+        auto basepair = secondary_structure::Basepair(
+                                 r->get_uuid(), partner.get_uuid(), util::Uuid(),
                                  primitives::BasepairType::WC,
                                  std::make_shared<base::SimpleString>(name));
         basepairs_.push_back(basepair);

@@ -10,9 +10,9 @@
 
 namespace all_atom {
 
-class SegmentGraph : public data_structures::SegmentGraph<Segment, Aligner> {
+/*class SegmentGraph : public data_structures::SegmentGraph<Segment, Aligner> {
 
-};
+};*/
 }
 
 #endif //RNAMAKE_NEW_SEGMENT_GRAPH_H

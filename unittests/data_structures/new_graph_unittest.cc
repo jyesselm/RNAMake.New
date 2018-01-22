@@ -15,4 +15,13 @@ TEST_CASE( "Test Graph Data Structure ", "[Graph]" ) {
     g.add_node(1, 3, 0, data_structures::NodeIndexandEdge{0, 0});
 
     REQUIRE(g.get_num_nodes() == 2);
+
+    struct X {
+        int x; int y;
+    };
+
+    auto g1 = data_structures::FixedEdgeDirectedGraph<X>();
+    g1.add_node(X{0, 0}, 3);
+
+    REQUIRE(g1.get_node_data(0).x == 0);
 }

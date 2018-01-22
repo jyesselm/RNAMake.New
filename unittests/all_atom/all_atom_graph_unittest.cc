@@ -11,7 +11,7 @@
 #include <all_atom/segment_factory.h>
 
 TEST_CASE( "Test all atom segment", "[AllAtomSegments]" ) {
-    init_unittest_safe_logging();
+    /*init_unittest_safe_logging();
 
     auto rts = all_atom::ResidueTypeSet();
     auto seg_factory = all_atom::SegmentFactory(rts);
@@ -24,5 +24,5 @@ TEST_CASE( "Test all atom segment", "[AllAtomSegments]" ) {
 
     for(auto const & n : g) {
         n.data->write_pdb("test."+std::to_string(n.index)+".pdb");
-    }
+    }*/
 }

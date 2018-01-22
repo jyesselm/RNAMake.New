@@ -154,6 +154,12 @@ class StringstoGraph(object):
 
         return node_connections
 
+    def _get_next_edge_index(self, g, ni):
+        for i in range(0, 10):
+            if not g.edge_index_empty(ni, i):
+                continue
+            return i
+
     def _build_directed_graph(self):
         g = FixedEdgeDirectedGraphInt()
         last = None
@@ -196,7 +202,10 @@ class StringstoGraph(object):
 
         for c in self._connections:
             if c[2] == 0 and c[3] == 0:
-                print c
+                e1 = self._get_next_edge_index(g, c[0])
+                e2 = self._get_next_edge_index(g, c[1])
+                g.add_edge(NodeIndexandEdge(c[0], e1), NodeIndexandEdge(c[1], e2))
+
 
         return g
 
@@ -275,14 +284,58 @@ class DirectedGraphUnittest(unittest.TestCase):
         parser = StringstoGraph()
         lines = s.split("\n")
         g = parser.parse(lines)
+        self.failUnless(g.edge_between_nodes(1, 5))
+        g.setup_path_transversal(0, 5)
+        path = []
+        target = [0, 2, 3, 5]
+        for n in g:
+            path.append(n.index)
+        self.failUnless(path == target)
 
+        g.setup_sub_graph_transversal(0, 5)
+        path = []
+        target = [0, 2, 3, 5, 1, 4]
+        for n in g:
+            path.append(int(n.index))
+        self.failUnless(path == target)
 
+    def test_sub_ring(self):
+        s = """
+                  ----------
+                  |        |
+        0----->1->2->3  4->5
+        |      |     |  ^
+        |      --->6--  |
+        -----------------           
+        """
+        parser = StringstoGraph()
+        lines = s.split("\n")
+        g = parser.parse(lines)
+        g.setup_path_transversal(0, 5)
+        path = []
+        target = [0, 4, 5]
+        for n in g:
+            path.append(int(n.index))
+        self.failUnless(path == target)
 
+        s = """
+                     ----------
+                     |        |
+           0----->1->2->3  4->5
+           |      |     |  |
+           |      --->6--  |
+           -----------------           
+        """
 
-
-
-
-
+        parser = StringstoGraph()
+        lines = s.split("\n")
+        g = parser.parse(lines)
+        g.setup_sub_graph_transversal(0, 3)
+        path = []
+        target = [0, 1, 2, 3, 6]
+        for n in g:
+            path.append(int(n.index))
+        self.failUnless(path == target)
 
 
 def main():

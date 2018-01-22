@@ -25,6 +25,14 @@ public:
 
 template<typename DataType>
 struct Node {
+
+    inline
+    Node(
+            DataType const & ndata,
+            Index nindex):
+            data(ndata),
+            index(nindex) {}
+
     DataType data;
     Index index;
 };

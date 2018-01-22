@@ -8,6 +8,7 @@
 #include <data_structures/directed_graph.h>
 #include <base/simple_string.h>
 
+/*
 namespace data_structures {
 
 template<typename SegmentType, typename AlignerType>
@@ -80,6 +81,6 @@ private:
 };
 
 }
-
+*/
 
 #endif //RNAMAKE_NEW_RNA_STRUCTURE_TYPE_GRAPH_H

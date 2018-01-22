@@ -161,6 +161,13 @@ public:
 
 };
 
+template<typename DataType>
+using FixedEdgeUndirectedGraph = UndirectedGraph<DataType, FixedEdges>;
+
+template<typename DataType>
+using DynamicEdgedUndirectedGraph = UndirectedGraph<DataType, DynamicEdges>;
+
+
 template<typename DataType, typename EdgeType>
 class DirectedGraph : public _DirectedGraph<DataType, EdgeType> {
 public:
