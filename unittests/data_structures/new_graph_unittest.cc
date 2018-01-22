@@ -7,7 +7,7 @@
 #include "../common.hpp"
 
 #include <primitives/residue.h>
-#include <data_structures/new_graph.h>
+#include <data_structures/graph.h>
 
 TEST_CASE( "Test Graph Data Structure ", "[Graph]" ) {
     auto g = data_structures::FixedEdgeDirectedGraph<int>();

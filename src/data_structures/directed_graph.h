@@ -6,7 +6,7 @@
 #define RNAMAKE_NEW_DIRECTED_GRAPH_H
 
 #include <base/vector_container.h>
-#include <data_structures/graph.h>
+#include <data_structures/graph_old.h>
 
 namespace data_structures {
 

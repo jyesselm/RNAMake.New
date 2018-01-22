@@ -164,11 +164,12 @@ target_link_libraries(primitive_memory_leak_unittest primitives_lib)
 set(data_structures_files
 	/Users/jyesselm/projects/RNAMake.New/src/data_structures/data_structures.cc
 	/Users/jyesselm/projects/RNAMake.New/src/data_structures/graph.cc
-	/Users/jyesselm/projects/RNAMake.New/src/data_structures/new_graph.cc
 	/Users/jyesselm/projects/RNAMake.New/src/data_structures/segment_graph.cc
 	/Users/jyesselm/projects/RNAMake.New/src/data_structures/directed_graph.cc
 	/Users/jyesselm/projects/RNAMake.New/src/data_structures/graph_adjacency_list.cc
+	/Users/jyesselm/projects/RNAMake.New/src/data_structures/graph_old.cc
 	/Users/jyesselm/projects/RNAMake.New/src/data_structures/graph_base.cc
+	/Users/jyesselm/projects/RNAMake.New/src/data_structures/graph_iter_list.cc
 )
 
 add_library(data_structures_lib ${data_structures_files})
@@ -185,4 +186,7 @@ target_link_libraries(new_graph_unittest data_structures_lib)
 
 add_executable(graph_unittest /Users/jyesselm/projects/RNAMake.New/unittests/data_structures/graph_unittest.cc)
 target_link_libraries(graph_unittest data_structures_lib)
+
+add_executable(graph_iter_list_unittest /Users/jyesselm/projects/RNAMake.New/unittests/data_structures/graph_iter_list_unittest.cc)
+target_link_libraries(graph_iter_list_unittest data_structures_lib)
 

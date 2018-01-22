@@ -166,7 +166,16 @@ public:
         expects<GraphException>(
                 nodes_.find(ni) != nodes_.end(),
                 "cannot find node of index: " + std::to_string(ni));
-        return nodes_.find(index)->second.data;
+        return nodes_.find(ni)->second.data;
+    }
+
+    Node<DataType> const &
+    get_node(
+            Index ni)  const {
+        expects<GraphException>(
+                nodes_.find(ni) != nodes_.end(),
+                "cannot find node of index: " + std::to_string(ni));
+        return nodes_.find(ni)->second;
     }
 
     NodeIndexandEdge
@@ -187,9 +196,10 @@ public:
     bool
     edge_between_nodes(
             Index n1,
-            Index n2) {
+            Index n2)  const {
         if (edges_.find(n1) == edges_.end()) { return false; }
-        for (auto const & edge : edges_[n1]) {
+        auto & edges = edges_.at(n1);
+        for (auto const & edge : edges) {
             if (edge == nullptr) { continue; }
             if (edge->node_i == n2 or edge->node_j == n2) { return true; }
         }
@@ -270,7 +280,7 @@ public:
             DataType const & d,
             Size n_edges,
             Index n_end_index,
-            NodeIndexandEdge const pie) {
+            NodeIndexandEdge const & pie) {
 
         // not sure why this would happen but will catch anyway
         expects<GraphException>(
@@ -285,6 +295,7 @@ public:
 
         auto n_index = add_node(d, n_edges);
         BaseClass::add_edge(pie, NodeIndexandEdge{n_index, n_end_index});
+        parent_[n_index] = pie.node_index;
         return n_index;
     }
 
@@ -302,8 +313,8 @@ public:
     bool
     has_parent(
             Index n_index) const {
-        if(parent_[n_index] == -1) { return false; }
-        else                       { return true;  }
+        if(parent_.at(n_index) == -1) { return false; }
+        else                          { return true;  }
     }
 
     Index
@@ -311,7 +322,7 @@ public:
             Index n_index) const {
 
         expects<GraphException>(
-                parent_[n_index] != -1,
+                parent_.at(n_index) != -1,
                 "node does not have parent cannot get parent index");
         return parent_.find(n_index)->second;
     }

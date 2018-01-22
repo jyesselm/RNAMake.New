@@ -11,13 +11,18 @@
 
 #include <primitives/residue.h>
 #include <primitives/chain.h>
-#include "directed_graph.h"
 
 namespace py = pybind11;
 namespace data_structures {
 
 PYBIND11_PLUGIN(data_structures) {
     py::module m("data_structures", "basic organization classes");
+    // NodeIndexandEdge
+    py::class_<NodeIndexandEdge, std::shared_ptr<NodeIndexandEdge>>(m, "NodeIndexandEdge")
+            .def(py::init<Index, Index>())
+            .def_readonly("node_index", &NodeIndexandEdge::node_index)
+            .def_readonly("edge_index", &NodeIndexandEdge::edge_index);
+
     // Edge Class
     py::class_<Edge, std::shared_ptr<Edge>>(m, "Edge")
             .def(py::init<Index, Index, Index, Index>())
@@ -26,11 +31,44 @@ PYBIND11_PLUGIN(data_structures) {
             .def_readonly("edge_i", &Edge::edge_i)
             .def_readonly("edge_j", &Edge::edge_j);
 
+    // Node Class
+    typedef Node<int> NodeInt;
+    py::class_<NodeInt, std::shared_ptr<NodeInt>>(m, "NodeInt")
+            .def(py::init<int, Index>())
+            .def_readonly("data", &NodeInt::data)
+            .def_readonly("index", &NodeInt::index);
+
+    // Int Graphs
+    typedef FixedEdgeDirectedGraph<int> FixedEdgeDirectedGraphInt;
+    py::class_<FixedEdgeDirectedGraphInt, std::shared_ptr<FixedEdgeDirectedGraphInt> >(m, "FixedEdgeDirectedGraphInt")
+            .def(py::init<>())
+            .def("__len__", &FixedEdgeDirectedGraphInt::get_num_nodes)
+            .def("__iter__", [](FixedEdgeDirectedGraphInt const & g) {
+                    return py::make_iterator(g.begin(), g.end()); }, py::keep_alive<0, 1>())
+            .def("setup_transversal", &FixedEdgeDirectedGraphInt::setup_transversal)
+            .def("setup_path_transversal", &FixedEdgeDirectedGraphInt::setup_path_transversal)
+            .def("setup_sub_graph_transversal", &FixedEdgeDirectedGraphInt::setup_sub_graph_transversal)
+            .def("add_node", (int (FixedEdgeDirectedGraphInt::*)(int const &, Size))
+                    &FixedEdgeDirectedGraphInt::add_node)
+            .def("add_node", (int (FixedEdgeDirectedGraphInt::*)(int const &, Size, Index, NodeIndexandEdge const &)) &FixedEdgeDirectedGraphInt::add_node)
+            .def("add_edge", &FixedEdgeDirectedGraphInt::add_edge)
+            .def("remove_node", &FixedEdgeDirectedGraphInt::remove_node)
+            .def("remove_edge", &FixedEdgeDirectedGraphInt::remove_edge)
+            .def("get_num_nodes", &FixedEdgeDirectedGraphInt::get_num_nodes)
+            .def("get_num_edges", &FixedEdgeDirectedGraphInt::get_num_edges)
+            .def("get_node_edges", &FixedEdgeDirectedGraphInt::get_num_edges)
+            .def("get_node", &FixedEdgeDirectedGraphInt::get_node)
+            .def("get_node_data", &FixedEdgeDirectedGraphInt::get_node_data)
+            .def("get_connected_node_info", &FixedEdgeDirectedGraphInt::get_connected_node_info)
+            .def("edge_between_nodes", &FixedEdgeDirectedGraphInt::edge_between_nodes)
+            .def("edge_index_empty", &FixedEdgeDirectedGraphInt::edge_index_empty);
+
+
     // Graph Class
-    typedef primitives::Residue DataType;
-    typedef std::shared_ptr<DataType> DataTypeOP;
-    typedef Graph<DataType> ResidueGraph;
-    py::class_<ResidueGraph, std::shared_ptr<ResidueGraph> >(m, "ResidueGraph")
+    //typedef primitives::Residue DataType;
+    //typedef std::shared_ptr<DataType> DataTypeOP;
+    //typedef Graph<DataType> ResidueGraph;
+    /*py::class_<ResidueGraph, std::shared_ptr<ResidueGraph> >(m, "ResidueGraph")
             .def(py::init<>())
             .def("__len__", &ResidueGraph::get_num_nodes)
             .def("__iter__", [](ResidueGraph const & g) { return py::make_iterator(g.begin(), g.end()); },
@@ -81,7 +119,7 @@ PYBIND11_PLUGIN(data_structures) {
             .def("has_parent", &ResidueDirectedGraph::has_parent)
             .def("get_parent_edge_index", &ResidueDirectedGraph::get_parent_edge_index)
             .def("get_all_edges", &ResidueDirectedGraph::get_all_edges)
-            .def("edge_exists", &ResidueDirectedGraph::edge_exist);
+            .def("edge_exists", &ResidueDirectedGraph::edge_exist);*/
 
 
     /*typedef primitives::PrimitiveChain DataType1;
