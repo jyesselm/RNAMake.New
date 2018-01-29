@@ -132,6 +132,12 @@ public: //structure wrappers
     size_t
     get_num_chains() const { return structure_.get_num_chains(); }
 
+    inline
+    base::VectorContainerOP<Chaintype>
+    get_chains() const {
+        return structure_.get_chains();
+    }
+
 public: //get basepairs interface
 
     BasepairsOP
@@ -418,15 +424,14 @@ public: // other getters
 
     int
     get_end_index(
-            String const & end_id) const {
+            String const & str) const {
         int i = 0;
         for(auto const & ei : end_ids_) {
-            if(ei->get_str() == end_id) { return i; }
+            if(ei->get_str() == str) { return i; }
+            if(get_end(i).get_name()->get_str() == str)  { return i; }
             i++;
         }
-        throw PoseException("cannot find end with end_id: " + end_id);
-
-
+        throw PoseException("cannot find end with str: " + str);
     }
 
     ResiduesOP

@@ -41,6 +41,9 @@ public:
             util::Uuid const & res2_uuid,
             util::Uuid const & uuid):
             primitives::Basepair() {
+        uuid_ = uuid;
+        res1_uuid_ = res1_uuid;
+        res2_uuid_ = res2_uuid;
         center_ = math::Point(j[0]);
         ref_frame_ = math::Matrix(j[1]);
         c1_prime_coords_ = math::Points(2);
@@ -51,10 +54,26 @@ public:
         name_ = std::make_shared<base::SimpleString>(j[6].ToString());
     }
 
-    /*inline
-    Basepair(
-            Basepair const & bp):
-            primitives::Basepair(bp) {}*/
+
+public:
+    bool
+    is_equal(
+            Basepair const & bp,
+            bool check_uuid = true) const {
+        if(check_uuid) {
+            if(uuid_ != bp.uuid_) { return false; };
+            if(res1_uuid_ != bp.res1_uuid_) { return false; }
+            if(res2_uuid_ != bp.res2_uuid_) { return false; }
+        }
+        if(!math::are_points_equal(center_, bp.center_)) { return false; }
+        if(!math::are_matrices_equal(ref_frame_, bp.ref_frame_)) { return false; }
+        if(!math::are_points_equal(c1_prime_coords_[0], bp.c1_prime_coords_[0])) { return false; }
+        if(!math::are_points_equal(c1_prime_coords_[1], bp.c1_prime_coords_[1])) { return false; }
+        return true;
+
+    }
+
+
 
 public: // non const methods
 

@@ -63,13 +63,12 @@ TEST_CASE( "Test Graph Data Structure ", "[Graph]" ) {
     SECTION("test directed") {
         auto adj_list = data_structures::FixedEdged_DAL<int>();
         adj_list.add_node(0, 3);
-        adj_list.add_node(1, 3);
-
-        adj_list.add_edge(data_structures::NodeIndexandEdge{0, 0},
-                          data_structures::NodeIndexandEdge{1, 0});
+        adj_list.add_node(1, 3, 0, data_structures::NodeIndexandEdge{0, 0});
 
         REQUIRE(adj_list.get_num_nodes() == 2);
 
+        REQUIRE(adj_list.has_parent(0) == false);
+        REQUIRE(adj_list.has_parent(1) == true);
 
     }
 

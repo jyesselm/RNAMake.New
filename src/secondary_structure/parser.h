@@ -72,8 +72,8 @@ public:
             Residue const & residue) {
         graph_.setup_transversal(0);
         for(auto const & n : graph_) {
-            for(auto const & r : n->data.residues) {
-                if(residue == *r) { return n->index; }
+            for(auto const & r : n->data().residues) {
+                if(residue == *r) { return n->index(); }
             }
         }
         return -1;

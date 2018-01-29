@@ -210,8 +210,6 @@ class StringstoGraph(object):
         return g
 
 
-
-
 class StringstoGraphUnittest(unittest.TestCase):
     def test_creation(self):
         parser = StringstoGraph()
@@ -335,6 +333,26 @@ class DirectedGraphUnittest(unittest.TestCase):
         target = [0, 1, 2, 3, 6]
         for n in g:
             path.append(int(n.index))
+        self.failUnless(path == target)
+
+    def test_sub_graphs(self):
+        s = """
+        0->1->2
+        
+        3->4->5
+        
+        6->7->8
+        """
+
+        parser = StringstoGraph()
+        lines = s.split("\n")
+        g = parser.parse(lines)
+        g.setup_transversal(0)
+        path = []
+        target = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        for n in g:
+            path.append(int(n.index))
+        self.failUnless(g.edge_between_nodes(2, 3) == False)
         self.failUnless(path == target)
 
 

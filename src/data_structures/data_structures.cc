@@ -35,8 +35,8 @@ PYBIND11_PLUGIN(data_structures) {
     typedef Node<int> NodeInt;
     py::class_<NodeInt, std::shared_ptr<NodeInt>>(m, "NodeInt")
             .def(py::init<int, Index>())
-            .def_readonly("data", &NodeInt::data)
-            .def_readonly("index", &NodeInt::index);
+            .def("data", (int & (NodeInt::*)(void)) &NodeInt::data)
+            .def("index", &NodeInt::index);
 
     // Int Graphs
     typedef FixedEdgeDirectedGraph<int> FixedEdgeDirectedGraphInt;
@@ -58,7 +58,7 @@ PYBIND11_PLUGIN(data_structures) {
             .def("get_num_edges", &FixedEdgeDirectedGraphInt::get_num_edges)
             .def("get_node_edges", &FixedEdgeDirectedGraphInt::get_num_edges)
             .def("get_node", &FixedEdgeDirectedGraphInt::get_node)
-            .def("get_node_data", &FixedEdgeDirectedGraphInt::get_node_data)
+            .def("get_node_data", (int & (FixedEdgeDirectedGraphInt::*)(int)) &FixedEdgeDirectedGraphInt::get_node_data)
             .def("get_connected_node_info", &FixedEdgeDirectedGraphInt::get_connected_node_info)
             .def("edge_between_nodes", &FixedEdgeDirectedGraphInt::edge_between_nodes)
             .def("edge_index_empty", &FixedEdgeDirectedGraphInt::edge_index_empty);

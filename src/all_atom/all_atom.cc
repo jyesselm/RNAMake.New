@@ -7,6 +7,7 @@
 #include <all_atom/residue_type_set.h>
 #include <all_atom/residue.h>
 #include <all_atom/pdb_parser.h>
+#include <all_atom/structure.h>
 
 namespace all_atom {
 namespace py = pybind11;
@@ -90,7 +91,23 @@ PYBIND11_PLUGIN(all_atom) {
             .def_readonly("protein_residues", &PDBParserResidues::protein_residues)
             .def_readonly("small_molecule_residues", &PDBParserResidues::small_molecule_residues);
 
+    py::class_<Structure, std::shared_ptr<Structure>>(m, "Structure")
+            .def(py::init<Residues const &, Cutpoints const &>())
+            .def("__iter__", [](const Structure & s) {
+        return py::make_iterator(s.begin(), s.end()); }, py::keep_alive<0, 1>())
+            .def("get_residue",
+                 (Residue const & (Structure::*)(Index) const) &Structure::get_residue)
+            .def("get_residue",
+                 (Residue const & (Structure::*)(int, char, char) const) &Structure::get_residue)
+            .def("get_residue",
+                 (Residue const & (Structure::*)(util::Uuid const &) const) &Structure::get_residue)
+            .def("get_res_index", &Structure::get_res_index)
+            .def("get_num_residues", &Structure::get_num_residues)
+            .def("get_num_chains", &Structure::get_num_chains)
+            .def("get_sequence", &Structure::get_sequence)
+            .def("get_chains", &Structure::get_chains, py::return_value_policy::reference);
 
+    m.def("get_structure_from_residues", &get_structure_from_residues);
 
     return m.ptr();
 }

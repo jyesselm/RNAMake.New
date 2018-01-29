@@ -165,10 +165,7 @@ target_link_libraries(primitive_memory_leak_unittest primitives_lib)
 set(data_structures_files
 	/Users/jyesselm/projects/RNAMake.New/src/data_structures/data_structures.cc
 	/Users/jyesselm/projects/RNAMake.New/src/data_structures/graph.cc
-	/Users/jyesselm/projects/RNAMake.New/src/data_structures/segment_graph.cc
-	/Users/jyesselm/projects/RNAMake.New/src/data_structures/directed_graph.cc
 	/Users/jyesselm/projects/RNAMake.New/src/data_structures/graph_adjacency_list.cc
-	/Users/jyesselm/projects/RNAMake.New/src/data_structures/graph_old.cc
 	/Users/jyesselm/projects/RNAMake.New/src/data_structures/graph_base.cc
 	/Users/jyesselm/projects/RNAMake.New/src/data_structures/graph_iter_list.cc
 )
@@ -307,6 +304,7 @@ target_link_libraries(sqlite_library_unittest resource_management_lib)
 
 set(segment_data_structures_files
 	/Users/jyesselm/projects/RNAMake.New/src/segment_data_structures/segment_graph.cc
+	/Users/jyesselm/projects/RNAMake.New/src/segment_data_structures/segment_merger.cc
 )
 
 add_library(segment_data_structures_lib ${segment_data_structures_files})
@@ -314,4 +312,10 @@ target_link_libraries(segment_data_structures_lib resource_management_lib  pybin
 
 add_library(segment_data_structures MODULE ${segment_data_structures_files})
 target_link_libraries(segment_data_structures resource_management_lib  pybind11::module)
+
+add_executable(segment_merger_unittest /Users/jyesselm/projects/RNAMake.New/unittests/segment_data_structures/segment_merger_unittest.cc)
+target_link_libraries(segment_merger_unittest segment_data_structures_lib)
+
+add_executable(segment_graph_unittest /Users/jyesselm/projects/RNAMake.New/unittests/segment_data_structures/segment_graph_unittest.cc)
+target_link_libraries(segment_graph_unittest segment_data_structures_lib)
 

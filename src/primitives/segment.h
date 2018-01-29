@@ -44,7 +44,12 @@ public:
     get_aligned_end_index() const{ return aligned_end_index_; }
 
     util::Uuid const &
-    get_uuid() { return uuid_; }
+    get_uuid() const { return uuid_; }
+
+    util::SegmentType
+    get_segment_type() const {
+        return segment_type_;
+    }
 
 protected:
     util::SegmentType segment_type_;

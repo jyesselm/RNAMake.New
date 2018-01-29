@@ -37,7 +37,7 @@ public:
     Structure(
             Residues const & res,
             Cutpoints const cut_points):
-            residues_(res),
+            residues_(std::move(res)),
             cut_points_(cut_points) {}
 
     inline

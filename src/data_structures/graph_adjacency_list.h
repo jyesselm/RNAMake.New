@@ -45,10 +45,10 @@ public:
     }
 
 public:
-    typedef typename std::map<Index, Node < DataType>>::const_iterator const_iterator;
+    typedef typename std::map<Index, Node<DataType>>::const_iterator const_iterator;
 
-    const_iterator begin() const noexcept { return nodes_.begin(); }
-    const_iterator end() const noexcept   { return nodes_.end(); }
+    const_iterator begin() const { return nodes_.begin(); }
+    const_iterator end() const   { return nodes_.end(); }
 
 public:
 
@@ -57,7 +57,7 @@ public:
     add_node(
             DataType const & d,
             Size n_edges) {
-        // required to avoid empty constructor on DataType
+        // required to avoid
         nodes_.insert(std::pair<int, Node<DataType>>( index_, Node<DataType>(d, index_)));
         edges_[index_] = std::vector<Edge const *> (n_edges);
         index_ += 1;
@@ -167,12 +167,30 @@ public:
         expects<GraphException>(
                 nodes_.find(ni) != nodes_.end(),
                 "cannot find node of index: " + std::to_string(ni));
-        return nodes_.find(ni)->second.data;
+        return nodes_.find(ni)->second.data();
+    }
+
+    DataType &
+    get_node_data(
+            Index ni) {
+        expects<GraphException>(
+                nodes_.find(ni) != nodes_.end(),
+                "cannot find node of index: " + std::to_string(ni));
+        return nodes_.find(ni)->second.data();
     }
 
     Node<DataType> const &
     get_node(
             Index ni)  const {
+        expects<GraphException>(
+                nodes_.find(ni) != nodes_.end(),
+                "cannot find node of index: " + std::to_string(ni));
+        return nodes_.find(ni)->second;
+    }
+
+    Node<DataType> &
+    get_node(
+            Index ni)  {
         expects<GraphException>(
                 nodes_.find(ni) != nodes_.end(),
                 "cannot find node of index: " + std::to_string(ni));
@@ -326,6 +344,22 @@ public:
                 parent_.at(n_index) != -1,
                 "node does not have parent cannot get parent index");
         return parent_.find(n_index)->second;
+    }
+
+    Index
+    get_parent_end_index(
+            Index n_index) const {
+        auto parent_index = get_parent_index(n_index);
+        auto & edges = this->get_node_edges(n_index);
+        for(auto const & edge : edges) {
+            if(edge == nullptr) { continue; }
+            if(edge->partner(n_index) == parent_index) {
+                return edge->end_index(parent_index);
+            }
+        }
+        throw GraphException("cannot find parent end index!!!!");
+
+
     }
 
 

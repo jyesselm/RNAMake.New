@@ -6,7 +6,6 @@
 #include "../common.hpp"
 
 #include <base/log.h>
-#include <data_structures/segment_graph.h>
 #include <all_atom/residue_type_set.h>
 #include <all_atom/segment_factory.h>
 

@@ -32,7 +32,7 @@ def run_tests(tests):
             print test, ": FAIL"
             subprocess.call(test, shell=True)
 
-libs = "base math util primitives data_structures secondary_structure all_atom".split()
+libs = "base math util primitives data_structures secondary_structure all_atom resource_management segment_data_structures".split()
 
 unittests = {
     'base' : [
@@ -49,17 +49,29 @@ unittests = {
         'primitives_unittest'],
 
     'data_structures' : [
+        'graph_adjacency_list_unittest',
+        'graph_iter_list_unittest',
         'graph_unittest'],
 
     'secondary_structure' : [
-        'parser_unittest',
-        'ss_rna_structure_graph_unittest'],
+        'parser_unittest'],
 
     'all_atom' : [
         'all_atom_basepair_unittest',
         'all_atom_structure_unittest',
         'all_atom_basic_unittest',
-        'pdb_parser_unittest']
+        'all_atom_pose_unittest',
+        'pdb_parser_unittest'],
+
+    'resource_management' : [
+        'resource_manager_unittest',
+        'sqlite_library_unittest'
+    ],
+
+    'segment_data_structures' : [
+        'segment_graph_unittest',
+        'segment_merger_unittest'
+    ]
 }
 
 args = parse_args()

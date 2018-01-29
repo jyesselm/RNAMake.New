@@ -24,17 +24,36 @@ public:
 };
 
 template<typename DataType>
-struct Node {
-
+class Node {
+public:
     inline
     Node(
-            DataType const & ndata,
-            Index nindex):
-            data(ndata),
-            index(nindex) {}
+            DataType const & data,
+            Index const index):
+            data_(data),
+            index_(index) {}
+public:
+    inline
+    DataType const &
+    data() const {
+        return data_;
+    }
 
-    DataType data;
-    Index index;
+    inline
+    DataType &
+    data() {
+        return data_;
+    }
+
+    inline
+    Index
+    index() const {
+        return index_;
+    }
+
+private:
+    DataType data_;
+    Index index_;
 };
 
 struct NodeIndexandEdge {

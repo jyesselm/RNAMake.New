@@ -26,6 +26,11 @@ public:
 
 public:
     typedef typename IterListType::const_iterator const_iterator;
+    typedef typename IterListType::iterator iterator;
+
+    iterator begin(){ return iter_list_.begin(); }
+    iterator end()  { return iter_list_.end(); }
+
     const_iterator begin() const noexcept { return iter_list_.begin(); }
     const_iterator end() const noexcept   { return iter_list_.end(); }
 
@@ -44,6 +49,7 @@ public:
     }
 
 public:
+    virtual
     inline
     Index
     add_node(
@@ -92,7 +98,7 @@ public:
     std::vector<Edge const *> const &
     get_node_edges(
             Index ni) const {
-        return adjacency_list_.get_nodes_edges(ni);
+        return adjacency_list_.get_node_edges(ni);
     }
 
     inline
@@ -106,6 +112,13 @@ public:
     DataType const &
     get_node_data(
             Index ni) const {
+        return adjacency_list_.get_node_data(ni);
+    }
+
+    inline
+    DataType &
+    get_node_data(
+            Index ni) {
         return adjacency_list_.get_node_data(ni);
     }
 
@@ -133,7 +146,7 @@ public:
     }
 
 
-public:
+protected:
     AdjacencyListType adjacency_list_;
     mutable IterListType iter_list_; // needs to update to iterate
 
@@ -197,7 +210,47 @@ public:
         return this->adjacency_list_.add_node(d, n_edges, n_end_index, pie);
     }
 
-    using BaseClass::add_node;
+    inline
+    Index
+    add_node(
+            DataType const & d,
+            Size n_edges) {
+        return this->adjacency_list_.add_node(d, n_edges);
+    }
+
+public:
+    inline
+    bool
+    has_parent(
+            Index ni) const {
+        return this->adjacency_list_.has_parent(ni);
+    }
+
+    inline
+    Index
+    get_parent_index(
+            Index ni) const {
+        return this->adjacency_list_.get_parent_index(ni);
+    }
+
+    inline
+    Index
+    get_parent_end_index(
+            Index ni) const {
+        return this->adjacency_list_.get_parent_end_index(ni);
+    }
+
+public:
+    Indexes
+    get_root_indexes() {
+        auto roots = Indexes();
+        for(auto const & kv : this->adjacency_list_) {
+            if(!this->adjacency_list_.has_parent(kv.first)) {
+                roots.push_back(kv.first);
+            }
+        }
+        return roots;
+    }
 };
 
 template<typename DataType>

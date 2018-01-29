@@ -75,7 +75,7 @@ public:
         for(int i = 0; i < j_bps.size(); i++) {
             auto & r1 = get_residue(j_bps[i][1].ToInt(), (char)j_bps[i][2].ToInt(), (char)j_bps[i][3].ToInt());
             auto & r2 = get_residue(j_bps[i][4].ToInt(), (char)j_bps[i][5].ToInt(), (char)j_bps[i][6].ToInt());
-            basepairs_.push_back(Basepair(j_bps[0], r1.get_uuid(), r2.get_uuid(), util::Uuid()));
+            basepairs_.push_back(Basepair(j_bps[i][0], r1.get_uuid(), r2.get_uuid(), util::Uuid()));
         }
 
         for(int i = 0; i < j_end_indexes.size(); i++) {
@@ -98,6 +98,12 @@ public:
         if(end_indexes_.size() != s.end_indexes_.size()) { return false; }
         if(*name_ != *s.name_) { return false; }
         if(*dot_bracket_ != *s.dot_bracket_) { return false; }
+        for(int i = 0; i < basepairs_.size(); i++) {
+            if(!basepairs_[i].is_equal(s.basepairs_[i], check_uuid)) { return false; }
+        }
+        for(int i = 0; i < end_indexes_.size(); i++) {
+            if(end_indexes_[i] != s.end_indexes_[i]) { return false; }
+        }
         if(! structure_.is_equal(s.structure_, check_uuid)) { return false; }
         if(! proteins_.is_equal(s.proteins_, check_uuid)) { return false; }
         if(! small_molecules_.is_equal(s.small_molecules_, check_uuid)) { return false; }

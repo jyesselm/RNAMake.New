@@ -101,6 +101,18 @@ class PDBParserUnittest(unittest.TestCase):
         amp = residues.small_molecule_residues[0]
         self.failUnless(amp.get_res_name() == "AMP")
 
+class StructureUnittest(unittest.TestCase):
+    def setUp(self):
+        self.rts = ResidueTypeSet()
+        self.pdb_parser = PDBParser(self.rts)
+
+    def test_create(self):
+        path = unittest_resources_path() + "/all_atom/p4p6.pdb"
+        residues = self.pdb_parser.parse(path)
+        s = get_structure_from_residues(residues.RNA_residues)
+        r = s.get_residue(0)
+
+
 
 def main():
     unittest.main()
