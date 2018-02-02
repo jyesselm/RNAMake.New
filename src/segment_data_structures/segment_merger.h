@@ -74,7 +74,8 @@ public:
 public:
     std::shared_ptr<SegmentType>
     merge(
-            SegmentGraph<SegmentType, AlignerType> const & g) {
+            SegmentGraph<SegmentType, AlignerType> const & g,
+            String const & merged_name) {
         for(auto const & n : g) {
             if(!g.has_parent(n->index())) {
                 _add_segment(n->data());
@@ -90,11 +91,10 @@ public:
             }
         }
 
-        _build_structure();
-        return std::shared_ptr<SegmentType>(nullptr);
+        return _build_structure(g, merged_name);
     }
 
-private:
+protected:
     void
     _add_segment(
             SegmentType const & sg) {
@@ -265,14 +265,17 @@ private:
         LOGW << "residue of a specified segments. This likely is not what you wanted to do!!!";
     }
 
+
     void
-    _build_structure() {
+    _get_rna_residues_and_cutpoints(
+            std::vector<ResType> & res,
+            Cutpoints & cutpoints) {
+
         auto start_indexes = Indexes();
         for(auto const & n : chain_graph_) {
             if(chain_graph_.edge_index_empty(n->index(), 0)) { start_indexes.push_back(n->index()); }
         }
-        auto res = std::vector<ResType>();
-        auto chain_cuts = Cutpoints();
+
         for(auto const & si : start_indexes) {
             auto * cur = &chain_graph_.get_node(si);
             while(true) {
@@ -289,17 +292,21 @@ private:
                 auto next_index = edges[1]->partner(cur->index());
                 cur = &chain_graph_.get_node(next_index);
             }
-            chain_cuts.push_back((int)res.size());
+            cutpoints.push_back((int)res.size());
         }
-
-        auto s = all_atom::Structure(res, chain_cuts);
-        s.write_pdb("merged.pdb");
 
     }
 
+public: // pure virtual needs to be different for each specialization
+
+    virtual
+    std::shared_ptr<SegmentType>
+    _build_structure(
+            SegmentGraph<SegmentType, AlignerType> const & g,
+            String const & merged_name) = 0;
 
 
-private:
+protected:
     resource_management::ResourceManager & rm_;
     std::vector<BasepairType const *> all_bps_;
     Indexes end_chain_ids_1_, end_chain_ids_2_;
@@ -312,7 +319,81 @@ private:
 
 namespace all_atom {
 
-typedef segment_data_structures::SegmentMerger<Segment, Chain, Residue, Basepair, Aligner> SegmentMerger;
+typedef segment_data_structures::SegmentMerger<Segment, Chain, Residue, Basepair, Aligner> _SegmentMerger;
+
+class SegmentMerger : public _SegmentMerger {
+public:
+    typedef _SegmentMerger BaseClass;
+
+public:
+    SegmentMerger(
+            resource_management::ResourceManager & rm):
+            BaseClass(rm) {}
+
+    ~SegmentMerger() {}
+
+public:
+
+    SegmentOP
+    _build_structure(
+            SegmentGraph const & g,
+            String const & merged_name) {
+
+        auto res = Residues();
+        auto chain_cuts = Cutpoints();
+        _get_rna_residues_and_cutpoints(res, chain_cuts);
+        auto res_uuids = std::map<util::Uuid, int>();
+        for(auto const & r : res) {
+            res_uuids[r.get_uuid()] = 1;
+        }
+
+        auto s = all_atom::Structure(res, chain_cuts);
+
+        auto protein_res = Residues();
+        auto protein_cutpoints = Cutpoints();
+
+        auto small_molecule_res = Residues();
+        auto small_molecule_cutpoints = Cutpoints();
+
+        for(auto const & n : g) {
+            for(auto it = n->data().protein_begin(); it != n->data().protein_end(); it += 1) {
+                protein_res.push_back(*it);
+                if (n->data().is_protein_residue_start_of_chain(*it)) {
+                    protein_cutpoints.push_back(protein_res.size());
+                }
+            }
+            if(protein_cutpoints.size() != 0 && protein_cutpoints.back() != protein_res.size()) {
+                protein_cutpoints.push_back(protein_res.size());
+            }
+
+            for(auto it = n->data().small_molecules_begin(); it != n->data().small_molecules_end(); it += 1) {
+                small_molecule_res.push_back(*it);
+                small_molecule_cutpoints.push_back(small_molecule_res.size());
+            }
+
+        }
+
+        auto basepairs = Basepairs();
+
+        for(auto bp : all_bps_) {
+            if(res_uuids.find(bp->get_res1_uuid()) == res_uuids.end()) { continue; }
+            if(res_uuids.find(bp->get_res2_uuid()) == res_uuids.end()) { continue; }
+            basepairs.push_back(*bp);
+
+
+        }
+
+        return rm_.segment_from_components(merged_name, s, basepairs,
+                                           Structure(protein_res, protein_cutpoints),
+                                           Structure(small_molecule_res, small_molecule_cutpoints),
+                                           util::SegmentType::SEGMENT);
+
+    }
+
+
+};
+
+
 
 }
 

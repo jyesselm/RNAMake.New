@@ -87,9 +87,6 @@ target_link_libraries(math_lib base_lib  pybind11::module)
 add_library(math MODULE ${math_files})
 target_link_libraries(math base_lib  pybind11::module)
 
-add_executable(serialization_unittest /Users/jyesselm/projects/RNAMake.New/unittests/math/serialization_unittest.cc)
-target_link_libraries(serialization_unittest math_lib)
-
 add_executable(xyz_matrix_unittest /Users/jyesselm/projects/RNAMake.New/unittests/math/xyz_matrix_unittest.cc)
 target_link_libraries(xyz_matrix_unittest math_lib)
 
@@ -149,9 +146,6 @@ target_link_libraries(primitives_lib util_lib  pybind11::module)
 add_library(primitives MODULE ${primitives_files})
 target_link_libraries(primitives util_lib  pybind11::module)
 
-add_executable(iterator_adaptor_unittest /Users/jyesselm/projects/RNAMake.New/unittests/primitives/iterator_adaptor_unittest.cc)
-target_link_libraries(iterator_adaptor_unittest primitives_lib)
-
 add_executable(primitives_unittest /Users/jyesselm/projects/RNAMake.New/unittests/primitives/primitives_unittest.cc)
 target_link_libraries(primitives_unittest primitives_lib)
 
@@ -178,9 +172,6 @@ target_link_libraries(data_structures util_lib  pybind11::module)
 
 add_executable(graph_adjacency_list_unittest /Users/jyesselm/projects/RNAMake.New/unittests/data_structures/graph_adjacency_list_unittest.cc)
 target_link_libraries(graph_adjacency_list_unittest data_structures_lib)
-
-add_executable(new_graph_unittest /Users/jyesselm/projects/RNAMake.New/unittests/data_structures/new_graph_unittest.cc)
-target_link_libraries(new_graph_unittest data_structures_lib)
 
 add_executable(graph_unittest /Users/jyesselm/projects/RNAMake.New/unittests/data_structures/graph_unittest.cc)
 target_link_libraries(graph_unittest data_structures_lib)
@@ -213,9 +204,6 @@ target_link_libraries(secondary_structure primitives_lib  pybind11::module)
 add_executable(parser_unittest /Users/jyesselm/projects/RNAMake.New/unittests/secondary_structure/parser_unittest.cc)
 target_link_libraries(parser_unittest secondary_structure_lib)
 
-add_executable(ss_rna_structure_graph_unittest /Users/jyesselm/projects/RNAMake.New/unittests/secondary_structure/ss_rna_structure_graph_unittest.cc)
-target_link_libraries(ss_rna_structure_graph_unittest secondary_structure_lib)
-
 ###########################################################################
 # all_atom
 ###########################################################################
@@ -241,9 +229,6 @@ target_link_libraries(all_atom_lib secondary_structure_lib  pybind11::module)
 
 add_library(all_atom MODULE ${all_atom_files})
 target_link_libraries(all_atom secondary_structure_lib  pybind11::module)
-
-add_executable(all_atom_graph_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_graph_unittest.cc)
-target_link_libraries(all_atom_graph_unittest all_atom_lib)
 
 add_executable(all_atom_generate_all_segments /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_generate_all_segments.cc)
 target_link_libraries(all_atom_generate_all_segments all_atom_lib)

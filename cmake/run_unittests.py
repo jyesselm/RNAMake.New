@@ -42,6 +42,7 @@ unittests = {
         'xyz_matrix_unittest'],
 
     'util' : [
+        'json_unittest',
         'x3dna_unittest',
         'sqlite3_connection_unittest'],
 

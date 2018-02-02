@@ -13,7 +13,6 @@
 
 
 TEST_CASE( "Test Parsing PDB formatted files ", "[PDBParser]" ) {
-    base::init_logging();
 
     auto rts = all_atom::ResidueTypeSet();
 

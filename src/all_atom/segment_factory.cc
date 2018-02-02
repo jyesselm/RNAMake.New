@@ -82,6 +82,50 @@ SegmentFactory::all_segments_from_pdb(
     return segments;
 }
 
+SegmentOP
+SegmentFactory::segment_from_components(
+        String const & name,
+        Structure const & rna_struc,
+        Basepairs const & basepairs,
+        Structure const & proteins,
+        Structure const & small_molecules,
+        util::SegmentType segment_type) {
+
+    auto end_indexes = get_end_indexes_from_basepairs(rna_struc, basepairs)->get_data();
+
+    if(end_indexes.size() == 0) {
+        throw SegmentFactoryException("Segments must contain at least one basepair end!");
+    }
+
+    auto seg_name = std::make_shared<base::SimpleString>(name);
+    auto me =  std::make_shared<SegmentElements>(seg_name, rna_struc, proteins, small_molecules,
+                                                 basepairs, end_indexes);
+    auto org_struc = me->rna;
+    auto org_ends = me->get_ends();
+
+    _check_common_segment_issues(*me, segment_type);
+
+    _standardize_motif_elements(*me, 0);
+    _align_motif_elements_to_frame(ref_motif_->get_end(0), *me, 0);
+
+    me->rna = *(_get_aligned_structure(me->rna));
+    _get_aligned_end_indexes(me->rna, me->end_indexes, me->basepairs);
+    _remove_beads_from_end_res(me->basepairs, me->end_indexes, me->rna);
+    _setup_end_ids(me->rna, me->basepairs, me->end_indexes, me->end_ids);
+
+    auto dot_bracket_str = primitives::get_dot_bracket_from_end_id(me->end_ids[0]->get_str());
+    auto dot_bracket = std::make_shared<base::SimpleString>(dot_bracket_str);
+
+    _align_motif_elements_back_to_org_frame(org_ends, org_struc, *me);
+    auto aligned_end = 0;
+
+    return std::make_shared<Segment>(me->rna, me->basepairs, me->end_indexes, me->end_ids, me->name,
+                                     me->proteins, me->small_molecules, dot_bracket,
+                                     segment_type, aligned_end, util::Uuid());
+
+
+}
+
 void
 SegmentFactory::align_segment_to_ref_frame(
         Segment & seg) {

@@ -33,6 +33,15 @@ SegmentSqliteLibrary::get_segment(
     }
 
     return seg;
+}
+
+bool
+SegmentSqliteLibrary::contains_segment(
+        StringStringMap const & args) {
+    _generate_query(retrieved_columns_, args);
+    auto row = conn_.get_first_row(query_string_);
+    if(row != nullptr) { return true;  }
+    else               { return false; }
 
 }
 

@@ -7,6 +7,7 @@
 
 #include <base/paths.h>
 #include <all_atom/residue_type_set.h>
+#include <all_atom/segment_factory.h>
 #include <resource_management/sqlite_library.h>
 #include <resource_management/segment_sqlite_library.h>
 
@@ -25,13 +26,30 @@ TEST_CASE( "Test basic sqlite library", "[Sqlitelibrary]" ) {
         auto db_path = base::resources_path() + "/motif_libraries/ideal_helices.db";
         auto seg_lib = resource_management::SegmentSqliteLibrary(db_path, "data_table", rts);
 
-        auto seg = seg_lib.get_segment(StringStringMap{{"name","HELIX.IDEAL.2"}});
-        REQUIRE(seg->get_name_str() == "HELIX.IDEAL.2");
+        SECTION("test retrival of segs is consistent") {
+            auto seg = seg_lib.get_segment(StringStringMap{{"name", "HELIX.IDEAL.2"}});
+            REQUIRE(seg->get_name_str() == "HELIX.IDEAL.2");
 
-        auto seg2 = seg_lib.get_segment(StringStringMap{{"name","HELIX.IDEAL.2"}});
-        // all uuids have changed should not be equal if checking uuids
-        REQUIRE(!seg->is_equal(*seg2, true));
-        REQUIRE(seg->is_equal(*seg2, false));
+            auto seg2 = seg_lib.get_segment(StringStringMap{{"name", "HELIX.IDEAL.2"}});
+            // all uuids have changed should not be equal if checking uuids
+            REQUIRE(!seg->is_equal(*seg2, true));
+            REQUIRE(seg->is_equal(*seg2, false));
+        }
+
+        SECTION("test retrivial is the same from just using seg factory") {
+            auto seg_factory = all_atom::SegmentFactory(rts);
+            auto seg = seg_lib.get_segment(StringStringMap{{"name", "HELIX.IDEAL.2"}});
+            auto path = base::unittest_resources_path() + "/all_atom/HELIX.IDEAL.2/HELIX.IDEAL.2.pdb";
+            auto seg2 = seg_factory.segment_from_pdb(path, util::SegmentType::HELIX);
+            seg_factory.align_segment_to_ref_frame(*seg2);
+
+            REQUIRE(seg->is_equal(*seg2, false));
+        }
+
+        SECTION("test errors for invalid queries") {
+
+        }
+
     }
 
 }

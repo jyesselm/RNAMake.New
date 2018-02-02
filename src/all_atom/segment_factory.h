@@ -40,10 +40,10 @@ public:
                 Indexes const & nend_indexes):
                 name(nname),
                 end_ids(base::SimpleStringCOPs()),
-                rna(rna_struc),
-                proteins(protein_struc),
-                small_molecules(small_molecule_struc),
-                basepairs(bps),
+                rna(std::move(rna_struc)),
+                proteins(std::move(protein_struc)),
+                small_molecules(std::move(small_molecule_struc)),
+                basepairs(std::move(bps)),
                 end_indexes(nend_indexes) {}
 
         inline
@@ -115,6 +115,15 @@ public:
             String const & pdb_path,
             util::SegmentType segment_type = util::SegmentType::SEGMENT,
             bool rebuild_x3dna_files = true);
+
+    SegmentOP
+    segment_from_components(
+            String const & name,
+            Structure const & rna_struc,
+            Basepairs const & basepairs,
+            Structure const & proteins,
+            Structure const & small_molecules,
+            util::SegmentType segment_type = util::SegmentType::SEGMENT);
 
     void
     align_segment_to_ref_frame(

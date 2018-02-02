@@ -13,7 +13,6 @@
 #include <all_atom/pose.h>
 
 TEST_CASE( "Parse all pdbs to poses", "[PDBParser]" ) {
-    base::init_logging();
 
     auto rts = all_atom::ResidueTypeSet();
     auto pdb_parser = all_atom::PDBParser(rts);

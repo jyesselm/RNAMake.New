@@ -28,6 +28,10 @@ public:
     get_segment(
             StringStringMap const &);
 
+    bool
+    contains_segment(
+            StringStringMap const &);
+
 protected:
     Strings retrieved_columns_;
     all_atom::ResidueTypeSet const & rts_;

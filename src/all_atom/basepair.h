@@ -65,6 +65,7 @@ public:
             if(res1_uuid_ != bp.res1_uuid_) { return false; }
             if(res2_uuid_ != bp.res2_uuid_) { return false; }
         }
+
         if(!math::are_points_equal(center_, bp.center_)) { return false; }
         if(!math::are_matrices_equal(ref_frame_, bp.ref_frame_)) { return false; }
         if(!math::are_points_equal(c1_prime_coords_[0], bp.c1_prime_coords_[0])) { return false; }

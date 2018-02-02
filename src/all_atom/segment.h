@@ -88,6 +88,21 @@ public:
     }
 
 public:
+
+    const_iterator protein_begin() const { return proteins_.begin(); }
+    const_iterator protein_end()   const { return proteins_.end(); }
+
+    inline
+    bool
+    is_protein_residue_start_of_chain(
+            Residue const & r) const {
+        return proteins_.is_residue_start_of_chain(r);
+    }
+
+    const_iterator small_molecules_begin() const { return small_molecules_.begin(); }
+    const_iterator small_molecules_end()   const { return small_molecules_.end(); }
+
+public:
     bool
     is_equal(
             Segment const & s,

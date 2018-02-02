@@ -30,8 +30,19 @@ TEST_CASE( "Test Graph Data Structure ", "[Graph]" ) {
     }
 
     auto sm = all_atom::SegmentMerger(rm);
-    auto merged_sg = sm.merge(sg);
+    auto merged_sg = sm.merge(sg, "merged_graph");
 
+    REQUIRE(merged_sg->get_num_ends() == 2);
+    REQUIRE(merged_sg->get_num_chains() == 2);
+    REQUIRE(merged_sg->get_name_str() == "merged_graph");
+
+    // copies normally
+    auto merged_copy = all_atom::Segment(*merged_sg);
+    REQUIRE(merged_copy.is_equal(*merged_sg));
+
+    auto j = merged_sg->get_json();
+    merged_copy = all_atom::Segment(j, rts);
+    REQUIRE(merged_copy.is_equal(*merged_sg, false));
 
 
     //sg.write_nodes_to_pdbs("test");

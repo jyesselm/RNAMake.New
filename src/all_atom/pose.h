@@ -91,6 +91,12 @@ public:
     }
 
 public:
+
+    const_iterator protein_begin() const { return proteins_.begin(); }
+    const_iterator protein_end()   const { return proteins_.end(); }
+
+
+public:
     bool
     is_equal(
             Pose const & p,
