@@ -24,7 +24,7 @@ public: // interface to get rows
     int
     start_iterate_rows(
             String const & command) {
-        int err = _prepare(command);
+        return _prepare(command);
     }
 
     RowOP

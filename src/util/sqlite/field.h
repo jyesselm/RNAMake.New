@@ -115,6 +115,9 @@ public:
         else if(type_ == SQLITE_INTEGER) { return std::to_string(int_); }
         else if(type_ == SQLITE_FLOAT)   { return std::to_string(float_); }
         else if(type_ == SQLITE_BLOB)    { return "BLOB"; }
+        else {
+           throw SqliteException("not a valid sqlite type");
+        };
     }
 
 

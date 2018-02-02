@@ -68,7 +68,7 @@ private:
     }
 
 private:
-    Database & operator=(const Database &) {}    // no assignment
+    Database & operator=(const Database &) = delete;
 
 private:
     sqlite3 *db_;    // associated db
