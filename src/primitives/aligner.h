@@ -24,13 +24,13 @@ public:
     void
     align(
             BasepairType const & ref_bp,
-            SegmentType & seg) = 0;
+            SegmentType & seg) const = 0;
 
     virtual
     SegmentTypeOP
     get_aligned(
             BasepairType const & ref_bp,
-            SegmentType const & seg) = 0;
+            SegmentType const & seg) const = 0;
 };
 
 }

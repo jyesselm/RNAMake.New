@@ -108,13 +108,13 @@ public:
     segment_from_pdb(
             String const & pdb_path,
             util::SegmentType segment_type = util::SegmentType::SEGMENT,
-            bool rebuild_x3dna_files = true);
+            bool rebuild_x3dna_files = true) const;
 
     SegmentOPs
     all_segments_from_pdb(
             String const & pdb_path,
             util::SegmentType segment_type = util::SegmentType::SEGMENT,
-            bool rebuild_x3dna_files = true);
+            bool rebuild_x3dna_files = true) const;
 
     SegmentOP
     segment_from_components(
@@ -123,11 +123,11 @@ public:
             Basepairs const & basepairs,
             Structure const & proteins,
             Structure const & small_molecules,
-            util::SegmentType segment_type = util::SegmentType::SEGMENT);
+            util::SegmentType segment_type = util::SegmentType::SEGMENT) const;
 
     void
     align_segment_to_ref_frame(
-            Segment &);
+            Segment &) const;
 
 private:
     PoseOP
@@ -141,12 +141,12 @@ public:
     SegmentElementsOP
     _get_segment_elements_from_pdb(
             String const &,
-            bool);
+            bool) const;
 
     void
     _check_common_segment_issues(
             SegmentElements const &,
-            util::SegmentType);
+            util::SegmentType) const;
 
 private:
 
@@ -155,60 +155,60 @@ private:
             Structure const &,
             Basepairs const &,
             Indexes const &,
-            base::SimpleStringCOPs &);
+            base::SimpleStringCOPs &) const;
 
     StructureOP
     _get_aligned_structure(
-            Structure const &);
+            Structure const &) const;
 
     void
     _get_aligned_end_indexes(
             Structure const &,
             Indexes &,
-            Basepairs &);
+            Basepairs &) const;
 
     void
     _remove_beads_from_end_res(
             Basepairs const &,
             Indexes const &,
-            Structure &);
+            Structure &) const;
 
     void
     _standardize_motif_elements(
             SegmentElements &,
-            Index);
+            Index) const;
 
     void
     _align_motif_elements_to_frame(
             Basepair const &,
             SegmentElements &,
-            Index);
+            Index) const;
 
     void
     _align_motif_elements_back_to_org_frame(
             Basepairs const &,
             Structure const &,
-            SegmentElements &);
+            SegmentElements &) const;
 
     void
     _align_segment_to_frame(
             Basepair const &,
-            Segment &);
+            Segment &) const;
 
     SegmentOP
     _get_aligned_segment(
             Basepair const &,
-            Segment &);
+            Segment &) const;
 
     int
     _num_steric_clashes(
             SegmentElements const &,
-            Segment const &);
+            Segment const &) const;
 
     int
     _are_structures_overlaid(
             Structure const &,
-            Structure const &);
+            Structure const &) const;
 
 
 

@@ -83,13 +83,13 @@ public:
 
     PDBParserResiduesOP
     parse(
-            String const &);
+            String const &) const;
 
 private:
     void
     _parse_atoms_from_pdb_file(
             String const &,
-            std::map<String, Atoms> &);
+            std::map<String, Atoms> &) const;
 
     ResidueOP
     _setup_ref_residue(
@@ -99,21 +99,21 @@ private:
     _setup_residue(
             String const &,
             Atoms const &,
-            ResidueTypeCOP);
+            ResidueTypeCOP) const;
 
     math::Matrix
     _get_res_ref_frame(
-            ResidueCOP);
+            ResidueCOP) const;
 
     math::Matrix
     _get_res_ref_frame_from_atoms(
             std::vector<Atom const *> const &,
-            ResidueTypeCOP);
+            ResidueTypeCOP) const;
 
     bool
     _replace_missing_phosphate_backbone(
             std::vector<Atom const *> &,
-            ResidueTypeCOP);
+            ResidueTypeCOP) const;
 
 
 private:

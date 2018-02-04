@@ -13,7 +13,7 @@ SegmentOP
 SegmentFactory::segment_from_pdb(
         String const & pdb_path,
         util::SegmentType segment_type,
-        bool rebuild_x3dna_files) {
+        bool rebuild_x3dna_files) const {
 
     auto me = _get_segment_elements_from_pdb(pdb_path, rebuild_x3dna_files);
     auto org_struc = me->rna;
@@ -46,7 +46,7 @@ SegmentOPs
 SegmentFactory::all_segments_from_pdb(
         String const & pdb_path,
         util::SegmentType segment_type,
-        bool rebuild_x3dna_files) {
+        bool rebuild_x3dna_files) const {
 
     auto segments = SegmentOPs();
     auto org_me = _get_segment_elements_from_pdb(pdb_path, rebuild_x3dna_files);
@@ -89,7 +89,7 @@ SegmentFactory::segment_from_components(
         Basepairs const & basepairs,
         Structure const & proteins,
         Structure const & small_molecules,
-        util::SegmentType segment_type) {
+        util::SegmentType segment_type) const {
 
     auto end_indexes = get_end_indexes_from_basepairs(rna_struc, basepairs)->get_data();
 
@@ -127,14 +127,14 @@ SegmentFactory::segment_from_components(
 
 void
 SegmentFactory::align_segment_to_ref_frame(
-        Segment & seg) {
+        Segment & seg) const {
     aligner_.align(ref_motif_->get_end(0), seg);
 }
 
 void
 SegmentFactory::_check_common_segment_issues(
         SegmentElements const & me,
-        util::SegmentType segment_type) {
+        util::SegmentType segment_type) const {
 
     // TWOWAY JUNCTION errors
     if(segment_type == util::SegmentType::TWOWAY_JUNCTION && me.end_indexes.size() != 2) {
@@ -228,7 +228,7 @@ SegmentFactory::_check_common_segment_issues(
 void
 SegmentFactory::_standardize_motif_elements(
         SegmentElements & m_elements,
-        Index end_index) {
+        Index end_index) const {
     _align_motif_elements_to_frame(base_helix_->get_end(1), m_elements, end_index);
 
     // figure out whats the best way to add this segment to the base helix
@@ -276,7 +276,7 @@ void
 SegmentFactory::_align_motif_elements_to_frame(
         Basepair const & ref_bp,
         SegmentElements & m_elements,
-        Index end_index) {
+        Index end_index) const {
 
     auto rot = dot(ref_bp.get_ref_frame().get_transposed(),
                    m_elements.get_end(end_index).get_ref_frame());
@@ -316,7 +316,7 @@ void
 SegmentFactory::_align_motif_elements_back_to_org_frame(
         Basepairs const & org_ends,
         Structure const & org_struc,
-        SegmentElements & me) {
+        SegmentElements & me) const {
 
     Basepair *  org_aligned_end = nullptr;
     for(auto & end : org_ends) {
@@ -346,7 +346,7 @@ SegmentFactory::_align_motif_elements_back_to_org_frame(
 void
 SegmentFactory::_align_segment_to_frame(
         Basepair const & ref_bp,
-        Segment & seg) {
+        Segment & seg) const {
 
     auto rot = dot(ref_bp.get_ref_frame().get_transposed(), seg.get_aligned_end().get_ref_frame());
     rot.unitarize();
@@ -386,7 +386,7 @@ SegmentFactory::_align_segment_to_frame(
 SegmentOP
 SegmentFactory::_get_aligned_segment(
         Basepair const & ref_bp,
-        Segment & seg) {
+        Segment & seg) const {
     auto seg_copy = std::make_shared<Segment>(seg);
     _align_segment_to_frame(ref_bp, *seg_copy);
     return seg_copy;
@@ -395,7 +395,7 @@ SegmentFactory::_get_aligned_segment(
 int
 SegmentFactory::_num_steric_clashes(
         SegmentElements const & m_elements,
-        Segment const & seg) {
+        Segment const & seg) const {
 
     int steric_clash_count = 0;
     for(auto const & r1 : seg) {
@@ -420,7 +420,7 @@ SegmentFactory::_num_steric_clashes(
 int
 SegmentFactory::_are_structures_overlaid(
         Structure const & s1,
-        Structure const & s2) {
+        Structure const & s2) const {
 
     for(auto const & r1 : s1)  {
         auto & r2 = s2.get_residue(r1.get_uuid());
@@ -471,7 +471,7 @@ SegmentFactory::_setup_base_helix() {
 SegmentFactory::SegmentElementsOP
 SegmentFactory::_get_segment_elements_from_pdb(
         String const & pdb_path,
-        bool rebuild_x3dna_files) {
+        bool rebuild_x3dna_files) const {
 
     auto filename = base::filename(pdb_path);
     auto name = std::make_shared<base::SimpleString>(filename.substr(0, filename.length() - 4));
@@ -513,7 +513,7 @@ SegmentFactory::_setup_end_ids(
         Structure const & s,
         Basepairs const & bps,
         Indexes const & end_indexes,
-        base::SimpleStringCOPs & end_ids) {
+        base::SimpleStringCOPs & end_ids) const {
 
     for(auto const & ei : end_indexes) {
         auto end_id = generate_end_id(s, bps, bps[ei]);
@@ -523,7 +523,7 @@ SegmentFactory::_setup_end_ids(
 
 StructureOP
 SegmentFactory::_get_aligned_structure(
-        Structure const & s) {
+        Structure const & s) const {
 
     auto best = 1000;
     auto ref_center = ref_motif_->get_end(0).get_center();
@@ -568,7 +568,7 @@ void
 SegmentFactory::_get_aligned_end_indexes(
         Structure const & s,
         Indexes & end_indexes,
-        Basepairs & bps) {
+        Basepairs & bps) const {
 
     auto best = 1000;
     auto pos = -1;
@@ -597,7 +597,7 @@ void
 SegmentFactory::_remove_beads_from_end_res(
         Basepairs const & bps,
         Indexes const & end_indexes,
-        Structure & s) {
+        Structure & s) const {
 
     s.remove_residue_beads(bps[end_indexes[0]].get_res1_uuid());
     s.remove_residue_beads(bps[end_indexes[0]].get_res2_uuid());

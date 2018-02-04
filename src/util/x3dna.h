@@ -183,7 +183,7 @@ public:
 public:
     void
     set_rebuild_files(
-            bool rebuild_files) { rebuild_files_ = rebuild_files; }
+            bool rebuild_files) const{ rebuild_files_ = rebuild_files; }
 
 private:
     void

@@ -21,7 +21,7 @@ namespace all_atom {
 void
 PDBParser::_parse_atoms_from_pdb_file(
         String const & pdb_file,
-        std::map<String, Atoms> & atoms) {
+        std::map<String, Atoms> & atoms) const {
 
     String startswith;
     String atom_name, res_name, res_num, chain_id, i_code;
@@ -42,7 +42,7 @@ PDBParser::_parse_atoms_from_pdb_file(
             if(atom_name[0] == 'H') { continue; }
 
             if(atom_name_corrections_.find(atom_name) != atom_name_corrections_.end()) {
-                atom_name = atom_name_corrections_[atom_name];
+                atom_name = atom_name_corrections_.at(atom_name);
             }
 
             res_name = line.substr(17, 4);
@@ -106,10 +106,9 @@ PDBParser::_setup_ref_residue(
     return std::make_shared<Residue>(res_name, res_num, chain_id, i_code, res_type, res_atoms, util::Uuid());
 }
 
-
 math::Matrix
 PDBParser::_get_res_ref_frame(
-        ResidueCOP r) {
+        ResidueCOP r) const {
     auto vec1 = math::Point();
     auto vec2 = math::Point();
     if(r->get_name() == 'A' || r->get_name() == 'G') {
@@ -132,7 +131,7 @@ PDBParser::_get_res_ref_frame(
 math::Matrix
 PDBParser::_get_res_ref_frame_from_atoms(
         std::vector<Atom const *> const & atoms,
-        ResidueTypeCOP res_type) {
+        ResidueTypeCOP res_type) const {
 
     auto vec1 = math::Point();
     auto vec2 = math::Point();
@@ -166,13 +165,12 @@ PDBParser::_get_res_ref_frame_from_atoms(
     return m;
 }
 
-
 bool
 PDBParser::_replace_missing_phosphate_backbone(
         std::vector<Atom const *> & atoms,
-        ResidueTypeCOP res_type) {
+        ResidueTypeCOP res_type) const {
 
-    auto ref_res = ref_residues_[res_type->get_name()];
+    auto ref_res = ref_residues_.at(res_type->get_name());
 
     // if these atoms do not exist cannot build res ref frame
     if(atoms[ res_type->get_atom_index("C1'")] == nullptr) { return false; }
@@ -205,7 +203,7 @@ ResidueOP
 PDBParser::_setup_residue(
         String const & key,
         Atoms const & atoms,
-        ResidueTypeCOP res_type) {
+        ResidueTypeCOP res_type) const {
 
 
     auto spl = base::split_str_by_delimiter(key, "|");
@@ -259,7 +257,7 @@ PDBParser::_setup_residue(
 
 PDBParserResiduesOP
 PDBParser::parse(
-        String const & pdb_file) {
+        String const & pdb_file) const {
 
     auto residues = std::make_shared<PDBParserResidues>();
     auto atoms = std::map<String, Atoms>();

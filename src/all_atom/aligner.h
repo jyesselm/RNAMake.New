@@ -27,7 +27,7 @@ public:
     void
     align(
             Basepair const & ref_bp,
-            Segment & seg) {
+            Segment & seg) const {
 
         r_ = dot(ref_bp.get_ref_frame().get_transposed(), seg.get_aligned_end().get_ref_frame());
         r_.unitarize();
@@ -54,7 +54,7 @@ public:
     SegmentTypeOP
     get_aligned(
             Basepair const & ref_bp,
-            Segment const & seg) {
+            Segment const & seg) const {
         auto seg_copy = std::make_shared<Segment>(seg);
         align(ref_bp, *seg_copy);
         return seg_copy;

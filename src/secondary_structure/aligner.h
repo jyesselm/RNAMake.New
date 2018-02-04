@@ -19,12 +19,12 @@ public:
     void
     align(
             Basepair const & ref_bp,
-            SegmentOP & rs) { }
+            SegmentOP & rs) const { }
 
     SegmentOP
     get_aligned(
             Basepair const & ref_bp,
-            SegmentOP const & rs) {
+            SegmentOP const & rs) const {
         return std::make_shared<Segment>(*rs);
     }
 };
