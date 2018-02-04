@@ -13,7 +13,10 @@ TEST_CASE( "Test resource manager", "[ResourceManager]" ) {
     resource_management::ResourceManager rm;
     //okay !
     auto & rm_ref = rm;
-
     // not okay
     //auto rm1 = rm;
+
+    // get segment
+    auto seg = rm.get_segment(StringStringMap{{"name", "HELIX.IDEAL.2"}});
+
 }

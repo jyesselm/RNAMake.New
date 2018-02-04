@@ -100,7 +100,7 @@ public:
 
     X3dna();
 
-    ~X3dna() { delete s_; }
+    ~X3dna() { }
 
 public:
     struct X3Residue {
@@ -172,13 +172,13 @@ public:
     };
 
 public:
-    X3Basepairs const &
+    X3Basepairs
     get_basepairs(
-            String const &);
+            String const &) const;
 
     X3Motifs
     get_motifs(
-            String const &);
+            String const &) const;
 
 public:
     void
@@ -188,59 +188,60 @@ public:
 private:
     void
     _generate_ref_frame(
-            String const &);
+            String const &) const;
 
     void
     generate_dssr_file(
-            String const &);
+            String const &) const;
 
 private:
     void
     _delete_files(
-            Strings const &);
+            Strings const &) const;
 
     void
     _delete_file(
-            String const &);
+            String const &) const;
 
     math::Point
     _convert_string_to_point(
-            String const &);
+            String const &) const;
 
     void
     _parse_ref_frame_file(
-            String const &);
+            String const &,
+            X3Basepairs &) const;
 
     std::map<String, Strings>
     _parse_dssr_file_into_sections(
-            String const &);
+            String const &) const;
 
     Strings
     _split_over_white_space(
-            String const &);
+            String const &) const;
 
     X3Residue *
     _parse_dssr_res_str(
-            String const &);
+            String const &) const;
 
     X3Motifs
     _parse_dssr_section(
             Strings const &,
-            String const &);
+            String const &) const;
 
     X3Motifs
     _parse_dssr_helix_section(
-            Strings const &);
+            Strings const &) const;
 
 
 private:
     String bin_path_;
-    X3Basepairs basepairs_;
     char *s_;
     Strings ref_frame_files_to_delete_, dssr_files_to_delete_;
-    bool rebuild_files_;
-    bool generated_ref_frames_, generated_dssr_;
-    bool no_ref_frames_;
+    // flags to decide whether to build files or not
+    mutable bool rebuild_files_;
+    mutable bool generated_ref_frames_, generated_dssr_;
+    mutable bool no_ref_frames_;
 };
 
 X3dnaBPType

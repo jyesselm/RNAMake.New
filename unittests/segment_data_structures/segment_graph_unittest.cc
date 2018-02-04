@@ -21,7 +21,7 @@ TEST_CASE( "Test Graph Data Structure ", "[Graph]" ) {
     auto seg1 = seg_lib.get_segment(StringStringMap{{"name","HELIX.IDEAL.2"}});
 
     resource_management::ResourceManager rm;
-    auto sg = all_atom::SegmentGraph(rm);
+    auto sg = all_atom::SegmentGraph();
     sg.add_segment(*seg1);
 
     for(int i = 0; i < 10; i++) {

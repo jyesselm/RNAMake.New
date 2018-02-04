@@ -56,6 +56,10 @@ String
 quoted_string(
         String const &);
 
+String
+string_map_to_string(
+        StringStringMap const &);
+
 }
 
 #endif /* defined(__RNAMake__string__) */

@@ -27,6 +27,7 @@ X3dna::X3dna():
     auto env = "X3DNA=" + x3dna_path;
     s_ = strdup(env.c_str());
     putenv(s_);
+    delete s_;
 
     bin_path_ = x3dna_path + "/bin/";
     // make sure have the correct x3dna programs for this operating system
@@ -51,20 +52,20 @@ X3dna::X3dna():
 
 void
 X3dna::_delete_files(
-        Strings const & file_names) {
+        Strings const & file_names) const {
     for (auto const & fn : file_names) { _delete_file(fn); }
 }
 
 void
 X3dna::_delete_file(
-        String const & file_name) {
+        String const & file_name) const {
     try { std::remove(file_name.c_str()); }
     catch (String const & e) {}
 }
 
 void
 X3dna::_generate_ref_frame(
-        String const & pdb_path) {
+        String const & pdb_path) const {
 
     auto fname = base::filename(pdb_path).substr(0, -4);
     fname = fname.substr(0, fname.length() - 4);
@@ -93,7 +94,7 @@ X3dna::_generate_ref_frame(
 
 math::Point
 X3dna::_convert_string_to_point(
-        String const & str) {
+        String const & str) const {
     auto doubles = std::vector<double>();
     auto spl = base::split_str_by_delimiter(str, " ");
     for (auto const & s : spl) {
@@ -107,7 +108,8 @@ X3dna::_convert_string_to_point(
 
 void
 X3dna::_parse_ref_frame_file(
-        String const & pdb_path) {
+        String const & pdb_path,
+        X3Basepairs & basepairs) const {
 
     //always rebuild
     auto base_path = base::base_dir(pdb_path);
@@ -127,7 +129,6 @@ X3dna::_parse_ref_frame_file(
 
     if(no_ref_frames_) { return; }
 
-    basepairs_ = X3Basepairs();
     auto lines = base::get_lines_from_file(ref_frames_path);
     auto r = std::regex("#\\s+(?:\\.+\\d+\\>)*(\\w+):\\.*(-*\\d+)\\S:\\[\\.*(\\S+)\\](\\w+)\\s+\\-\\s+(?:\\.+\\d+\\>)*(\\w+):\\.*(-*\\d+)\\S:\\[\\.*(\\S+)\\](\\w+)");
     auto start_bp = 0;
@@ -167,7 +168,7 @@ X3dna::_parse_ref_frame_file(
             auto res1 = X3Residue{bp_info->res1_num, bp_info->res1_chain_id, ' '};
             auto res2 = X3Residue{bp_info->res2_num, bp_info->res2_chain_id, ' '};
             auto bp   = X3Basepair{res1, res2, d, r, X3dnaBPType::cDDD};
-            basepairs_.push_back(bp);
+            basepairs.push_back(bp);
             start_bp = 0;
             continue;
 
@@ -180,7 +181,7 @@ X3dna::_parse_ref_frame_file(
 
 void
 X3dna::generate_dssr_file(
-        String const & pdb_path) {
+        String const & pdb_path) const {
 
     auto fname = base::filename(pdb_path);
     fname = fname.substr(0, fname.length()-4);
@@ -204,7 +205,7 @@ X3dna::generate_dssr_file(
 
 std::map<String, Strings>
 X3dna::_parse_dssr_file_into_sections(
-        String const & pdb_path) {
+        String const & pdb_path) const {
     auto fname = base::filename(pdb_path).substr(0, -4);
     fname = fname.substr(0, fname.length() - 4);
 
@@ -251,7 +252,7 @@ X3dna::_parse_dssr_file_into_sections(
 
 Strings
 X3dna::_split_over_white_space(
-        String const & str) {
+        String const & str) const {
     Strings spl = base::split_str_by_delimiter(str, " ");
     Strings non_white_space;
     String temp;
@@ -265,7 +266,7 @@ X3dna::_split_over_white_space(
 
 X3dna::X3Residue *
 X3dna::_parse_dssr_res_str(
-        String const & res_str) {
+        String const & res_str) const {
     auto spl = base::split_str_by_delimiter(res_str, ".");
 
     if(spl.size() != 2) {
@@ -295,21 +296,23 @@ X3dna::_parse_dssr_res_str(
 
 }
 
-X3dna::X3Basepairs const &
+X3dna::X3Basepairs
 X3dna::get_basepairs(
-        String const & pdb_path) {
+        String const & pdb_path) const {
+
+    auto basepairs = X3Basepairs();
 
     // check if we created these files
     no_ref_frames_ = false;
     generated_ref_frames_ = false;
     generated_dssr_ = false;
 
-    _parse_ref_frame_file(pdb_path);
+    _parse_ref_frame_file(pdb_path, basepairs);
 
-    if(no_ref_frames_) { return basepairs_; }
+    if(no_ref_frames_) { return basepairs; }
 
     auto dssr_file_sections = _parse_dssr_file_into_sections(pdb_path);
-    if(dssr_file_sections.find("base") == dssr_file_sections.end()) { return basepairs_; }
+    if(dssr_file_sections.find("base") == dssr_file_sections.end()) { return basepairs; }
     auto dssr_bp_section = dssr_file_sections["base"];
 
     for(auto const & l : dssr_bp_section) {
@@ -338,7 +341,7 @@ X3dna::get_basepairs(
         if(res1 == nullptr || res2 == nullptr) { continue; }
 
         // find existing base pair and add base pair type
-        for(auto & bp : basepairs_) {
+        for(auto & bp : basepairs) {
             if((bp.res1 == *res1 && bp.res2 == *res2) ||
                (bp.res2 == *res1 && bp.res1 == *res2)) {
                 bp.bp_type = bp_type;
@@ -357,7 +360,7 @@ X3dna::get_basepairs(
         _delete_file(fname + "_dssr.out");
     }
 
-    return basepairs_;
+    return basepairs;
 
 }
 

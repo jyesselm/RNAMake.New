@@ -34,6 +34,10 @@ TEST_CASE( "Test basic sqlite library", "[Sqlitelibrary]" ) {
             // all uuids have changed should not be equal if checking uuids
             REQUIRE(!seg->is_equal(*seg2, true));
             REQUIRE(seg->is_equal(*seg2, false));
+
+            auto seg3 = seg_lib.get_segment(StringStringMap{{"end_id", "CCCC_LLLL_GGGG_RRRR"}});
+
+            REQUIRE(seg->is_equal(*seg3, false));
         }
 
         SECTION("test retrivial is the same from just using seg factory") {
@@ -47,6 +51,23 @@ TEST_CASE( "Test basic sqlite library", "[Sqlitelibrary]" ) {
         }
 
         SECTION("test errors for invalid queries") {
+            REQUIRE_THROWS_AS(seg_lib.get_segment(StringStringMap{{"name", "FAKE"}}),
+                              resource_management::SqliteLibraryException);
+
+            REQUIRE_THROWS_AS(seg_lib.get_segment(StringStringMap{{"end_id", "FAKE"}}),
+                              resource_management::SqliteLibraryException);
+
+            REQUIRE_THROWS_AS(seg_lib.get_segment(StringStringMap{{"end_name", "FAKE"}}),
+                              resource_management::SqliteLibraryException);
+
+            REQUIRE_THROWS_AS(seg_lib.get_segment(StringStringMap{{"name", "HELIX.IDEAL.2"}, {"end_id", "FAKE"}}),
+                              resource_management::SqliteLibraryException);
+
+        }
+
+        SECTION("test contains segments") {
+            REQUIRE(seg_lib.contains_segment(StringStringMap{{"name", "HELIX.IDEAL.2"}}) == true);
+            REQUIRE(seg_lib.contains_segment(StringStringMap{{"name", "FAKE"}}) == false);
 
         }
 

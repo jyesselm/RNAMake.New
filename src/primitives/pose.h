@@ -355,6 +355,14 @@ public: // get end interace
         return basepairs_[end_indexes_[index]];
     }
 
+public:
+    inline
+    String
+    get_end_name(
+            Index index) const {
+        return get_end(index).get_name_str();
+    }
+
 public: // get end by end id
     // avoid confliction with getting by name ... not pretty
     BPtype const &

@@ -6,7 +6,6 @@
 #define RNAMAKE_NEW_SEGMENT_GRAPH_H
 
 #include <data_structures/graph.h>
-#include <resource_management/resource_manager.h>
 #include <all_atom/aligner.h>
 
 namespace segment_data_structures {
@@ -14,9 +13,7 @@ namespace segment_data_structures {
 template <typename SegmentType, typename AlignerType>
 class SegmentGraph {
 public:
-    SegmentGraph(
-            resource_management::ResourceManager & rm):
-            rm_(rm),
+    SegmentGraph():
             aligner_(AlignerType()),
             graph_(data_structures::FixedEdgeDirectedGraph<SegmentType>()){}
 
@@ -142,7 +139,6 @@ protected:
 
 
 protected:
-    resource_management::ResourceManager & rm_;
     data_structures::FixedEdgeDirectedGraph<SegmentType> graph_;
     AlignerType aligner_;
 };

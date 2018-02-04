@@ -59,8 +59,8 @@ ResourceBuilder::build_basic_libraries() {
             { motif_dirs_path_ + "/hairpins/" , util::SegmentType::HAIRPIN },
             { motif_dirs_path_ + "/helices/"  , util::SegmentType::HELIX },
             { motif_dirs_path_ + "/junctions/", util::SegmentType::NWAY_JUNCTION },
-            { motif_dirs_path_ + "/tertiary_contact_hairpin_hairpin/", util::SegmentType::TC_HAIRPIN_HAIRPIN },
-            { motif_dirs_path_ + "/tertiary_contact_junction_hairpin/", util::SegmentType::TC_JUNCTION_HAIRPIN },
+            { motif_dirs_path_ + "/tertiary_contact_hairpin_hairpin/",   util::SegmentType::TC_HAIRPIN_HAIRPIN },
+            { motif_dirs_path_ + "/tertiary_contact_junction_hairpin/",  util::SegmentType::TC_JUNCTION_HAIRPIN },
             { motif_dirs_path_ + "/tertiary_contact_junction_junction/", util::SegmentType::TC_JUNCTION_JUNCTION},
     };
 

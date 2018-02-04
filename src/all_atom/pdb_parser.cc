@@ -20,65 +20,70 @@ namespace all_atom {
 
 void
 PDBParser::_parse_atoms_from_pdb_file(
-        String const & pdb_file) {
+        String const & pdb_file,
+        std::map<String, Atoms> & atoms) {
 
-    atoms_ = std::map<String, Atoms>();
+    String startswith;
+    String atom_name, res_name, res_num, chain_id, i_code;
+    String sx, sy, sz;
+    math::Point atom_coords;
+
     auto lines = base::get_lines_from_file(pdb_file);
     auto key = String("");
     auto found = false;
     for (auto const & line : lines) {
         if(line.size() < 6) { continue; }
-        startswith_ = line.substr(0, 6);
-        if (startswith_ == ("ATOM  ") || startswith_ == ("HETATM")) {
-            atom_name_ = line.substr(12, 4);
-            atom_name_ = base::trim(atom_name_);
+        startswith = line.substr(0, 6);
+        if (startswith == ("ATOM  ") || startswith == ("HETATM")) {
+            atom_name = line.substr(12, 4);
+            atom_name = base::trim(atom_name);
 
             // do not save hydrogen atoms
-            if(atom_name_[0] == 'H') { continue; }
+            if(atom_name[0] == 'H') { continue; }
 
-            if(atom_name_corrections_.find(atom_name_) != atom_name_corrections_.end()) {
-                atom_name_ = atom_name_corrections_[atom_name_];
+            if(atom_name_corrections_.find(atom_name) != atom_name_corrections_.end()) {
+                atom_name = atom_name_corrections_[atom_name];
             }
 
-            res_name_ = line.substr(17, 4);
-            res_name_ = base::trim(res_name_);
+            res_name = line.substr(17, 4);
+            res_name = base::trim(res_name);
             // do not save water
-            if(res_name_ == "HOH") { continue; }
+            if(res_name == "HOH") { continue; }
 
             //do not save ions
-            if(ions_.find(res_name_) != ions_.end()) { continue; }
+            if(ions_.find(res_name) != ions_.end()) { continue; }
 
-            chain_id_ = line.substr(21, 1);
-            i_code_ = line.substr(26, 1);
+            chain_id = line.substr(21, 1);
+            i_code = line.substr(26, 1);
 
-            sx_ = line.substr(30, 8);
-            sy_ = line.substr(38, 8);
-            sz_ = line.substr(46, 8);
-            sx_ = base::trim(sx_);
-            sy_ = base::trim(sy_);
-            sz_ = base::trim(sz_);
+            sx = line.substr(30, 8);
+            sy = line.substr(38, 8);
+            sz = line.substr(46, 8);
+            sx = base::trim(sx);
+            sy = base::trim(sy);
+            sz = base::trim(sz);
 
-            atom_coords_ = math::Point(std::stod(sx_),  std::stod(sy_),  std::stod(sz_));
+            atom_coords = math::Point(std::stod(sx),  std::stod(sy),  std::stod(sz));
 
-            res_num_ = line.substr(22, 4);
-            res_num_ = base::trim(res_num_);
+            res_num = line.substr(22, 4);
+            res_num = base::trim(res_num);
 
-            key = res_name_ + "|" + res_num_ + "|" + chain_id_ + "|" + i_code_;
+            key = res_name + "|" + res_num + "|" + chain_id + "|" + i_code;
             found = false;
-            if(atoms_.find(key) == atoms_.end()) { atoms_[key] = Atoms(); }
-            for(auto const & a : atoms_[key]) {
-                if(a.get_str_name() == atom_name_) {
+            if(atoms.find(key) == atoms.end()) { atoms[key] = Atoms(); }
+            for(auto const & a : atoms[key]) {
+                if(a.get_str_name() == atom_name) {
                     found = true;
                     break;
                 }
             }
             if(found) { continue; }
-            atoms_[key].push_back(Atom(std::make_shared<base::SimpleString>(atom_name_),
-                                       atom_coords_));
+            atoms[key].push_back(Atom(std::make_shared<base::SimpleString>(atom_name),
+                                       atom_coords));
 
         }
 
-        else if (startswith_ == "ENDMDL" || startswith_.substr(0, 3) == "END") { break; }
+        else if (startswith == "ENDMDL" || startswith.substr(0, 3) == "END") { break; }
     }
 
 
@@ -87,9 +92,10 @@ PDBParser::_parse_atoms_from_pdb_file(
 ResidueOP
 PDBParser::_setup_ref_residue(
         String const & pdb_file) {
-    _parse_atoms_from_pdb_file(pdb_file);
-    auto key = atoms_.begin()->first;
-    auto & atoms = atoms_.begin()->second;
+    auto atoms = std::map<String, Atoms>();
+    _parse_atoms_from_pdb_file(pdb_file, atoms);
+    auto key = atoms.begin()->first;
+    auto & res_atoms = atoms.begin()->second;
     auto spl = base::split_str_by_delimiter(key, "|");
     auto res_name = spl[0][0];
     auto res_type = rts_.get_residue_type(spl[0]);
@@ -97,7 +103,7 @@ PDBParser::_setup_ref_residue(
     auto chain_id = spl[2][0];
     auto i_code = spl[3][0];
 
-    return std::make_shared<Residue>(res_name, res_num, chain_id, i_code, res_type, atoms, util::Uuid());
+    return std::make_shared<Residue>(res_name, res_num, chain_id, i_code, res_type, res_atoms, util::Uuid());
 }
 
 
@@ -256,8 +262,9 @@ PDBParser::parse(
         String const & pdb_file) {
 
     auto residues = std::make_shared<PDBParserResidues>();
-    _parse_atoms_from_pdb_file(pdb_file);
-    for(auto const & kv : atoms_) {
+    auto atoms = std::map<String, Atoms>();
+    _parse_atoms_from_pdb_file(pdb_file, atoms);
+    for(auto const & kv : atoms) {
         auto spl = base::split_str_by_delimiter(kv.first, "|");
         auto has_res_type = rts_.contains_residue_type(spl[0]);
         if(has_res_type) {

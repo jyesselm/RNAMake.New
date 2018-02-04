@@ -14,18 +14,14 @@
 
 
 TEST_CASE( "Test Graph Data Structure ", "[Graph]" ) {
-    auto rts = all_atom::ResidueTypeSet();
-    auto db_path = base::resources_path() + "/motif_libraries/ideal_helices.db";
-    auto seg_lib = resource_management::SegmentSqliteLibrary(db_path, "data_table", rts);
-
-    auto seg1 = seg_lib.get_segment(StringStringMap{{"name","HELIX.IDEAL.2"}});
-
     resource_management::ResourceManager rm;
-    auto sg = all_atom::SegmentGraph(rm);
+    auto seg1 = rm.get_segment(StringStringMap{{"name","HELIX.IDEAL.2"}});
+
+    auto sg = all_atom::SegmentGraph();
     sg.add_segment(*seg1);
 
     for(int i = 0; i < 10; i++) {
-        auto seg = seg_lib.get_segment(StringStringMap{{"name","HELIX.IDEAL.2"}});
+        auto seg = rm.get_segment(StringStringMap{{"name","HELIX.IDEAL.2"}});
         sg.add_segment(*seg, i, sg.get_segment_end_name(i, 1));
     }
 
@@ -41,7 +37,7 @@ TEST_CASE( "Test Graph Data Structure ", "[Graph]" ) {
     REQUIRE(merged_copy.is_equal(*merged_sg));
 
     auto j = merged_sg->get_json();
-    merged_copy = all_atom::Segment(j, rts);
+    merged_copy = all_atom::Segment(j, rm.get_residue_type_set());
     REQUIRE(merged_copy.is_equal(*merged_sg, false));
 
 

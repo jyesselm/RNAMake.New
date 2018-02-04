@@ -61,9 +61,9 @@ public:
     }
 
 private:
-    math::Matrix r_, r_t;
-    math::Point t_, dummy_, sugar_diff_1_, sugar_diff_2_, avg_sugar_diff_;
-    double sugar_dist_;
+    mutable math::Matrix r_, r_t;
+    mutable math::Point t_, dummy_, sugar_diff_1_, sugar_diff_2_, avg_sugar_diff_;
+    mutable double sugar_dist_;
 
 };
 

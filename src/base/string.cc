@@ -136,9 +136,22 @@ is_char_in_string(
 }
 
 String
-quoted_string( String const & s ) {
+quoted_string(
+        String const & s ) {
     return String("'") + s + String("'");
 }
+
+
+String
+string_map_to_string(
+        StringStringMap const & ssm) {
+    auto s = String("");
+    for(auto const & kv: ssm) {
+        s += kv.first + "=" + kv.second + " ";
+    }
+    return s;
+}
+
 
 }
 

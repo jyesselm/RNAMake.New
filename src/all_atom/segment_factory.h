@@ -136,6 +136,8 @@ private:
     SegmentOP
     _setup_base_helix();
 
+public:
+
     SegmentElementsOP
     _get_segment_elements_from_pdb(
             String const &,
@@ -217,10 +219,7 @@ private:
     PDBParser pdb_parser_;
     PoseOP ref_motif_;
     SegmentOP base_helix_, added_helix_;
-    String name_;
     // variables for aligning
-    math::Point sugar_diff_1_, sugar_diff_2_, avg_sugar_diff_;
-    double sugar_dist_1_, sugar_dist_2_;
 };
 
 typedef std::shared_ptr<SegmentFactory> SegmentFactoryOP;

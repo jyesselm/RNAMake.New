@@ -88,7 +88,8 @@ public:
 private:
     void
     _parse_atoms_from_pdb_file(
-            String const &);
+            String const &,
+            std::map<String, Atoms> &);
 
     ResidueOP
     _setup_ref_residue(
@@ -120,12 +121,7 @@ private:
     std::map<String, ResidueOP> ref_residues_;
     std::map<String, String> atom_name_corrections_;
     std::map<String, int> ions_;
-    // parse variables
-    std::map<String, Atoms> atoms_;
-    String startswith_;
-    String atom_name_, res_name_, res_num_, chain_id_, i_code_;
-    String sx_, sy_, sz_;
-    math::Point atom_coords_;
+
 
 };
 

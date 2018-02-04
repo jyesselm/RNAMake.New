@@ -15,7 +15,7 @@ SegmentSqliteLibrary::get_segment(
     _generate_query(retrieved_columns_, args);
     auto row = conn_.get_first_row(query_string_);
     if(row == nullptr) {
-        throw SqliteLibraryException("cannot find row");
+        throw SqliteLibraryException("cannot segment: " + base::string_map_to_string(args));
     }
     int id = row->at(0);
     auto seg = all_atom::SegmentOP(nullptr);
