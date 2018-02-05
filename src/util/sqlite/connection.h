@@ -27,6 +27,8 @@ public: // interface to get rows
         return _prepare(command);
     }
 
+
+
     RowOP
     next() {
         if (sqlite3_step(stmt_) != SQLITE_ROW) { return RowOP(nullptr); }
@@ -38,7 +40,10 @@ public: // interface to get rows
     get_first_row(
             String const & command) {
         int err = _prepare(command);
-        if (sqlite3_step(stmt_) != SQLITE_ROW) { return RowOP(nullptr); }
+        if (sqlite3_step(stmt_) != SQLITE_ROW) {
+            sqlite3_finalize(stmt_);
+            return RowOP(nullptr);
+        }
 
         auto row = _generate_row_from_statement();
         sqlite3_finalize(stmt_);

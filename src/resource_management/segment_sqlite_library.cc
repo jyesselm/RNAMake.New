@@ -10,7 +10,7 @@ namespace resource_management {
 
 all_atom::SegmentOP
 SegmentSqliteLibrary::get_segment(
-        StringStringMap const & args) {
+        StringStringMap const & args) const {
 
     _generate_query(retrieved_columns_, args);
     auto row = conn_.get_first_row(query_string_);
@@ -37,7 +37,7 @@ SegmentSqliteLibrary::get_segment(
 
 bool
 SegmentSqliteLibrary::contains_segment(
-        StringStringMap const & args) {
+        StringStringMap const & args) const {
     _generate_query(retrieved_columns_, args);
     auto row = conn_.get_first_row(query_string_);
     if(row != nullptr) { return true;  }

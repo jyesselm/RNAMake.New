@@ -8,7 +8,7 @@
 #include <resource_management/resource_manager.h>
 
 TEST_CASE( "Test resource manager", "[ResourceManager]" ) {
-    init_unittest_safe_logging(base::LogLevel::WARN);
+    init_unittest_safe_logging();
 
     resource_management::ResourceManager rm;
     //okay !
@@ -17,6 +17,6 @@ TEST_CASE( "Test resource manager", "[ResourceManager]" ) {
     //auto rm1 = rm;
 
     // get segment
-    auto seg = rm.get_segment(StringStringMap{{"name", "HELIX.IDEAL.2"}});
+    REQUIRE_NOTHROW(rm.get_segment(StringStringMap{{"name", "HELIX.IDEAL.2"}}));
 
 }

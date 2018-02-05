@@ -35,20 +35,17 @@ protected:
     void
     _generate_query(
             Strings const &,
-            StringStringMap const &);
+            StringStringMap const &) const;
 
     bool
     _is_valid_key(
-            String const &);
-
-    String
-    _args_to_str();
+            String const &) const;
 
 protected:
     util::sqlite::Database db_;
-    util::sqlite::Connection conn_;
     util::sqlite::TableDetails table_details_;
-    String query_string_;
+    mutable util::sqlite::Connection conn_; // sqlite3 api commands cannot be const
+    mutable String query_string_;
 };
 
 }

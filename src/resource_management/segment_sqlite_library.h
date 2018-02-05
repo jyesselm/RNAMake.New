@@ -26,16 +26,16 @@ public:
 public:
     all_atom::SegmentOP
     get_segment(
-            StringStringMap const &);
+            StringStringMap const &) const;
 
     bool
     contains_segment(
-            StringStringMap const &);
+            StringStringMap const &) const;
 
 protected:
     Strings retrieved_columns_;
     all_atom::ResidueTypeSet const & rts_;
-    std::map<int, all_atom::SegmentOP> segments_;
+    mutable std::map<int, all_atom::SegmentOP> segments_; // ack this seems bad
 
 };
 

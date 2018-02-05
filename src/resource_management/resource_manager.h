@@ -56,7 +56,7 @@ public:    // load new segments from pdbs and components
     segment_from_pdb(
             String const & pdb_path,
             util::SegmentType segment_type = util::SegmentType::SEGMENT,
-            bool rebuild_x3dna_files = true) {
+            bool rebuild_x3dna_files = true) const {
         return seg_f_.segment_from_pdb(pdb_path, segment_type, rebuild_x3dna_files);
     }
 
@@ -65,7 +65,7 @@ public:    // load new segments from pdbs and components
     all_segments_from_pdb(
             String const & pdb_path,
             util::SegmentType segment_type = util::SegmentType::SEGMENT,
-            bool rebuild_x3dna_files = true) {
+            bool rebuild_x3dna_files = true) const {
         return seg_f_.all_segments_from_pdb(pdb_path, segment_type, rebuild_x3dna_files);
     }
 
@@ -77,7 +77,7 @@ public:    // load new segments from pdbs and components
             all_atom::Basepairs const & basepairs,
             all_atom::Structure const & proteins,
             all_atom::Structure const & small_molecules,
-            util::SegmentType segment_type = util::SegmentType::SEGMENT) {
+            util::SegmentType segment_type = util::SegmentType::SEGMENT) const {
         return seg_f_.segment_from_components(name, rna_struc, basepairs, proteins, small_molecules, segment_type);
     }
 
@@ -86,7 +86,7 @@ public: // get segments
     inline
     all_atom::SegmentOP
     get_segment(
-            StringStringMap const & args) {
+            StringStringMap const & args) const {
         for(auto & seg_lib : sqlite_libraries_) {
             if(seg_lib->contains_segment(args)) { return seg_lib->get_segment(args); }
         }
@@ -97,7 +97,7 @@ public: // get segments
     inline
     bool
     contains_segment(
-            StringStringMap const & args) {
+            StringStringMap const & args) const {
         for (auto & seg_lib : sqlite_libraries_) {
             if(seg_lib->contains_segment(args)) { return true; }
         }

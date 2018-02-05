@@ -6,12 +6,17 @@
 #include "../common.hpp"
 
 #include <base/paths.h>
+#include <base/file_io.h>
 #include <util/x3dna.h>
 
 TEST_CASE( "Test X3dna parser ", "[X3dnaParser]" ) {
+    init_unittest_safe_logging();
+
     auto x = util::X3dna();
     auto path = base::unittest_resources_path() + "/all_atom/p4p6.pdb";
     auto x3dna_bps = x.get_basepairs(path);
-
+    REQUIRE(x3dna_bps.size() == 63);
+    REQUIRE(base::file_exists("ref_frames.dat") == false);
+    REQUIRE(base::file_exists("p4p6_dssr.out") == false);
 
 }

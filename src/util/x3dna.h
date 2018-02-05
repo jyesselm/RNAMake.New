@@ -100,7 +100,7 @@ public:
 
     X3dna();
 
-    ~X3dna() { }
+    ~X3dna() { delete s_; }
 
 public:
     struct X3Residue {

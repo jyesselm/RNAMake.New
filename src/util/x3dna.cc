@@ -27,7 +27,6 @@ X3dna::X3dna():
     auto env = "X3DNA=" + x3dna_path;
     s_ = strdup(env.c_str());
     putenv(s_);
-    delete s_;
 
     bin_path_ = x3dna_path + "/bin/";
     // make sure have the correct x3dna programs for this operating system

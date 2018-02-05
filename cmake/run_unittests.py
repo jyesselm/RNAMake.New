@@ -7,7 +7,7 @@ import argparse
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-tests_until', default="all_atom")
+    parser.add_argument('-tests_until', default="segment_data_structures")
     args = parser.parse_args()
 
     return args

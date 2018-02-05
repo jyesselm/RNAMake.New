@@ -26,7 +26,7 @@ SqliteLibrary::SqliteLibrary(
 void
 SqliteLibrary::_generate_query(
         Strings const & retrieved_columns,
-        StringStringMap const & restraint_col_and_vals) {
+        StringStringMap const & restraint_col_and_vals) const {
 
     query_string_ = "SELECT ";
     int i = 0;
@@ -56,7 +56,7 @@ SqliteLibrary::_generate_query(
 
 bool
 SqliteLibrary::_is_valid_key(
-        String const & key) {
+        String const & key) const {
     for(auto const & col : table_details_) {
         if(col.name == key) { return true; }
     }
