@@ -7,6 +7,7 @@
 
 #include <data_structures/graph.h>
 #include <all_atom/aligner.h>
+#include <resource_management/resource_manager.h>
 
 namespace segment_data_structures {
 
@@ -50,6 +51,13 @@ public:
     get_segment(
             Index ni) {
         return graph_.get_node_data(ni);
+    }
+
+    inline
+    std::vector<data_structures::Edge const *> const &
+    get_segment_connections(
+            Index ni) const {
+        return graph_.get_node_edges(ni);
     }
 
 public:
@@ -142,6 +150,67 @@ protected:
     data_structures::FixedEdgeDirectedGraph<SegmentType> graph_;
     AlignerType aligner_;
 };
+
+template <typename SegmentType, typename AlignerType>
+using SegmentGraphOP = std::shared_ptr<SegmentGraph<SegmentType, AlignerType>>;
+
+struct NodeIndexandEdgeCompare {
+    bool operator () (
+            data_structures::NodeIndexandEdge const & nie1,
+            data_structures::NodeIndexandEdge const & nie2) const {
+        return nie1.node_index > nie2.node_index;
+    }
+};
+
+template <typename SegmentType, typename AlignerType>
+SegmentGraphOP<SegmentType, AlignerType>
+convert_ideal_helices_to_basepair_steps(
+        SegmentGraph<SegmentType, AlignerType> const & g,
+        resource_management::ResourceManager const & rm) {
+    typedef data_structures::NodeIndexandEdge NodeIndexandEdge;
+    auto new_g = std::make_shared<SegmentGraph<SegmentType, AlignerType>>();
+    auto index_convert = std::map<NodeIndexandEdge, NodeIndexandEdge, NodeIndexandEdgeCompare>();
+    auto args = StringStringMap{{"name", "HELIX.IDEAL"}};
+    auto aligner = AlignerType();
+    for(auto const & n : g) {
+        if(n->data().get_segment_type() != util::SegmentType::HELIX) {
+            continue;
+        }
+        else if(n->data().get_name_str().substr(0, 5) != "HELIX") {
+            continue;
+        }
+
+        auto num_res = n->data().get_num_residues();
+        auto num_bp_steps = num_res / 2;
+
+        auto start = rm.get_segment(args);
+        auto pos = -1;
+
+        if(g.has_parent(n->index())) {
+
+        }
+        else { // no parent but make sure its starting from the correct orientation
+            aligner.align(n->data().get_end(0), *start);
+            pos = new_g->add_segment(*start);
+        }
+
+        for(int i = 0; i < num_bp_steps-2; i++) {
+            auto ideal_bp_step = rm.get_segment(args);
+            pos = new_g->add_segment(*ideal_bp_step, pos, start->get_end_name(1));
+        }
+
+        auto org_nie = NodeIndexandEdge{n->index(), 1};
+        auto new_nie = NodeIndexandEdge{pos, 1};
+
+        index_convert[org_nie] = new_nie;
+
+        //std::cout << n->index() << " " << n->data().get_name_str() << std::endl;
+    }
+
+    new_g->write_nodes_to_pdbs("new");
+
+    return new_g;
+}
 
 }
 

@@ -105,7 +105,6 @@ public: // get segments
     }
 
 
-
 public:
     all_atom::ResidueTypeSet const &
     get_residue_type_set() { return rts_; }

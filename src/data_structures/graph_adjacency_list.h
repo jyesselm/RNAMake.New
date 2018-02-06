@@ -223,8 +223,8 @@ public:
             if (edge->node_i == n2 or edge->node_j == n2) { return true; }
         }
         return false;
-
     }
+
 
 public:
     bool

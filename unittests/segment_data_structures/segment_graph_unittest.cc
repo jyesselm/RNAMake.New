@@ -14,13 +14,14 @@
 
 
 TEST_CASE( "Test Graph Data Structure ", "[Graph]" ) {
+    init_unittest_safe_logging();
+
     auto rts = all_atom::ResidueTypeSet();
     auto db_path = base::resources_path() + "/motif_libraries/ideal_helices.db";
     auto seg_lib = resource_management::SegmentSqliteLibrary(db_path, "data_table", rts);
 
     auto seg1 = seg_lib.get_segment(StringStringMap{{"name","HELIX.IDEAL.2"}});
 
-    resource_management::ResourceManager rm;
     auto sg = all_atom::SegmentGraph();
     sg.add_segment(*seg1);
 
@@ -39,6 +40,15 @@ TEST_CASE( "Test Graph Data Structure ", "[Graph]" ) {
     }
     REQUIRE(path == target);
 
+    SECTION("test replace idealized helices") {
+        auto sg = all_atom::SegmentGraph();
+        resource_management::ResourceManager rm;
+        auto seg1 = seg_lib.get_segment(StringStringMap{{"name","HELIX.IDEAL.10"}});
+        sg.add_segment(*seg1);
+
+        auto new_g = segment_data_structures::convert_ideal_helices_to_basepair_steps<all_atom::Segment, all_atom::Aligner>(sg, rm);
+
+    }
 
 
     //sg.write_nodes_to_pdbs("test");

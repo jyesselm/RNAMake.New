@@ -288,7 +288,7 @@ SegmentFactory::_align_motif_elements_to_frame(
 
     // do additional sugar alignment
     auto sugar_dist_1 = ref_bp.get_res1_c1_prime_coord().distance(m_elements.get_end(end_index).get_res1_c1_prime_coord());
-    auto sugar_dist_2 = ref_bp.get_res1_c1_prime_coord().distance(m_elements.get_end(end_index).get_res2_c1_prime_coord());
+    auto sugar_dist_2 = ref_bp.get_res2_c1_prime_coord().distance(m_elements.get_end(end_index).get_res1_c1_prime_coord());
 
     if(sugar_dist_1 > 5 && sugar_dist_2 > 5) {
         LOGW << "difference in sugar c1' coords between reference and aligned is greater than 5. " <<
@@ -299,13 +299,13 @@ SegmentFactory::_align_motif_elements_to_frame(
     auto sugar_diff_1 = math::Point();
     auto sugar_diff_2 = math::Point();
 
-    if(sugar_dist_1 < 5) {
+    if(sugar_dist_1 < sugar_dist_2) {
         sugar_diff_1 =  ref_bp.get_res1_c1_prime_coord() - m_elements.get_end(end_index).get_res1_c1_prime_coord();
         sugar_diff_2 =  ref_bp.get_res2_c1_prime_coord() - m_elements.get_end(end_index).get_res2_c1_prime_coord();
     }
     else {
-        sugar_diff_1 =  ref_bp.get_res1_c1_prime_coord() - m_elements.get_end(end_index).get_res1_c1_prime_coord();
-        sugar_diff_2 =  ref_bp.get_res2_c1_prime_coord() - m_elements.get_end(end_index).get_res2_c1_prime_coord();
+        sugar_diff_1 =  ref_bp.get_res1_c1_prime_coord() - m_elements.get_end(end_index).get_res2_c1_prime_coord();
+        sugar_diff_2 =  ref_bp.get_res2_c1_prime_coord() - m_elements.get_end(end_index).get_res1_c1_prime_coord();
     }
     auto avg_sugar_diff = (sugar_diff_1 + sugar_diff_2) / 2;
     m_elements.move(avg_sugar_diff);
@@ -358,7 +358,7 @@ SegmentFactory::_align_segment_to_frame(
 
     // do additional sugar alignment
     auto sugar_dist_1 = ref_bp.get_res1_c1_prime_coord().distance(seg.get_aligned_end().get_res1_c1_prime_coord());
-    auto sugar_dist_2 = ref_bp.get_res1_c1_prime_coord().distance(seg.get_aligned_end().get_res2_c1_prime_coord());
+    auto sugar_dist_2 = ref_bp.get_res2_c1_prime_coord().distance(seg.get_aligned_end().get_res1_c1_prime_coord());
 
     if(sugar_dist_1 > 5 && sugar_dist_2 > 5) {
         LOGW << "difference in sugar c1' coords between reference and aligned is greater than 5. " <<
@@ -369,13 +369,13 @@ SegmentFactory::_align_segment_to_frame(
     auto sugar_diff_1 = math::Point();
     auto sugar_diff_2 = math::Point();
 
-    if(sugar_dist_1 < 5) {
+    if(sugar_dist_1 < sugar_dist_2) {
         sugar_diff_1 =  ref_bp.get_res1_c1_prime_coord() - seg.get_aligned_end().get_res1_c1_prime_coord();
         sugar_diff_2 =  ref_bp.get_res2_c1_prime_coord() - seg.get_aligned_end().get_res2_c1_prime_coord();
     }
     else {
-        sugar_diff_1 =  ref_bp.get_res1_c1_prime_coord() - seg.get_aligned_end().get_res1_c1_prime_coord();
-        sugar_diff_2 =  ref_bp.get_res2_c1_prime_coord() - seg.get_aligned_end().get_res2_c1_prime_coord();
+        sugar_diff_1 =  ref_bp.get_res1_c1_prime_coord() - seg.get_aligned_end().get_res2_c1_prime_coord();
+        sugar_diff_2 =  ref_bp.get_res2_c1_prime_coord() - seg.get_aligned_end().get_res1_c1_prime_coord();
     }
 
     auto avg_sugar_diff = (sugar_diff_1 + sugar_diff_2) / 2;
