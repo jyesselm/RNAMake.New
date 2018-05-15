@@ -5,6 +5,8 @@
 #ifndef RNAMAKE_NEW_GRAPH_BASE_H
 #define RNAMAKE_NEW_GRAPH_BASE_H
 
+#include <map>
+
 #include <base/types.h>
 #include <base/assertions.h>
 
@@ -56,6 +58,7 @@ private:
     Index index_;
 };
 
+
 struct NodeIndexandEdge {
     Index node_index;
     Index edge_index;
@@ -65,6 +68,17 @@ struct NodeIndexandEdge {
         return "node_index: " + std::to_string(node_index) + " edge_index: " + std::to_string(edge_index);
     }
 };
+
+struct NodeIndexandEdgeCompare {
+    bool operator () (
+            data_structures::NodeIndexandEdge const & nie1,
+            data_structures::NodeIndexandEdge const & nie2) const {
+        return nie1.node_index > nie2.node_index;
+    }
+};
+
+typedef std::map<NodeIndexandEdge, NodeIndexandEdge, NodeIndexandEdgeCompare> NodeIndexandEdgeMap;
+
 
 struct Edge {
     Index node_i, node_j, edge_i, edge_j;

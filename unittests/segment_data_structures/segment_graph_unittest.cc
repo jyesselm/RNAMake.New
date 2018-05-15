@@ -43,13 +43,28 @@ TEST_CASE( "Test Graph Data Structure ", "[Graph]" ) {
     SECTION("test replace idealized helices") {
         auto sg = all_atom::SegmentGraph();
         resource_management::ResourceManager rm;
-        auto seg1 = seg_lib.get_segment(StringStringMap{{"name","HELIX.IDEAL.10"}});
+        auto seg1 = rm.get_segment(StringStringMap{{"name","HELIX.IDEAL.10"}});
         sg.add_segment(*seg1);
 
-        auto new_g = segment_data_structures::convert_ideal_helices_to_basepair_steps<all_atom::Segment, all_atom::Aligner>(sg, rm);
-
+        auto new_g = all_atom::convert_ideal_helices_to_basepair_steps(sg, rm);
+        REQUIRE(new_g->get_num_segments() == 11);
     }
 
+    SECTION("test replace idealized helices with motifs") {
+        auto sg = all_atom::SegmentGraph();
+        resource_management::ResourceManager rm;
+
+        auto seg1 = rm.get_segment(StringStringMap{{"name","HELIX.IDEAL.5"}});
+        auto seg2 = rm.get_segment(StringStringMap{{"name","TWOWAY.1A34.0"}});
+        auto seg3 = rm.get_segment(StringStringMap{{"name","HELIX.IDEAL.5"}});
+        sg.add_segment(*seg1);
+        sg.add_segment(*seg2, 0, sg.get_segment_end_name(0, 1));
+        sg.add_segment(*seg3, 1, sg.get_segment_end_name(1, 1));
+
+        auto new_g = all_atom::convert_ideal_helices_to_basepair_steps(sg, rm);
+        new_g->write_nodes_to_pdbs("nodes");
+
+    }
 
     //sg.write_nodes_to_pdbs("test");
 

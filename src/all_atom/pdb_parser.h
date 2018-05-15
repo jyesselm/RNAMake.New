@@ -18,8 +18,8 @@
 #include <all_atom/residue.h>
 #include <all_atom/residue_type_set.h>
 
-namespace all_atom {
 
+namespace all_atom {
 struct PDBParserResidues {
     ResidueOPs RNA_residues, protein_residues, small_molecule_residues;
 

@@ -23,6 +23,15 @@ SqliteLibrary::SqliteLibrary(
     table_details_ = *(conn_.get_table_details(table_name));
 }
 
+
+size_t
+SqliteLibrary::get_num_of_rows() {
+    query_string_ = "SELECT COUNT(*) FROM " + table_details_.name();
+    auto row = conn_.get_first_row(query_string_);
+    int count = row->at(0);
+    return (size_t)count;
+}
+
 void
 SqliteLibrary::_generate_query(
         Strings const & retrieved_columns,

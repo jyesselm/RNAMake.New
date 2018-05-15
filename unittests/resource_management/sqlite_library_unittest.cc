@@ -75,4 +75,12 @@ TEST_CASE( "Test basic sqlite library", "[Sqlitelibrary]" ) {
 
     }
 
+    SECTION("test twoway database") {
+        auto rts = all_atom::ResidueTypeSet();
+        auto db_path = base::resources_path() + "/motif_libraries/two_ways.db";
+        auto seg_lib = resource_management::SegmentSqliteLibrary(db_path, "data_table", rts);
+        //std::cout << seg_lib.contains_segment(StringStringMap{{"name", "TWOWAY.1A34.0"}}) << std::endl;
+
+    }
+
 }

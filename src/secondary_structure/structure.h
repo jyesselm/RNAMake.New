@@ -146,7 +146,7 @@ public: //setters
 typedef std::shared_ptr<Structure> StructureOP;
 typedef std::shared_ptr<Structure> StructureUP;
 
-StructureUP
+StructureOP
 get_structure_from_secondary_structure(
         String const &,
         String const &);

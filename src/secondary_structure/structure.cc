@@ -6,13 +6,12 @@
 //  Copyright (c) 2015 Joseph Yesselman. All rights reserved.
 //
 
-#include <base/unique_ptr.h>
 #include <secondary_structure/structure.h>
 
 namespace secondary_structure {
 
 
-StructureUP
+StructureOP
 get_structure_from_secondary_structure(
         String const & sequence,
         String const & dot_bracket) {
@@ -54,7 +53,7 @@ get_structure_from_secondary_structure(
         }
     }
     cut_points.push_back((int)residues.size());
-    return base::make_unique<Structure>(residues, cut_points);
+    return std::make_shared<Structure>(residues, cut_points);
 }
 
 }

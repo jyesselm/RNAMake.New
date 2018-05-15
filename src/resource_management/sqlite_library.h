@@ -31,6 +31,11 @@ public:
     virtual
     ~SqliteLibrary() {}
 
+public:
+    size_t
+    get_num_of_rows();
+
+
 protected:
     void
     _generate_query(

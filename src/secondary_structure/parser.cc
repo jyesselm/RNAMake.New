@@ -2,7 +2,6 @@
 // Created by Joseph Yesselman on 10/27/17.
 //
 
-#include <base/unique_ptr.h>
 #include <secondary_structure/parser.h>
 
 namespace secondary_structure {
