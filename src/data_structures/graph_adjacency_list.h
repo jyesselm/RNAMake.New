@@ -78,7 +78,6 @@ public:
     add_node(
             DataType const & d,
             Size n_edges) {
-        // required to avoid
         nodes_.insert(std::pair<int, Node<DataType>>( index_, Node<DataType>(d, index_)));
         edges_[index_] = std::vector<Edge const *> (n_edges);
         index_ += 1;

@@ -96,10 +96,11 @@ struct Edge {
 
     inline
     bool
-    operator==(Edge & other) const {
+    operator==(Edge const & other) const {
         return node_i == other.node_i && node_j == other.node_j &&
                edge_i == other.edge_i && edge_j == other.edge_j;
     }
+
 
     Index
     partner(
@@ -123,6 +124,11 @@ struct Edge {
         if (index == node_i) { return edge_i; }
         else { return edge_j; }
 
+    }
+
+    String
+    to_str() const {
+        return "ni: " + std::to_string(node_i) + " nj: " + std::to_string(node_j) + " ei: " + std::to_string(edge_i) + " ej: " + std::to_string(edge_j);
     }
 
 };

@@ -16,29 +16,56 @@
 TEST_CASE( "Test Graph Data Structure ", "[Graph]" ) {
     init_unittest_safe_logging();
 
-    auto rts = all_atom::ResidueTypeSet();
-    auto db_path = base::resources_path() + "/motif_libraries/ideal_helices.db";
-    auto seg_lib = resource_management::SegmentSqliteLibrary(db_path, "data_table", rts);
+    SECTION("basic tests ") {
+        auto rts = all_atom::ResidueTypeSet();
+        auto db_path = base::resources_path() + "/motif_libraries/ideal_helices.db";
+        auto seg_lib = resource_management::SegmentSqliteLibrary(db_path, "data_table", rts);
 
-    auto seg1 = seg_lib.get_segment(StringStringMap{{"name","HELIX.IDEAL.2"}});
+        auto seg1 = seg_lib.get_segment(StringStringMap{{"name", "HELIX.IDEAL.2"}});
 
-    auto sg = all_atom::SegmentGraph();
-    sg.add_segment(*seg1);
+        auto sg = all_atom::SegmentGraph();
+        sg.add_segment(*seg1);
 
-    for(int i = 0; i < 10; i++) {
-        auto seg = seg_lib.get_segment(StringStringMap{{"name","HELIX.IDEAL.2"}});
-        sg.add_segment(*seg, i, sg.get_segment_end_name(i, 1));
+        for (int i = 0; i < 10; i++) {
+            auto seg = seg_lib.get_segment(StringStringMap{{"name", "HELIX.IDEAL.2"}});
+            sg.add_segment(*seg, i, sg.get_segment_end_name(i, 1));
+        }
+
+        REQUIRE(sg.get_num_segments() == 11);
+
+        auto sg2 = all_atom::SegmentGraph(sg);
+        REQUIRE(sg2.get_num_segments() == 11);
+
+        sg.remove_segment(5);
+        REQUIRE(sg2.get_num_segments() == 11);
+
+        auto path = Indexes();
+        auto target = Indexes{0, 1, 2, 3, 4, 6, 7, 8, 9, 10};
+        for (auto const & n : sg) {
+            path.push_back(n->index());
+        }
+
+        REQUIRE(path == target);
     }
 
-    REQUIRE(sg.get_num_segments() == 11);
+    SECTION("test add connection") {
+        auto sg = all_atom::SegmentGraph();
+        resource_management::ResourceManager rm;
 
-    sg.remove_segment(5);
-    auto path = Indexes();
-    auto target = Indexes{0, 1, 2, 3, 4, 6, 7, 8, 9, 10};
-    for(auto const & n : sg) {
-        path.push_back(n->index());
+        auto seg1 = rm.get_segment(StringStringMap{{"name","HELIX.IDEAL.2"}});
+        sg.add_segment(*seg1);
+
+        for (int i = 0; i < 9; i++) {
+            auto seg = rm.get_segment(StringStringMap{{"name","HELIX.IDEAL.2"}});
+            sg.add_segment(*seg, i, sg.get_segment_end_name(i, 1));
+        }
+
+        sg.add_connection(data_structures::NodeIndexandEdge{0, 0},
+                          data_structures::NodeIndexandEdge{9, 1});
+
+        REQUIRE(sg.are_motifs_connected(0, 9) == true);
+
     }
-    REQUIRE(path == target);
 
     SECTION("test replace idealized helices") {
         auto sg = all_atom::SegmentGraph();
@@ -51,6 +78,7 @@ TEST_CASE( "Test Graph Data Structure ", "[Graph]" ) {
     }
 
     SECTION("test replace idealized helices with motifs") {
+        auto rts = all_atom::ResidueTypeSet();
         auto sg = all_atom::SegmentGraph();
         resource_management::ResourceManager rm;
 
@@ -60,9 +88,12 @@ TEST_CASE( "Test Graph Data Structure ", "[Graph]" ) {
         sg.add_segment(*seg1);
         sg.add_segment(*seg2, 0, sg.get_segment_end_name(0, 1));
         sg.add_segment(*seg3, 1, sg.get_segment_end_name(1, 1));
+        sg.add_connection(data_structures::NodeIndexandEdge{0, 0},
+                          data_structures::NodeIndexandEdge{2, 1});
 
         auto new_g = all_atom::convert_ideal_helices_to_basepair_steps(sg, rm);
-        new_g->write_nodes_to_pdbs("nodes");
+        REQUIRE(new_g->get_num_segments() == 13);
+        REQUIRE(new_g->are_motifs_connected(0, 12));
 
     }
 

@@ -18,6 +18,11 @@ public:
             aligner_(AlignerType()),
             graph_(data_structures::FixedEdgeDirectedGraph<SegmentType>()){}
 
+    SegmentGraph(
+            SegmentGraph const & sg):
+            aligner_(AlignerType()),
+            graph_(sg.graph_) {}
+
 public:
 
     typedef typename data_structures::FixedEdgeDirectedGraph<SegmentType>::const_iterator const_iterator;
@@ -82,6 +87,21 @@ public:
         return graph_.get_parent_end_index(ni);
     }
 
+    inline
+    bool
+    are_motifs_connected(
+            Index n1,
+            Index n2) const {
+        return graph_.edge_between_nodes(n1, n2);
+    }
+
+    inline
+    std::vector<data_structures::Edge const *> const &
+    get_motif_connections (
+            Index ni) const {
+        return graph_.get_node_edges(ni);
+    }
+
 
 public:
     Index
@@ -105,6 +125,14 @@ public:
                                   data_structures::NodeIndexandEdge{parent_index, parent_end_index});
         _update_default_transveral();
         return ni;
+    }
+
+public:
+    void
+    add_connection(
+            data_structures::NodeIndexandEdge const & nie1,
+            data_structures::NodeIndexandEdge const & nie2) {
+        return graph_.add_edge(nie1, nie2);
     }
 
 public:
@@ -162,33 +190,24 @@ add_motif(
         Index i,
         SegmentGraph<SegmentType, AlignerType> const & g,
         SegmentGraph<SegmentType, AlignerType> & new_g,
-        data_structures::NodeIndexandEdgeMap & index_convert) {
+        std::map<Index, Index> & index_convert) {
 
     auto pos = -1;
-    auto org_pei = 1;
-    auto pei = 1;
     auto & seg = g.get_segment(i);
 
     if(g.has_parent(i)) {
         auto pi = g.get_parent_index(i);
-        auto org_pei = g.get_parent_end_index(i);
-        auto new_nie = index_convert[data_structures::NodeIndexandEdge{pi, org_pei}];
-        pos = new_g.add_segment(seg,
-                                new_nie.node_index,
-                                new_g.get_segment_end_name(new_nie.node_index, new_nie.edge_index));
-        pei = new_nie.edge_index;
+        auto pei = g.get_parent_end_index(i);
+        auto new_pi = index_convert[pi];
+        pos = new_g.add_segment(seg, new_pi, new_g.get_segment_end_name(new_pi, pei));
     }
 
     else {
         pos = new_g.add_segment(seg);
     }
 
-    auto org_nie = data_structures::NodeIndexandEdge{i, org_pei};
-    auto new_nie = data_structures::NodeIndexandEdge{pos, pei};
-    index_convert[org_nie] = new_nie;
+    index_convert[i] = pos;
 };
-
-
 }
 
 template <typename SegmentType, typename AlignerType>
@@ -198,10 +217,21 @@ convert_ideal_helices_to_basepair_steps(
         resource_management::ResourceManager const & rm) {
     typedef data_structures::NodeIndexandEdge NodeIndexandEdge;
     auto new_g = std::make_shared<SegmentGraph<SegmentType, AlignerType>>();
-    auto index_convert = data_structures::NodeIndexandEdgeMap();
+    auto index_convert = std::map<Index, Index>();
     auto args = StringStringMap{{"name", "HELIX.IDEAL"}};
     auto aligner = AlignerType();
+    auto seen_connections = std::map<String, int>();
     for(auto const & n : g) {
+        if(g.has_parent(n->index())) {
+            auto pi = g.get_parent_index(n->index());
+            auto pei = g.get_parent_end_index(n->index());
+
+            auto key1 = data_structures::Edge(n->index(), pi, 0, pei).to_str();
+            auto key2 = data_structures::Edge(pi, n->index(), pei, 0).to_str();
+
+            seen_connections[key1] = 1; seen_connections[key2] = 1;
+
+        }
 
         // not a helix or not idealized
         if(n->data().get_segment_type() != util::SegmentType::HELIX) {
@@ -220,16 +250,12 @@ convert_ideal_helices_to_basepair_steps(
         auto start = rm.get_segment(args);
         auto pos = -1;
         auto org_pei = 1;
-        auto pei = 1;
 
         if(g.has_parent(n->index())) {
             auto pi = g.get_parent_index(n->index());
-            org_pei = g.get_parent_end_index(n->index());
-            auto new_nie = index_convert[data_structures::NodeIndexandEdge{pi, org_pei}];
-            pos = new_g->add_segment(*start,
-                                    new_nie.node_index,
-                                    new_g->get_segment_end_name(new_nie.node_index, new_nie.edge_index));
-            pei = new_nie.edge_index;
+            auto pei = g.get_parent_end_index(n->index());
+            auto new_pi = index_convert[pi];
+            pos = new_g->add_segment(*start, new_pi, new_g->get_segment_end_name(new_pi, pei));
 
         }
         else { // no parent but make sure its starting from the correct orientation
@@ -242,12 +268,31 @@ convert_ideal_helices_to_basepair_steps(
             pos = new_g->add_segment(*ideal_bp_step, pos, start->get_end_name(1));
         }
 
-        auto org_nie = NodeIndexandEdge{n->index(), org_pei};
-        auto new_nie = NodeIndexandEdge{pos, pei};
-
-        index_convert[org_nie] = new_nie;
+        index_convert[n->index()] = pos;
 
     }
+
+    for(auto const & n : g) {
+        auto & connections = g.get_motif_connections(n->index());
+        for(auto const & c : connections) {
+            if(c == nullptr) { continue; }
+            auto key = c->to_str();
+            if(seen_connections.find(key) != seen_connections.end()) { continue; }
+
+            auto new_ni = index_convert[c->node_i];
+            auto new_nj = index_convert[c->node_j];
+
+            if(c->node_i == 0) { new_ni = 0; }
+            if(c->node_j == 0) { new_nj = 0; }
+
+            new_g->add_connection(data_structures::NodeIndexandEdge{new_ni, c->edge_i},
+                                  data_structures::NodeIndexandEdge{new_nj, c->edge_j});
+
+            seen_connections[key] = 1;
+
+        }
+    }
+
     return new_g;
 }
 
