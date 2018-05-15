@@ -20,8 +20,10 @@ template<typename DataType, typename AdjacencyListType, typename IterListType>
 class _Graph {
 public:
     _Graph() :
-            adjacency_list_(AdjacencyListType()) {}
+            adjacency_list_(AdjacencyListType()),
+            iter_list_(IterListType()){}
 
+    virtual
     ~_Graph() {}
 
 public:
@@ -78,7 +80,7 @@ public:
     remove_edge(
             NodeIndexandEdge const & nie1,
             NodeIndexandEdge const & nie2) {
-        return; adjacency_list_.remove_edge(nie1, nie2);
+        return adjacency_list_.remove_edge(nie1, nie2);
     }
 
 public:
@@ -172,6 +174,12 @@ public:
     UndirectedGraph():
             BaseClass() {}
 
+    UndirectedGraph(
+            UndirectedGraph const & g) {
+        this->adjacency_list_ = g.adjacency_list_;
+
+    }
+
 };
 
 template<typename DataType>
@@ -189,6 +197,12 @@ public:
 public:
     DirectedGraph() :
             BaseClass() {}
+
+    DirectedGraph(
+            DirectedGraph const & g):
+            BaseClass() {
+        this->adjacency_list_ = g.adjacency_list_;
+    }
 
 public:
     inline

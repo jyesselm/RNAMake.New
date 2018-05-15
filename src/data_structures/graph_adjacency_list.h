@@ -45,6 +45,27 @@ public:
     }
 
 public:
+    AdjacencyList &
+    operator= (
+            AdjacencyList const & abj_list) {
+        this->nodes_ = abj_list.nodes_;
+        this->index_ = abj_list.index_;
+        for (auto const & kv : nodes_) {
+            this->edges_[kv.first] = std::vector < Edge const * > (abj_list.get_node_edges(kv.first).size());
+        }
+        for (auto const & kv : abj_list.edges_) {
+            for (auto const & e : kv.second) {
+                if (e == nullptr) { continue; }
+                if (this->edge_between_nodes(e->node_i, e->node_j)) { continue; }
+                this->add_edge(NodeIndexandEdge{e->node_i, e->edge_i}, NodeIndexandEdge{e->node_j, e->edge_j});
+            }
+        }
+        return *this;
+
+    }
+
+
+public:
     typedef typename std::map<Index, Node<DataType>>::const_iterator const_iterator;
 
     const_iterator begin() const { return nodes_.begin(); }
@@ -282,13 +303,15 @@ public:
             BaseClass() {}
 
     DirectedAdjacencyList(
-            DirectedAdjacencyList const & abj_list) {
+            DirectedAdjacencyList const & abj_list):
+            DirectedAdjacencyList() {
         this->nodes_ = abj_list.nodes_;
         this->index_ = abj_list.index_;
         this->parent_ = abj_list.parent_;
         for (auto const & kv : this->nodes_) {
             this->edges_[kv.first] = std::vector < Edge const * > (abj_list.get_node_edges(kv.first).size());
         }
+
         for (auto const & kv : abj_list.edges_) {
             for (auto const & e : kv.second) {
                 if (e == nullptr) { continue; }
@@ -298,7 +321,27 @@ public:
         }
     }
 
-    ~DirectedAdjacencyList() {}
+public:
+    DirectedAdjacencyList &
+    operator= (
+            DirectedAdjacencyList const & abj_list) {
+        this->nodes_ = abj_list.nodes_;
+        this->index_ = abj_list.index_;
+        this->parent_ = abj_list.parent_;
+        for (auto const & kv : this->nodes_) {
+            this->edges_[kv.first] = std::vector < Edge const * > (abj_list.get_node_edges(kv.first).size());
+        }
+
+        for (auto const & kv : abj_list.edges_) {
+            for (auto const & e : kv.second) {
+                if (e == nullptr) { continue; }
+                if (this->edge_between_nodes(e->node_i, e->node_j)) { continue; }
+                this->add_edge(NodeIndexandEdge{e->node_i, e->edge_i}, NodeIndexandEdge{e->node_j, e->edge_j});
+            }
+        }
+        return *this;
+
+    }
 
 public:
 
