@@ -319,7 +319,7 @@ public: // outputing functions
         }
 
         return std::make_shared<secondary_structure::Segment>(
-                ss_structure, ss_bps, end_indexes_, end_ids_, name_, segment_type_, aligned_end_index_);
+                ss_structure, ss_bps, end_indexes_, end_ids_, name_, segment_type_, aligned_end_index_, uuid_);
     }
 
 

@@ -27,10 +27,23 @@ public:
             BaseClass(structure, basepairs, end_indexes, end_ids, name, segment_type, aligned_end_index, uuid) {}
 
 public:
+
+    inline
+    String
+    get_dot_bracket() { return structure_.get_dot_bracket(); }
+
+    inline
     void
     set_sequence(
             String const & sequence) {
         structure_.set_sequence(sequence);
+
+        int i = -1;
+        for(auto const & ei : this->end_indexes_) {
+            i++;
+            auto end_id = generate_end_id(this->structure_, this->basepairs_, this->basepairs_[ei]);
+            this->end_ids_[i] = std::make_shared<base::SimpleString const>(end_id);
+        }
     }
 
     inline
@@ -40,7 +53,6 @@ public:
             char name) {
         structure_.set_residue_identity(residue_index, name);
     }
-
 
 
 };

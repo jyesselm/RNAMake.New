@@ -37,7 +37,14 @@ TEST_CASE( "Test Secondary Structure Parser ", "[SecondaryStructureParser]" ) {
     }
 
     SECTION("test sequence replacement") {
+        auto parser = secondary_structure::Parser();
+        auto seg = parser.parse_to_segment("GAC&GUC", "(((&)))");
 
+        REQUIRE(seg->get_end_id(0)->get_str() == "GAC_LLL_GUC_RRR");
+        auto new_seq = String("CAG&CAG");
+        seg->set_sequence(new_seq);
+        REQUIRE(seg->get_sequence() == "CAG&CAG");
+        REQUIRE(seg->get_end_id(0)->get_str() == "CAG_LLL_CAG_RRR");
 
     }
  }
