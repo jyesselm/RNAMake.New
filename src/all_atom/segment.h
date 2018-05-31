@@ -7,6 +7,7 @@
 
 #include <util/segment_type.h>
 #include <primitives/segment.h>
+#include <secondary_structure/segment.h>
 #include <all_atom/structure.h>
 #include <all_atom/basepair.h>
 
@@ -263,7 +264,7 @@ public:
         return steric_clash_count;
     }
 
-public:
+public: // outputing functions
     json::JSON
     get_json() const {
         auto j_bps = json::Array();
@@ -293,6 +294,36 @@ public:
                 "aligned_end_index", aligned_end_index_};
     }
 
+    secondary_structure::SegmentOP
+    get_secondary_structure() const {
+        auto dot_bracket_spl = base::split_str_by_delimiter(dot_bracket_->get_str(), "&");
+        auto dot_bracket_str = base::join_by_delimiter(dot_bracket_spl, "");
+
+        auto i = 0 ;
+        auto residues = secondary_structure::Residues();
+        auto cutpoints = structure_.get_cutpoints();
+        for(auto const & r : structure_) {
+           auto ss_r = secondary_structure::Residue(r.get_name(), dot_bracket_str[i], r.get_num(),
+                                                    r.get_chain_id(), r.get_i_code(), r.get_uuid());
+            residues.push_back(ss_r);
+            i += 1;
+        }
+
+        auto ss_structure = secondary_structure::Structure(residues, cutpoints);
+        auto ss_bps = secondary_structure::Basepairs();
+        for(auto const & bp : basepairs_) {
+            auto ss_bp = secondary_structure::Basepair(
+                    bp.get_res1_uuid(), bp.get_res2_uuid(), bp.get_uuid(), bp.get_bp_type(), bp.get_name());
+
+            ss_bps.push_back(ss_bp);
+        }
+
+        return std::make_shared<secondary_structure::Segment>(
+                ss_structure, ss_bps, end_indexes_, end_ids_, name_, segment_type_, aligned_end_index_);
+    }
+
+
+public: // pdb functions
     String
     get_pdb_str(
             int &,
@@ -319,7 +350,7 @@ public:
 public:
     inline
     String
-    dot_bracket() { return dot_bracket_->get_str(); }
+    get_dot_bracket() { return dot_bracket_->get_str(); }
 
     inline
     Basepair const &

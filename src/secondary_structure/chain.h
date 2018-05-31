@@ -101,7 +101,7 @@ public:
 public:
     inline
     void
-    set_residue_name(
+    set_residue_identity(
             Index residue_index,
             char name) {
         residues_[residue_index].set_name(name);

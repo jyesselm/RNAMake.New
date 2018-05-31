@@ -78,7 +78,6 @@ TEST_CASE( "Test Graph Data Structure ", "[Graph]" ) {
     }
 
     SECTION("test replace idealized helices with motifs") {
-        auto rts = all_atom::ResidueTypeSet();
         auto sg = all_atom::SegmentGraph();
         resource_management::ResourceManager rm;
 
@@ -94,6 +93,30 @@ TEST_CASE( "Test Graph Data Structure ", "[Graph]" ) {
         auto new_g = all_atom::convert_ideal_helices_to_basepair_steps(sg, rm);
         REQUIRE(new_g->get_num_segments() == 13);
         REQUIRE(new_g->are_motifs_connected(0, 12));
+
+    }
+
+    SECTION("test conversion to secondary structure") {
+        resource_management::ResourceManager rm;
+        auto seg1 = rm.get_segment(StringStringMap{{"name","HELIX.IDEAL.5"}});
+
+        auto ss = seg1->get_secondary_structure();
+        REQUIRE(ss->get_sequence() == seg1->get_sequence());
+        REQUIRE(ss->get_dot_bracket() == seg1->get_dot_bracket());
+
+        auto sg = all_atom::SegmentGraph();
+
+        auto seg2 = rm.get_segment(StringStringMap{{"name","TWOWAY.1A34.0"}});
+        auto seg3 = rm.get_segment(StringStringMap{{"name","HELIX.IDEAL.5"}});
+        sg.add_segment(*seg1);
+        sg.add_segment(*seg2, 0, sg.get_segment_end_name(0, 1));
+        sg.add_segment(*seg3, 1, sg.get_segment_end_name(1, 1));
+        sg.add_connection(data_structures::NodeIndexandEdge{0, 0},
+                          data_structures::NodeIndexandEdge{2, 1});
+
+        auto ss_sg = all_atom::get_secondary_structure_graph(sg);
+        REQUIRE(ss_sg->get_num_segments() == 3);
+        REQUIRE(ss_sg->are_motifs_connected(0, 2));
 
     }
 

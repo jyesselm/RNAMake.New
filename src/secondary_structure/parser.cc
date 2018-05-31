@@ -25,8 +25,15 @@ SegmentOP
 Parser::parse_to_segment(
         String const & sequence,
         String const & dot_bracket) {
-    auto p = parse_to_pose(sequence, dot_bracket);
-    return std::make_shared<Segment>(*p, util::SegmentType::SEGMENT, 0);
+    // make sure things are reset
+    basepairs_ = Basepairs();
+    tc_basepairs_ = Basepairs();
+
+    auto s = get_structure_from_secondary_structure(sequence, dot_bracket);
+    parse_structure_to_chain_graph(*s);
+
+    //return std::make_shared<Segment>(*p, util::SegmentType::SEGMENT, 0);
+    return _generate_segment(*s);
 
 }
 
@@ -71,10 +78,12 @@ Parser::parse_structure_to_chain_graph(
 
 }
 
-PoseOP
-Parser::_generate_pose(
-        Structure const & s) {
-    auto current_basepairs = Basepairs();
+
+void
+Parser::_get_basepairs_in_structure(
+        Structure const & s,
+        Basepairs & current_basepairs) {
+
     for(auto const & bp : basepairs_) {
         // do both residues in basepair exist in structure
         try {
@@ -94,6 +103,14 @@ Parser::_generate_pose(
         catch(StructureException) { continue; }
         current_basepairs.push_back(bp);
     }
+}
+
+PoseOP
+Parser::_generate_pose(
+        Structure const & s) {
+    auto current_basepairs = Basepairs();
+    _get_basepairs_in_structure(s, current_basepairs);
+
     auto end_indexes = get_end_indexes_from_basepairs(s, current_basepairs)->get_data();
 
     auto end_ids = base::SimpleStringCOPs();
@@ -107,6 +124,29 @@ Parser::_generate_pose(
 
 }
 
+
+SegmentOP
+Parser::_generate_segment(
+        Structure const & s) {
+    auto current_basepairs = Basepairs();
+    _get_basepairs_in_structure(s, current_basepairs);
+
+    auto end_indexes = get_end_indexes_from_basepairs(s, current_basepairs)->get_data();
+
+    if(end_indexes.size() == 0) {
+        throw ParserException("segments must include at least one end!");
+    }
+
+    auto end_ids = base::SimpleStringCOPs();
+    for(auto const & ei : end_indexes) {
+        auto end_id = generate_end_id(s, current_basepairs, current_basepairs[ei]);
+        end_ids.push_back(std::make_shared<base::SimpleString const>(end_id));
+    }
+    auto name = std::make_shared<base::SimpleString const>("from_secondary_structure");
+    auto seg = std::make_shared<Segment>(s, current_basepairs, end_indexes, end_ids, name,
+                                         util::SegmentType::SEGMENT, 0, util::Uuid());
+    return seg;
+}
 
 
 };

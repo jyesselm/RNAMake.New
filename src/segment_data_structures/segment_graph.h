@@ -8,18 +8,20 @@
 #include <data_structures/graph.h>
 #include <all_atom/aligner.h>
 #include <resource_management/resource_manager.h>
+#include <secondary_structure/segment.h>
+#include <secondary_structure/aligner.h>
 
 namespace segment_data_structures {
 
-template <typename SegmentType, typename AlignerType>
+template<typename SegmentType, typename AlignerType>
 class SegmentGraph {
 public:
-    SegmentGraph():
+    SegmentGraph() :
             aligner_(AlignerType()),
-            graph_(data_structures::FixedEdgeDirectedGraph<SegmentType>()){}
+            graph_(data_structures::FixedEdgeDirectedGraph<SegmentType>()) {}
 
     SegmentGraph(
-            SegmentGraph const & sg):
+            SegmentGraph const & sg) :
             aligner_(AlignerType()),
             graph_(sg.graph_) {}
 
@@ -28,14 +30,11 @@ public:
     typedef typename data_structures::FixedEdgeDirectedGraph<SegmentType>::const_iterator const_iterator;
     typedef typename data_structures::FixedEdgeDirectedGraph<SegmentType>::iterator iterator;
 
-    iterator begin(){ return graph_.begin(); }
-    iterator end()  { return graph_.end(); }
+    iterator begin() { return graph_.begin(); }
+    iterator end() { return graph_.end(); }
 
     const_iterator begin() const noexcept { return graph_.begin(); }
-    const_iterator end() const noexcept   { return graph_.end(); }
-
-public:
-
+    const_iterator end() const noexcept { return graph_.end(); }
 
 public:
     inline
@@ -97,7 +96,7 @@ public:
 
     inline
     std::vector<data_structures::Edge const *> const &
-    get_motif_connections (
+    get_motif_connections(
             Index ni) const {
         return graph_.get_node_edges(ni);
     }
@@ -141,7 +140,7 @@ public:
             Index ni) {
         graph_.remove_node(ni);
         auto roots = graph_.get_root_indexes();
-        if(roots.size() > 0) {
+        if (roots.size() > 0) {
             graph_.setup_transversal(roots[0]);
         }
     }
@@ -159,8 +158,8 @@ public:
     void
     write_nodes_to_pdbs(
             String const & name) const {
-        for(auto const & n : graph_) {
-            n->data().write_pdb(name+"."+std::to_string(n->index())+".pdb");
+        for (auto const & n : graph_) {
+            n->data().write_pdb(name + "." + std::to_string(n->index()) + ".pdb");
         }
     }
 
@@ -168,7 +167,7 @@ protected:
     void
     _update_default_transveral() {
         auto roots = graph_.get_root_indexes();
-        if(roots.size() > 0) {
+        if (roots.size() > 0) {
             graph_.setup_transversal(roots[0]);
         }
     }
@@ -181,6 +180,31 @@ protected:
 
 template <typename SegmentType, typename AlignerType>
 using SegmentGraphOP = std::shared_ptr<SegmentGraph<SegmentType, AlignerType>>;
+
+}
+
+// typedefs
+//////////////////////////////////////////////////////////////////////////////////
+
+namespace all_atom  {
+
+typedef segment_data_structures::SegmentGraph<Segment, Aligner> SegmentGraph;
+typedef std::shared_ptr<SegmentGraph> SegmentGraphOP;
+
+}
+
+namespace secondary_structure {
+
+typedef segment_data_structures::SegmentGraph<Segment, Aligner> SegmentGraph;
+typedef std::shared_ptr<SegmentGraph> SegmentGraphOP;
+
+}
+
+
+// conversion functions
+/////////////////////////////////////////////////////////////////////////////////
+
+namespace segment_data_structures {
 
 namespace __helpers {
 
@@ -208,6 +232,32 @@ add_motif(
 
     index_convert[i] = pos;
 };
+
+template <typename SegmentType, typename AlignerType>
+base::VectorContainerOP<data_structures::Edge>
+get_extra_connections(
+        SegmentGraph<SegmentType, AlignerType> const & g,
+        std::map<String, int> & seen_connections) {
+
+    auto new_edges = std::vector<data_structures::Edge>();
+
+    for(auto const & n : g) {
+        auto & connections = g.get_motif_connections(n->index());
+        for (auto const & c : connections) {
+            if (c == nullptr) { continue; }
+            auto key = c->to_str();
+            if (seen_connections.find(key) != seen_connections.end()) { continue; }
+
+            new_edges.push_back(*c);
+
+            seen_connections[key] = 1;
+        }
+    }
+
+    return std::make_shared<base::VectorContainer<data_structures::Edge> >(new_edges);
+
+};
+
 }
 
 template <typename SegmentType, typename AlignerType>
@@ -296,20 +346,70 @@ convert_ideal_helices_to_basepair_steps(
     return new_g;
 }
 
+template <typename SegmentType, typename AlignerType>
+secondary_structure::SegmentGraphOP
+get_secondary_structure_graph(
+        SegmentGraph<SegmentType, AlignerType> const & g) {
+
+    if(std::is_same<SegmentType, secondary_structure::Segment>::value) {
+        LOGE << "attempting to generate a secondary structure graph from an existing one";
+        throw std::runtime_error("attempting to generate a secondary structure graph from an existing one");
+    }
+
+    auto ss_g = std::make_shared<secondary_structure::SegmentGraph>();
+    auto seen_connections = std::map<String, int>();
+
+    for(auto const & n : g) {
+        auto seg = n->data().get_secondary_structure();
+
+        if(g.has_parent(n->index())) {
+            auto pi = g.get_parent_index(n->index());
+            auto pei = g.get_parent_end_index(n->index());
+
+            auto key1 = data_structures::Edge(n->index(), pi, 0, pei).to_str();
+            auto key2 = data_structures::Edge(pi, n->index(), pei, 0).to_str();
+            seen_connections[key1] = 1; seen_connections[key2] = 1;
+
+            ss_g->add_segment(*seg, pi, ss_g->get_segment_end_name(pi, pei));
+
+        }
+
+        else {
+            ss_g->add_segment(*seg);
+        }
+    }
+
+    auto extra_connections = __helpers::get_extra_connections(g, seen_connections);
+    for(auto const & e: *extra_connections) {
+        ss_g->add_connection(data_structures::NodeIndexandEdge{e.node_i, e.edge_i},
+                             data_structures::NodeIndexandEdge{e.node_j, e.edge_j});
+    }
+
+    return ss_g;
+
+}
+
+
+
 }
 
 
 namespace all_atom {
 
-typedef segment_data_structures::SegmentGraph<Segment, Aligner> SegmentGraph;
-
 inline
-std::shared_ptr<SegmentGraph>
+SegmentGraphOP
 convert_ideal_helices_to_basepair_steps(
         SegmentGraph const & sg,
         resource_management::ResourceManager const & rm) {
     return segment_data_structures::convert_ideal_helices_to_basepair_steps<Segment, Aligner>(sg, rm);
 }
+
+inline
+secondary_structure::SegmentGraphOP
+get_secondary_structure_graph(
+    SegmentGraph const & sg) {
+    return segment_data_structures::get_secondary_structure_graph<Segment, Aligner>(sg);
+};
 
 
 }

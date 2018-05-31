@@ -150,6 +150,11 @@ public:
         return std::make_shared<Chains>(chains);
     }
 
+    Cutpoints const &
+    get_cutpoints() const {
+        return cut_points_;
+    }
+
     size_t
     get_num_residues() const { return residues_.size(); }
 

@@ -7,10 +7,25 @@
 
 
 #include <resource_management/resource_manager.h>
+#include <secondary_structure/segment.h>
 #include <all_atom/segment.h>
 #include <segment_data_structures/segment_graph.h>
 
 namespace segment_data_structures {
+
+template <typename SegmentType>
+struct SegmentMergerResult {
+    inline
+    SegmentMergerResult(
+            std::shared_ptr<SegmentType> nsegment,
+            std::map<util::Uuid, util::Uuid> const & nres_uuid_map):
+            segment(nsegment),
+            res_uuid_map(nres_uuid_map) {}
+
+    std::shared_ptr<SegmentType> segment;
+    std::map<util::Uuid, util::Uuid> res_uuid_map;
+};
+
 
 /*
  * Exception for segment merger
@@ -40,13 +55,6 @@ public:
                 prime5_override(nprime5_override),
                 prime3_override(nprime3_override) {}
 
-        /*inline
-        ChainNodeData &
-        operator = (
-                ChainNodeData const & cnd) {
-                return *this;
-        }*/
-
         ChainType  chain;
         util::Uuid m_uuid;
         bool prime5_override;
@@ -61,21 +69,25 @@ public:
         NON_SPECIFIC_SEQUENCE // sequence does not matter such as idealized helices
     };
 
+    typedef std::shared_ptr<SegmentMergerResult<SegmentType> > SegmentMergerResultOP;
 
 public:
     SegmentMerger(
             resource_management::ResourceManager & rm):
             rm_(rm),
             end_chain_ids_1_(Indexes(2)),
-            end_chain_ids_2_(Indexes(2)) {}
+            end_chain_ids_2_(Indexes(2)),
+            res_uuid_map_(std::map<util::Uuid, util::Uuid>()) {}
 
     ~SegmentMerger() {}
 
 public:
-    std::shared_ptr<SegmentType>
+    SegmentMergerResultOP
     merge(
             SegmentGraph<SegmentType, AlignerType> const & g,
             String const & merged_name) {
+        res_uuid_map_ = std::map<util::Uuid, util::Uuid>();
+
         for(auto const & n : g) {
             if(!g.has_parent(n->index())) {
                 _add_segment(n->data());
@@ -91,7 +103,13 @@ public:
             }
         }
 
-        return _build_structure(g, merged_name);
+        auto seg = _build_structure(g, merged_name);
+
+        return std::make_shared<SegmentMergerResult<SegmentType> >(seg, res_uuid_map_);
+        //return SegmentMergerResultOP(nullptr);
+
+        //return std::make_shared<SegmentMergerResult>(seg, res_uuid_map_);
+
     }
 
 protected:
@@ -234,8 +252,16 @@ protected:
 
         // auxiliary chain (a_index) first or last residue will be overritten by the dominant chain
         // during the final merger
-        if(a_end_index == 0) { chain_graph_.get_node_data(a_index).prime5_override = 1; }
-        else                 { chain_graph_.get_node_data(a_index).prime3_override = 1; }
+        if(a_end_index == 0) {
+            chain_graph_.get_node_data(a_index).prime5_override = 1;
+            res_uuid_map_[chain_graph_.get_node_data(a_index).chain.get_first().get_uuid()] = \
+                          chain_graph_.get_node_data(d_index).chain.get_last().get_uuid();
+        }
+        else                 {
+            chain_graph_.get_node_data(a_index).prime3_override = 1;
+            res_uuid_map_[chain_graph_.get_node_data(a_index).chain.get_last().get_uuid()] = \
+                          chain_graph_.get_node_data(d_index).chain.get_first().get_uuid();
+        }
 
         chain_graph_.add_edge(data_structures::NodeIndexandEdge{d_index, d_end_index},
                               data_structures::NodeIndexandEdge{a_index, a_end_index});
@@ -310,12 +336,64 @@ protected:
     resource_management::ResourceManager & rm_;
     std::vector<BasepairType const *> all_bps_;
     Indexes end_chain_ids_1_, end_chain_ids_2_;
+    std::map<util::Uuid, util::Uuid> res_uuid_map_;
     ChainGraph chain_graph_;
-
 
 };
 
 }
+
+
+namespace secondary_structure {
+
+typedef segment_data_structures::SegmentMerger<Segment, Chain, Residue, Basepair, Aligner> _SegmentMerger;
+
+class SegmentMerger : public _SegmentMerger {
+public:
+    typedef _SegmentMerger BaseClass;
+
+public:
+    SegmentMerger(
+            resource_management::ResourceManager & rm):
+            BaseClass(rm) {}
+
+
+    SegmentOP
+    _build_structure(
+            SegmentGraph const & g,
+            String const & merged_name) {
+
+        auto res = Residues();
+        auto chain_cuts = Cutpoints();
+        _get_rna_residues_and_cutpoints(res, chain_cuts);
+        auto res_uuids = std::map<util::Uuid, int>();
+        for(auto const & r : res) {
+            res_uuids[r.get_uuid()] = 1;
+        }
+
+        auto s = Structure(res, chain_cuts);
+
+        auto basepairs = Basepairs();
+
+        for(auto bp : all_bps_) {
+            if(res_uuids.find(bp->get_res1_uuid()) == res_uuids.end()) { continue; }
+            if(res_uuids.find(bp->get_res2_uuid()) == res_uuids.end()) { continue; }
+            basepairs.push_back(*bp);
+
+
+        }
+
+        auto end_indexes = get_ends_from_basepairs(s, basepairs);
+        std::cout << end_indexes->size() << std::endl;
+
+        return SegmentOP(nullptr);
+
+
+    }
+};
+
+}
+
 
 namespace all_atom {
 
@@ -347,7 +425,7 @@ public:
             res_uuids[r.get_uuid()] = 1;
         }
 
-        auto s = all_atom::Structure(res, chain_cuts);
+        auto s = Structure(res, chain_cuts);
 
         auto protein_res = Residues();
         auto protein_cutpoints = Cutpoints();

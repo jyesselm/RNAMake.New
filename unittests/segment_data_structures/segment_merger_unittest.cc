@@ -14,34 +14,78 @@
 
 
 TEST_CASE( "Test Graph Data Structure ", "[Graph]" ) {
-    resource_management::ResourceManager rm;
-    auto seg1 = rm.get_segment(StringStringMap{{"name","HELIX.IDEAL.2"}});
 
-    auto sg = all_atom::SegmentGraph();
-    sg.add_segment(*seg1);
+    SECTION("test merger with all_atom") {
 
-    for(int i = 0; i < 10; i++) {
-        auto seg = rm.get_segment(StringStringMap{{"name","HELIX.IDEAL.2"}});
-        sg.add_segment(*seg, i, sg.get_segment_end_name(i, 1));
+        resource_management::ResourceManager rm;
+        auto seg1 = rm.get_segment(StringStringMap{{"name", "HELIX.IDEAL.2"}});
+
+        auto sg = all_atom::SegmentGraph();
+        sg.add_segment(*seg1);
+
+        for (int i = 0; i < 10; i++) {
+            auto seg = rm.get_segment(StringStringMap{{"name", "HELIX.IDEAL.2"}});
+            sg.add_segment(*seg, i, sg.get_segment_end_name(i, 1));
+        }
+
+        auto sm = all_atom::SegmentMerger(rm);
+        auto merged_results = sm.merge(sg, "merged_graph");
+        auto merged_sg = merged_results->segment;
+
+        REQUIRE(merged_results->res_uuid_map.size() == 20);
+        REQUIRE(merged_sg->get_num_ends() == 2);
+        REQUIRE(merged_sg->get_num_chains() == 2);
+        REQUIRE(merged_sg->get_name_str() == "merged_graph");
+
+        // copies normally
+        auto merged_copy = all_atom::Segment(*merged_sg);
+        REQUIRE(merged_copy.is_equal(*merged_sg));
+
+        auto j = merged_sg->get_json();
+        merged_copy = all_atom::Segment(j, rm.get_residue_type_set());
+        REQUIRE(merged_copy.is_equal(*merged_sg, false));
     }
 
-    auto sm = all_atom::SegmentMerger(rm);
-    auto merged_sg = sm.merge(sg, "merged_graph");
+    SECTION("test merger on secondary structure") {
+        resource_management::ResourceManager rm;
+        auto seg1 = rm.get_segment(StringStringMap{{"name", "HELIX.IDEAL.2"}});
 
-    REQUIRE(merged_sg->get_num_ends() == 2);
-    REQUIRE(merged_sg->get_num_chains() == 2);
-    REQUIRE(merged_sg->get_name_str() == "merged_graph");
+        auto sg = all_atom::SegmentGraph();
+        sg.add_segment(*seg1);
 
-    // copies normally
-    auto merged_copy = all_atom::Segment(*merged_sg);
-    REQUIRE(merged_copy.is_equal(*merged_sg));
+        for (int i = 0; i < 10; i++) {
+            auto seg = rm.get_segment(StringStringMap{{"name", "HELIX.IDEAL.2"}});
+            sg.add_segment(*seg, i, sg.get_segment_end_name(i, 1));
+        }
 
-    auto j = merged_sg->get_json();
-    merged_copy = all_atom::Segment(j, rm.get_residue_type_set());
-    REQUIRE(merged_copy.is_equal(*merged_sg, false));
+        auto ss_sg = all_atom::get_secondary_structure_graph(sg);
+        auto sm = secondary_structure::SegmentMerger(rm);
+        auto merged_results = sm.merge(*ss_sg, "merged_graph");
 
 
-    //sg.write_nodes_to_pdbs("test");
+    }
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

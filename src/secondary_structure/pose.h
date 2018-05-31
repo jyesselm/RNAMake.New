@@ -77,10 +77,10 @@ public: //setters
 
     inline
     void
-    set_residue_name(
+    set_residue_identity(
             Index residue_index,
             char name) {
-        structure_.set_residue_name(residue_index, name);
+        structure_.set_residue_identity(residue_index, name);
     }
 
 private:

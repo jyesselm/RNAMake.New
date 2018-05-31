@@ -28,6 +28,19 @@ struct ChainGraphNode {
 
 };
 
+/*
+ * Exception for parser
+ */
+class ParserException : public std::runtime_error {
+public:
+    /**
+     * Standard constructor for ParserException
+     * @param   message   Error message for secondary structure parser
+     */
+    ParserException(String const & message) :
+            std::runtime_error(message) {}
+};
+
 
 class ChainGraph {
 public:
@@ -201,12 +214,22 @@ private:
         for(auto const & bp: tc_basepairs_) {
             if(bp.get_res2_uuid() == r.get_uuid()) { return bp; }
         }
+
+        throw ParserException("something went very wrong cannot find existing basepair");
     }
 
     PoseOP
     _generate_pose(
-            Structure const & s);
+            Structure const &);
 
+    SegmentOP
+    _generate_segment(
+            Structure const &);
+
+    void
+    _get_basepairs_in_structure(
+            Structure const &,
+            Basepairs &);
 
 
 private:

@@ -5,11 +5,12 @@
 #ifndef RNAMAKE_NEW_SS_ALIGNER_H
 #define RNAMAKE_NEW_SS_ALIGNER_H
 
+#include <primitives/aligner.h>
 #include <secondary_structure/segment.h>
 
 namespace secondary_structure {
 
-class Aligner {
+class Aligner : public primitives::Aligner<Segment, Basepair> {
 public:
     Aligner() {}
 
@@ -19,13 +20,13 @@ public:
     void
     align(
             Basepair const & ref_bp,
-            SegmentOP & rs) const { }
+            Segment & seg) const { }
 
     SegmentOP
     get_aligned(
             Basepair const & ref_bp,
-            SegmentOP const & rs) const {
-        return std::make_shared<Segment>(*rs);
+            Segment const & seg) const {
+        return std::make_shared<Segment>(seg);
     }
 };
 

@@ -102,7 +102,7 @@ public: //iterators
 public: //structure wrappers
     inline
     String
-    get_sequence() { return structure_.sequence(); }
+    get_sequence() { return structure_.get_sequence(); }
 
     inline
     Restype const &
