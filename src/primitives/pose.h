@@ -405,7 +405,6 @@ public: // get end by end id
 
 public: // other getters
 
-    inline
     base::SimpleStringCOP
     get_end_id(
             Index index) const {
@@ -468,8 +467,8 @@ protected:
     Structuretype structure_;
     std::vector<BPtype> basepairs_;
     Indexes end_indexes_;
-    base::SimpleStringCOPs end_ids_;
     base::SimpleStringCOP name_;
+    mutable base::SimpleStringCOPs end_ids_;
 
 };
 

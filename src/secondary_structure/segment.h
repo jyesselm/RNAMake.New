@@ -24,7 +24,8 @@ public:
             util::SegmentType segment_type,
             Index aligned_end_index,
             util::Uuid const & uuid):
-            BaseClass(structure, basepairs, end_indexes, end_ids, name, segment_type, aligned_end_index, uuid) {}
+            BaseClass(structure, basepairs, end_indexes, end_ids, name, segment_type, aligned_end_index, uuid),
+            sequence_update_(false) {}
 
 public:
 
@@ -37,13 +38,7 @@ public:
     set_sequence(
             String const & sequence) {
         structure_.set_sequence(sequence);
-
-        int i = -1;
-        for(auto const & ei : this->end_indexes_) {
-            i++;
-            auto end_id = generate_end_id(this->structure_, this->basepairs_, this->basepairs_[ei]);
-            this->end_ids_[i] = std::make_shared<base::SimpleString const>(end_id);
-        }
+        sequence_update_ = true;
     }
 
     inline
@@ -52,7 +47,39 @@ public:
             Index residue_index,
             char name) {
         structure_.set_residue_identity(residue_index, name);
+        sequence_update_ = true;
     }
+
+public: //overrided
+
+    base::SimpleStringCOP
+    get_end_id(
+            Index index) const{
+
+        if(sequence_update_) {
+            _update_end_ids();
+            sequence_update_ = false;
+        }
+
+        return primitives::Segment<Basepair, Structure, Chain, Residue>::get_end_id(index);
+    }
+
+
+private:
+    void
+    _update_end_ids() const {
+        int i = -1;
+        for(auto const & ei : this->end_indexes_) {
+            i++;
+            auto end_id = generate_end_id(this->structure_, this->basepairs_, this->basepairs_[ei]);
+            this->end_ids_[i] = std::make_shared<base::SimpleString const>(end_id);
+        }
+
+    }
+
+
+private:
+    mutable bool sequence_update_;
 
 
 };

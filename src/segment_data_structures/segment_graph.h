@@ -147,6 +147,18 @@ public:
         }
     }
 
+    void
+    replace_segment(
+            Index pos,
+            SegmentType const & seg,
+            bool copy = true) {
+
+        if(! copy) { get_segment(pos) = seg; }
+        else       { get_segment(pos) = SegmentType(seg); }
+        _update_alignments(pos);
+
+    }
+
 
 public:
     String
@@ -174,6 +186,31 @@ protected:
         }
     }
 
+    void
+    _update_alignments(
+            int start)  {
+
+        auto parent_index = 0;
+        auto parent_end_index = 0;
+        auto needs_update = false;
+        for(auto & n : graph_) {
+            if(! has_parent(n->index())) {
+                needs_update = false;
+                continue;
+            }
+
+            if(start == n->index()) {
+                needs_update = true;
+            }
+
+            if(! needs_update) { continue; }
+
+            parent_index = get_parent_index(n->index());
+            parent_end_index = get_parent_end_index(n->index());
+
+            aligner_.align(get_segment(parent_index).get_end(parent_end_index), n->data());
+        }
+    }
 
 protected:
     data_structures::FixedEdgeDirectedGraph<SegmentType> graph_;

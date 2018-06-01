@@ -106,6 +106,29 @@ TEST_CASE( "Test Graph Data Structure ", "[Graph]" ) {
 
     }
 
+    SECTION("test replacing a segment") {
+        auto sg = all_atom::SegmentGraph();
+        auto sg2 = all_atom::SegmentGraph();
+        resource_management::ResourceManager rm;
+
+        auto seg1 = rm.get_segment(StringStringMap{{"name","HELIX.IDEAL.5"}});
+        auto seg2 = rm.get_segment(StringStringMap{{"name","TWOWAY.1A34.0"}});
+        auto seg3 = rm.get_segment(StringStringMap{{"name","HELIX.IDEAL.5"}});
+        auto seg4 = rm.get_segment(StringStringMap{{"name","HELIX.IDEAL.5"}});
+        sg.add_segment(*seg1);
+        sg.add_segment(*seg2, 0, sg.get_segment_end_name(0, 1));
+        sg.add_segment(*seg3, 1, sg.get_segment_end_name(1, 1));
+
+        sg.replace_segment(1, *seg4);
+
+        //compare to graph without replacement
+        sg2.add_segment(*seg1);
+        sg2.add_segment(*seg4, 0, sg2.get_segment_end_name(0, 1));
+        sg2.add_segment(*seg3, 1, sg2.get_segment_end_name(1, 1));
+
+        REQUIRE(sg.get_segment(2).get_end(1) == sg2.get_segment(2).get_end(1));
+    }
+
     SECTION("test conversion to secondary structure") {
         resource_management::ResourceManager rm;
         auto seg1 = rm.get_segment(StringStringMap{{"name","HELIX.IDEAL.5"}});
