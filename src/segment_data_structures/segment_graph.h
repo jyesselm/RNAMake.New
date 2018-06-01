@@ -23,7 +23,9 @@ public:
     SegmentGraph(
             SegmentGraph const & sg) :
             aligner_(AlignerType()),
-            graph_(sg.graph_) {}
+            graph_(sg.graph_) {
+        _update_default_transveral();
+    }
 
 public:
 

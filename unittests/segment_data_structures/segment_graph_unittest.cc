@@ -46,6 +46,16 @@ TEST_CASE( "Test Graph Data Structure ", "[Graph]" ) {
         }
 
         REQUIRE(path == target);
+
+        // is copying messing up transveral
+        path = Indexes();
+        auto target_2 = Indexes{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        for (auto const & n : sg2) {
+            path.push_back(n->index());
+        }
+
+        REQUIRE(path == target_2);
+
     }
 
     SECTION("test add connection") {

@@ -11,7 +11,7 @@
 #include <all_atom/structure.h>
 #include <all_atom/basepair.h>
 
-// forward declaration to allow SegmentSqliteLibraryt to call new_uuids()
+// forward declaration to allow SegmentSqliteLibrary to call new_uuids()
 namespace resource_management {
     class SegmentSqliteLibrary;
 }

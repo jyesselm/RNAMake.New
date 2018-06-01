@@ -48,20 +48,23 @@ TEST_CASE( "Test Graph Data Structure ", "[Graph]" ) {
 
     SECTION("test merger on secondary structure") {
         resource_management::ResourceManager rm;
-        auto seg1 = rm.get_segment(StringStringMap{{"name", "HELIX.IDEAL.2"}});
+        auto seg1 = rm.get_segment(StringStringMap{{"name", "HELIX.IDEAL"}});
 
         auto sg = all_atom::SegmentGraph();
         sg.add_segment(*seg1);
 
-        for (int i = 0; i < 10; i++) {
-            auto seg = rm.get_segment(StringStringMap{{"name", "HELIX.IDEAL.2"}});
+        for (int i = 0; i < 2; i++) {
+            auto seg = rm.get_segment(StringStringMap{{"name", "HELIX.IDEAL"}});
             sg.add_segment(*seg, i, sg.get_segment_end_name(i, 1));
         }
 
         auto ss_sg = all_atom::get_secondary_structure_graph(sg);
         auto sm = secondary_structure::SegmentMerger(rm);
         auto merged_results = sm.merge(*ss_sg, "merged_graph");
+        auto merged_sg = merged_results->segment;
 
+        REQUIRE(merged_sg->get_sequence() == "GGGG&CCCC");
+        REQUIRE(merged_sg->get_dot_bracket() == "((((&))))");
 
     }
 

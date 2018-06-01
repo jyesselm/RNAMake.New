@@ -73,7 +73,7 @@ public:
 
 public:
     SegmentMerger(
-            resource_management::ResourceManager & rm):
+            resource_management::ResourceManager const & rm):
             rm_(rm),
             end_chain_ids_1_(Indexes(2)),
             end_chain_ids_2_(Indexes(2)),
@@ -333,7 +333,7 @@ public: // pure virtual needs to be different for each specialization
 
 
 protected:
-    resource_management::ResourceManager & rm_;
+    resource_management::ResourceManager const & rm_;
     std::vector<BasepairType const *> all_bps_;
     Indexes end_chain_ids_1_, end_chain_ids_2_;
     std::map<util::Uuid, util::Uuid> res_uuid_map_;
@@ -354,7 +354,7 @@ public:
 
 public:
     SegmentMerger(
-            resource_management::ResourceManager & rm):
+            resource_management::ResourceManager const & rm):
             BaseClass(rm) {}
 
 
@@ -379,18 +379,22 @@ public:
             if(res_uuids.find(bp->get_res1_uuid()) == res_uuids.end()) { continue; }
             if(res_uuids.find(bp->get_res2_uuid()) == res_uuids.end()) { continue; }
             basepairs.push_back(*bp);
-
-
         }
 
-        auto end_indexes = get_ends_from_basepairs(s, basepairs);
-        std::cout << end_indexes->size() << std::endl;
+        auto end_indexes = get_ends_from_basepairs(s, basepairs)->get_data();
+        auto end_ids = base::SimpleStringCOPs();
+        for(auto const & ei : end_indexes) {
+            auto end_id = generate_end_id(s, basepairs, basepairs[ei]);
+            end_ids.push_back(std::make_shared<base::SimpleString const>(end_id));
+        }
 
-        return SegmentOP(nullptr);
-
-
+        auto name = std::make_shared<base::SimpleString const>(merged_name);
+        auto seg = std::make_shared<Segment>(s, basepairs, end_indexes, end_ids, name,
+                                             util::SegmentType::SEGMENT, 0, util::Uuid());
+        return seg;
     }
 };
+
 
 }
 
@@ -405,7 +409,7 @@ public:
 
 public:
     SegmentMerger(
-            resource_management::ResourceManager & rm):
+            resource_management::ResourceManager const & rm):
             BaseClass(rm) {}
 
     ~SegmentMerger() {}

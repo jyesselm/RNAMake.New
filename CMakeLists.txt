@@ -288,6 +288,7 @@ target_link_libraries(sqlite_library_unittest resource_management_lib)
 ###########################################################################
 
 set(segment_data_structures_files
+	/Users/jyesselm/projects/RNAMake.New/src/segment_data_structures/sequence_updater.cc
 	/Users/jyesselm/projects/RNAMake.New/src/segment_data_structures/segment_graph.cc
 	/Users/jyesselm/projects/RNAMake.New/src/segment_data_structures/segment_merger.cc
 )
@@ -300,6 +301,9 @@ target_link_libraries(segment_data_structures resource_management_lib  pybind11:
 
 add_executable(segment_merger_unittest /Users/jyesselm/projects/RNAMake.New/unittests/segment_data_structures/segment_merger_unittest.cc)
 target_link_libraries(segment_merger_unittest segment_data_structures_lib)
+
+add_executable(sequence_updater_unittest /Users/jyesselm/projects/RNAMake.New/unittests/segment_data_structures/sequence_updater_unittest.cc)
+target_link_libraries(sequence_updater_unittest segment_data_structures_lib)
 
 add_executable(segment_graph_unittest /Users/jyesselm/projects/RNAMake.New/unittests/segment_data_structures/segment_graph_unittest.cc)
 target_link_libraries(segment_graph_unittest segment_data_structures_lib)

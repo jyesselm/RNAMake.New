@@ -6,9 +6,6 @@
 #define PRIMITIVES_CHAIN_H
 
 #include <memory>
-#include <boost/iterator/indirect_iterator.hpp>
-#include <boost/iterator/iterator_adaptor.hpp>
-
 
 #include <base/string.h>
 #include <base/assertions.h>
