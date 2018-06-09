@@ -119,6 +119,24 @@ TEST_CASE( "testing basic all atom classes", "[AllAtom]" ) {
 
             }
 
+            SECTION("test copying") {
+                auto r_s2 = state::Residue(r_s);
+                REQUIRE(r_s == r_s2);
+
+                auto p = math::Point(10, 0, 0);
+                r_s2.move(p);
+
+                REQUIRE(r_s != r_s2);
+            }
+
+            SECTION("test creation from json") {
+                auto j = r_s.get_json();
+                auto r_s2 = state::Residue(j);
+
+                REQUIRE(r_s.is_equal(r_s2, false));
+
+            }
+
         }
 
     }

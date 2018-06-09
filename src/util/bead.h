@@ -68,6 +68,13 @@ public:
         bead_type_   = BeadType(std::stoi(spl[1]));
     }
 
+    inline
+    Bead(
+            json::JSON & j) {
+        bead_type_ = static_cast<BeadType>(j[0].ToInt());
+        center_    = math::Point(j[1]);
+    }
+
     /**
      * Copy constructor
      * @param   b   Bead object copying from
@@ -123,6 +130,12 @@ public: //operators
         return true;
     }
 
+    inline
+    bool
+    operator != (Bead const & b) const {
+        return !(*this == b);
+    }
+
 public: //getters
 
     /**
@@ -142,6 +155,11 @@ public: //getters
     String
     get_str() const {
         return center_.get_str() + "," + std::to_string((int)bead_type_);
+    }
+
+    json::JSON
+    get_json() const {
+        return json::Array((int)bead_type_, center_.get_json());
     }
 
     String

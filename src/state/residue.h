@@ -27,8 +27,25 @@ public:
     inline
     Residue(
             Residue const & r):
-            primitives::Residue(r.name_, r.num_, r.chain_id_, r.i_code_, r.uuid_) {}
+            primitives::Residue(r.name_, r.num_, r.chain_id_, r.i_code_, r.uuid_),
+            beads_(r.beads_){}
 
+
+    Residue(
+            json::JSON & j):
+            primitives::Residue() {
+        name_     = (char)j["name"].ToInt();
+        num_      = (int)j["num"].ToInt();
+        chain_id_ = (char)j["chain_id"].ToInt();
+        i_code_   = (char)j["i_code"].ToInt();
+        uuid_     = util::Uuid();
+        beads_    = util::Beads();
+        auto & bead_json = j["beads"];
+        for(int i = 0; i < bead_json.size(); i++) {
+            beads_.push_back(util::Bead(bead_json[i]));
+        }
+
+    }
 
     ~Residue() {}
 
@@ -37,6 +54,53 @@ public: //iterator stuff
 
     const_iterator begin() const noexcept { return beads_.begin(); }
     const_iterator end() const noexcept   { return beads_.end(); }
+
+
+public:
+
+    inline
+    bool
+    operator == (
+            Residue const & r) const {
+        return is_equal(r);
+    }
+
+    inline
+    bool
+    operator != (
+            Residue const & r) const {
+        return !is_equal(r);
+    }
+
+    friend
+    std::ostream &
+    operator<< (
+            std::ostream & stream ,
+            Residue const & r) {
+        stream << r.num_ << r.chain_id_;
+        if(r.i_code_ != ' ') { stream << "(" << r.i_code_ << ")"; }
+        return stream;
+    }
+
+
+public:
+    inline
+    bool
+    is_equal(
+            Residue const & r,
+            bool check_uuid = true) const {
+        if(check_uuid && uuid_ != r.uuid_) { return false; }
+        if(name_ != r.name_) { return false; }
+        if(num_ != r.num_) { return false; }
+        if(chain_id_ != r.chain_id_) { return false; }
+        if(i_code_ != r.i_code_) { return false; }
+        for(int i = 0; i < beads_.size(); i++) {
+            if(beads_[i] != r.beads_[i]) { return false;}
+        }
+        return true;
+    }
+
+
 
 public:
     inline
@@ -51,7 +115,17 @@ public:
     }
 
     json::JSON
-    get_json() const;
+    get_json() const {
+        auto bead_array = json::Array();
+        for(auto const & b : beads_) { bead_array.append(b.get_json()); }
+
+        return json::JSON {
+                "name", name_,
+                "num", num_,
+                "chain_id", chain_id_,
+                "i_code", i_code_,
+                "beads", bead_array };
+    }
 
 public:
 
