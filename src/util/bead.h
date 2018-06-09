@@ -134,7 +134,7 @@ public: //getters
     }
 
     String
-    get_type_name() {
+    get_type_name() const {
         if     (bead_type_ == BeadType::PHOS)  { return "PHOSPHATE"; }
         else if(bead_type_ == BeadType::SUGAR) { return "SUGAR"; }
         else if(bead_type_ == BeadType::BASE)  { return "BASE"; }

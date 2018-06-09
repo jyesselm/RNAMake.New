@@ -258,6 +258,20 @@ add_executable(all_atom_basic_unittest /Users/jyesselm/projects/RNAMake.New/unit
 target_link_libraries(all_atom_basic_unittest all_atom_lib)
 
 ###########################################################################
+# state
+###########################################################################
+
+set(state_files
+	/Users/jyesselm/projects/RNAMake.New/src/state/residue.cc
+)
+
+add_library(state_lib ${state_files})
+target_link_libraries(state_lib all_atom_lib  pybind11::module)
+
+add_library(state MODULE ${state_files})
+target_link_libraries(state all_atom_lib  pybind11::module)
+
+###########################################################################
 # resource_management
 ###########################################################################
 
@@ -269,10 +283,10 @@ set(resource_management_files
 )
 
 add_library(resource_management_lib ${resource_management_files})
-target_link_libraries(resource_management_lib all_atom_lib  pybind11::module)
+target_link_libraries(resource_management_lib all_atom_lib  state_lib  pybind11::module)
 
 add_library(resource_management MODULE ${resource_management_files})
-target_link_libraries(resource_management all_atom_lib  pybind11::module)
+target_link_libraries(resource_management all_atom_lib  state_lib  pybind11::module)
 
 add_executable(resource_manager_unittest /Users/jyesselm/projects/RNAMake.New/unittests/resource_management/resource_manager_unittest.cc)
 target_link_libraries(resource_manager_unittest resource_management_lib)

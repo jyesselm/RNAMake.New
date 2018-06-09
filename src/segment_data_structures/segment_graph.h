@@ -37,22 +37,13 @@ public:
     typedef typename data_structures::FixedEdgeDirectedGraph<SegmentType>::iterator iterator;
 
     iterator begin() {
-        if(needs_update_) {
-            _update_alignments(first_update_);
-            needs_update_ = false;
-            first_update_ = INT_MAX;
-        }
+        _check_to_update_alignments();
         return graph_.begin();
     }
     iterator end() { return graph_.end(); }
 
     const_iterator begin() const noexcept {
-        if(needs_update_) {
-            _update_alignments(first_update_);
-            needs_update_ = false;
-            first_update_ = INT_MAX;
-        }
-
+        _check_to_update_alignments();
         return graph_.begin();
     }
     const_iterator end() const noexcept { return graph_.end(); }
@@ -69,12 +60,7 @@ public:
     get_segment(
             Index ni) const {
 
-        if(needs_update_) {
-            _update_alignments(first_update_);
-            needs_update_ = false;
-            first_update_ = INT_MAX;
-        }
-
+        _check_to_update_alignments();
         return graph_.get_node_data(ni);
     }
 
@@ -82,11 +68,7 @@ public:
     SegmentType &
     get_segment(
             Index ni) {
-        if(needs_update_) {
-            _update_alignments(first_update_);
-            needs_update_ = false;
-            first_update_ = INT_MAX;
-        }
+        _check_to_update_alignments();
         return graph_.get_node_data(ni);
     }
 
@@ -204,12 +186,8 @@ public:
     void
     write_nodes_to_pdbs(
             String const & name) const {
-        if(needs_update_) {
-            _update_alignments(first_update_);
-            needs_update_ = false;
-            first_update_ = INT_MAX;
-        }
 
+        _check_to_update_alignments();
         for (auto const & n : graph_) {
             n->data().write_pdb(name + "." + std::to_string(n->index()) + ".pdb");
         }
@@ -248,6 +226,16 @@ protected:
 
             aligner_.align(graph_.get_node_data(parent_index).get_end(parent_end_index), n->data());
         }
+    }
+
+    void
+    _check_to_update_alignments() const {
+        if(needs_update_) {
+            _update_alignments(first_update_);
+            needs_update_ = false;
+            first_update_ = INT_MAX;
+        }
+
     }
 
 protected:

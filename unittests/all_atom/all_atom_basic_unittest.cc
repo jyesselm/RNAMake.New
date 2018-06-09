@@ -11,6 +11,8 @@
 #include <all_atom/pdb_parser.h>
 #include <all_atom/pose.h>
 
+#include <state/residue.h>
+
 #include <util/sqlite/connection.h>
 
 struct UnitestData : BasicUnitestData {
@@ -84,6 +86,19 @@ TEST_CASE( "testing basic all atom classes", "[AllAtom]" ) {
             auto j = r.get_json();
             auto r2 = all_atom::Residue(j, rts);
             REQUIRE(r.is_equal(r2, false));
+        }
+
+        SECTION("test state generation") {
+            auto beads = util::Beads{r.bead_begin(), r.bead_end()};
+            auto r_s = state::Residue(r.get_name(), r.get_num(), r.get_chain_id(), r.get_i_code(),
+                                      beads, r.get_uuid());
+
+            REQUIRE(r_s.get_name() == r.get_name());
+            REQUIRE(r_s.get_num() == r.get_num());
+            REQUIRE(r_s.get_chain_id() == r.get_chain_id());
+            REQUIRE(r_s.get_i_code() == r.get_i_code());
+            REQUIRE(r_s.get_uuid() == r.get_uuid());
+
         }
 
     }
