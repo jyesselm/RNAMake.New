@@ -62,6 +62,7 @@ ResourceBuilder::build_basic_libraries() {
             { motif_dirs_path_ + "/tertiary_contact_hairpin_hairpin/",   util::SegmentType::TC_HAIRPIN_HAIRPIN },
             { motif_dirs_path_ + "/tertiary_contact_junction_hairpin/",  util::SegmentType::TC_JUNCTION_HAIRPIN },
             { motif_dirs_path_ + "/tertiary_contact_junction_junction/", util::SegmentType::TC_JUNCTION_JUNCTION},
+            { motif_dirs_path_ + "/basepair_steps/", util::SegmentType::HELIX }
     };
 
     auto excluded_motifs = std::map<String, int>();
@@ -90,6 +91,7 @@ ResourceBuilder::build_basic_libraries() {
     }
 
 }
+
 
 void
 ResourceBuilder::_insert_segment_to_motif_table(
@@ -141,7 +143,8 @@ ResourceBuilder::_build_basic_library(
             auto spl = base::split_str_by_delimiter(fname, ".");
             if (spl[1] == "IDEAL" || spl[1] == "LE") { continue; }
         }
-        if(fname.length() < 10) { continue;}
+        //if(fname.length() < 10) { continue;}
+        if(fname[0] == '.') { continue; }
         if(excluded_motifs.find(fname) != excluded_motifs.end()) { continue; }
 
         auto pdb_path = path + fname + "/" + fname + ".pdb";
@@ -150,7 +153,6 @@ ResourceBuilder::_build_basic_library(
         for(auto & seg : segs ) {
             seg_f_.align_segment_to_ref_frame(*seg);
             _insert_segment_to_motif_table(*seg, i, conn);
-            seg->write_pdb("test."+std::to_string(i)+".pdb");
             i++;
         }
 

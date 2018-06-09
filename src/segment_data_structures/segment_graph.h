@@ -18,12 +18,16 @@ class SegmentGraph {
 public:
     SegmentGraph() :
             aligner_(AlignerType()),
-            graph_(data_structures::FixedEdgeDirectedGraph<SegmentType>()) {}
+            graph_(data_structures::FixedEdgeDirectedGraph<SegmentType>()),
+            needs_update_(false),
+            first_update_(INT_MAX){}
 
     SegmentGraph(
             SegmentGraph const & sg) :
             aligner_(AlignerType()),
-            graph_(sg.graph_) {
+            graph_(sg.graph_),
+            needs_update_(false),
+            first_update_(INT_MAX) {
         _update_default_transveral();
     }
 
@@ -32,10 +36,25 @@ public:
     typedef typename data_structures::FixedEdgeDirectedGraph<SegmentType>::const_iterator const_iterator;
     typedef typename data_structures::FixedEdgeDirectedGraph<SegmentType>::iterator iterator;
 
-    iterator begin() { return graph_.begin(); }
+    iterator begin() {
+        if(needs_update_) {
+            _update_alignments(first_update_);
+            needs_update_ = false;
+            first_update_ = INT_MAX;
+        }
+        return graph_.begin();
+    }
     iterator end() { return graph_.end(); }
 
-    const_iterator begin() const noexcept { return graph_.begin(); }
+    const_iterator begin() const noexcept {
+        if(needs_update_) {
+            _update_alignments(first_update_);
+            needs_update_ = false;
+            first_update_ = INT_MAX;
+        }
+
+        return graph_.begin();
+    }
     const_iterator end() const noexcept { return graph_.end(); }
 
 public:
@@ -49,6 +68,13 @@ public:
     SegmentType const &
     get_segment(
             Index ni) const {
+
+        if(needs_update_) {
+            _update_alignments(first_update_);
+            needs_update_ = false;
+            first_update_ = INT_MAX;
+        }
+
         return graph_.get_node_data(ni);
     }
 
@@ -56,6 +82,11 @@ public:
     SegmentType &
     get_segment(
             Index ni) {
+        if(needs_update_) {
+            _update_alignments(first_update_);
+            needs_update_ = false;
+            first_update_ = INT_MAX;
+        }
         return graph_.get_node_data(ni);
     }
 
@@ -155,8 +186,9 @@ public:
 
         if(! copy) { get_segment(pos) = seg; }
         else       { get_segment(pos) = SegmentType(seg); }
-        _update_alignments(pos);
 
+        needs_update_ = true;
+        if(first_update_ > pos) { first_update_ = pos; }
     }
 
 
@@ -172,6 +204,12 @@ public:
     void
     write_nodes_to_pdbs(
             String const & name) const {
+        if(needs_update_) {
+            _update_alignments(first_update_);
+            needs_update_ = false;
+            first_update_ = INT_MAX;
+        }
+
         for (auto const & n : graph_) {
             n->data().write_pdb(name + "." + std::to_string(n->index()) + ".pdb");
         }
@@ -188,7 +226,7 @@ protected:
 
     void
     _update_alignments(
-            int start)  {
+            int start) const  {
 
         auto parent_index = 0;
         auto parent_end_index = 0;
@@ -208,13 +246,16 @@ protected:
             parent_index = get_parent_index(n->index());
             parent_end_index = get_parent_end_index(n->index());
 
-            aligner_.align(get_segment(parent_index).get_end(parent_end_index), n->data());
+            aligner_.align(graph_.get_node_data(parent_index).get_end(parent_end_index), n->data());
         }
     }
 
 protected:
-    data_structures::FixedEdgeDirectedGraph<SegmentType> graph_;
     AlignerType aligner_;
+    // lots of mutatables to allow lazy updates
+    mutable data_structures::FixedEdgeDirectedGraph<SegmentType> graph_;
+    mutable bool needs_update_;
+    mutable int first_update_;
 };
 
 template <typename SegmentType, typename AlignerType>
