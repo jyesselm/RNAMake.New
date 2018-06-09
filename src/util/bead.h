@@ -7,6 +7,7 @@
 
 #include <math/xyz_vector.h>
 #include <math/xyz_matrix.h>
+#include <math/numerical.h>
 
 namespace util {
 
@@ -110,6 +111,16 @@ public:
             math::Vector const & t) {
         auto dummy = math::dot_vector(r, center_);
         center_ = dummy + t;
+    }
+
+public: //operators
+
+    inline
+    bool
+    operator == (Bead const & b) const {
+        if(bead_type_ != b.bead_type_) { return false; }
+        if(! math::are_points_equal(center_, b.center_)) { return false; }
+        return true;
     }
 
 public: //getters

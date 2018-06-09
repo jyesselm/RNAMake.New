@@ -99,6 +99,26 @@ TEST_CASE( "testing basic all atom classes", "[AllAtom]" ) {
             REQUIRE(r_s.get_i_code() == r.get_i_code());
             REQUIRE(r_s.get_uuid() == r.get_uuid());
 
+            SECTION("test transforms") {
+                auto p = math::Point(10, 0, 0);
+                r.move(p);
+                r_s.move(p);
+
+                REQUIRE(r.get_bead(util::BeadType::BASE)  == r_s.get_bead(util::BeadType::BASE));
+                REQUIRE(r.get_bead(util::BeadType::SUGAR) == r_s.get_bead(util::BeadType::SUGAR));
+                REQUIRE(r.get_bead(util::BeadType::PHOS)  == r_s.get_bead(util::BeadType::PHOS));
+
+                auto m = math::get_random_rotation_matrix();
+
+                r.transform(m, p);
+                r_s.transform(m, p);
+
+                REQUIRE(r.get_bead(util::BeadType::BASE)  == r_s.get_bead(util::BeadType::BASE));
+                REQUIRE(r.get_bead(util::BeadType::SUGAR) == r_s.get_bead(util::BeadType::SUGAR));
+                REQUIRE(r.get_bead(util::BeadType::PHOS)  == r_s.get_bead(util::BeadType::PHOS));
+
+            }
+
         }
 
     }

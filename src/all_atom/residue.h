@@ -448,16 +448,6 @@ residue_steric_clash_RNA(
         }
     }
 
-    /*std::for_each(r1.bead_begin(), r1.bead_end(), [](util::Bead const & b1) {
-        if(b1.get_type() != util::BeadType::PHOS) {
-            std::for_each(r2.bead_begin(), r2.bead_end(), [](util::Bead const & b2) {
-                if (b2.get_type() != util::BeadType::PHOS) {
-                    if (b1.distance(b2) < 2.5) { return true; }
-                }
-            });
-        }
-    });*/
-
     return false;
 }
 
