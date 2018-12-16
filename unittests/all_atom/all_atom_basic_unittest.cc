@@ -12,6 +12,7 @@
 #include <all_atom/pose.h>
 
 #include <state/residue.h>
+#include <state/chain.h>
 
 #include <util/sqlite/connection.h>
 
@@ -137,6 +138,22 @@ TEST_CASE( "testing basic all atom classes", "[AllAtom]" ) {
 
             }
 
+            SECTION("test getting from get_state function()") {
+                auto r_s = r.get_state();
+
+                REQUIRE(r_s->get_name() == r.get_name());
+                REQUIRE(r_s->get_num() == r.get_num());
+                REQUIRE(r_s->get_chain_id() == r.get_chain_id());
+                REQUIRE(r_s->get_i_code() == r.get_i_code());
+                REQUIRE(r_s->get_uuid() == r.get_uuid());
+
+                REQUIRE(r.get_bead(util::BeadType::BASE) == r_s->get_bead(util::BeadType::BASE));
+                auto p = math::Point(10, 0, 0);
+                r_s->move(p);
+
+                REQUIRE(r.get_bead(util::BeadType::BASE) != r_s->get_bead(util::BeadType::BASE));
+            }
+
         }
 
     }
@@ -162,6 +179,34 @@ TEST_CASE( "testing basic all atom classes", "[AllAtom]" ) {
             auto j = c.get_json();
             auto c2 = all_atom::Chain(j, rts);
             REQUIRE(c.is_equal(c2, false));
+        }
+
+        SECTION("test state generation") {
+            auto res_states = state::Residues();
+            for(auto const & r : res) {
+                res_states.push_back(*r.get_state());
+            }
+            auto c_s = state::Chain(res_states);
+            REQUIRE(c_s.get_length() == 3);
+
+            SECTION("test copying") {
+                auto c_s2 = state::Chain(c_s);
+                REQUIRE(c_s2 == c_s);
+
+                auto p = math::Point(2, 2, 2);
+                c_s2.move(p);
+
+                REQUIRE(c_s2 != c_s);
+            }
+
+            SECTION("test json") {
+                auto j = c_s.get_json();
+                auto c_s2 = state::Chain(j);
+
+                REQUIRE(c_s.is_equal(c_s2, false));
+
+            }
+
         }
     }
 

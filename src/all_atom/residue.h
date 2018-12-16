@@ -19,6 +19,7 @@
 #include <all_atom/residue_type.h>
 #include <all_atom/residue_type_set.h>
 #include <util/bead.h>
+#include <state/residue.h>
 
 
 namespace all_atom {
@@ -346,6 +347,16 @@ public: // getters
      */
     void
     write_pdb(String const);
+
+    /**
+     * get state object
+     */
+    state::ResidueOP
+    get_state() const {
+        auto beads = beads_; // copy
+        auto r_s = std::make_shared<state::Residue>(name_, num_, chain_id_, i_code_, beads, uuid_);
+        return r_s;
+    }
 
 public: // non const
 
