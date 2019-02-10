@@ -78,7 +78,7 @@ public:
     bool
     is_equal(
             Structure const & s,
-            bool check_uuid = true) const {
+            CheckUUID check_uuid = CheckUUID::YES) const {
 
         if(residues_.size() != s.residues_.size() ) { return false; }
         if(cut_points_.size() != s.cut_points_.size() ) { return false; }

@@ -88,8 +88,8 @@ public:
     bool
     is_equal(
             Residue const & r,
-            bool check_uuid = true) const {
-        if(check_uuid && uuid_ != r.uuid_) { return false; }
+            CheckUUID check_uuid = CheckUUID::YES) const {
+        if(check_uuid == CheckUUID::YES && uuid_ != r.uuid_) { return false; }
         if(name_ != r.name_) { return false; }
         if(num_ != r.num_) { return false; }
         if(chain_id_ != r.chain_id_) { return false; }

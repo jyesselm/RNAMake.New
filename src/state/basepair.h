@@ -1,20 +1,18 @@
 //
-// Created by Joseph Yesselman on 12/15/17.
+// Created by Joseph Yesselman on 1/5/19.
 //
 
-#ifndef RNAMAKE_NEW_ALL_ATOM_BASEPAIR_H
-#define RNAMAKE_NEW_ALL_ATOM_BASEPAIR_H
+#ifndef RNAMAKE_NEW_STATE_BASEPAIR_H
+#define RNAMAKE_NEW_STATE_BASEPAIR_H
 
 #include <base/json.h>
 #include <base/vector_container.h>
 #include <math/xyz_matrix.h>
 #include <math/xyz_vector.h>
-#include <util/x3dna.h>
+#include <math/numerical.h>
 #include <primitives/basepair.h>
-#include <all_atom/residue.h>
-#include <state/basepair.h>
 
-namespace all_atom {
+namespace state {
 
 class Basepair : public primitives::Basepair {
 public:
@@ -25,15 +23,13 @@ public:
             util::Uuid const & uuid,
             primitives::BasepairType bp_type,
             base::SimpleStringCOP name,
-            util::X3dnaBPType x3dna_type,
             math::Matrix const & ref_frame,
             math::Point const & center,
-            math::Points const & c1_prime_coords):
+            math::Points const & c1_prime_coords) :
             primitives::Basepair(res1_uuid, res2_uuid, uuid, bp_type, name),
             ref_frame_(ref_frame),
             center_(center),
-            c1_prime_coords_(c1_prime_coords),
-            x3dna_type_(x3dna_type) {}
+            c1_prime_coords_(c1_prime_coords) {}
 
     inline
     Basepair(
@@ -41,15 +37,14 @@ public:
             primitives::Basepair(bp.res1_uuid_, bp.res2_uuid_, bp.uuid_, bp.bp_type_, bp.name_),
             ref_frame_(bp.ref_frame_),
             center_(bp.center_),
-            c1_prime_coords_(bp.c1_prime_coords_),
-            x3dna_type_(bp.x3dna_type_) {}
+            c1_prime_coords_(bp.c1_prime_coords_) {}
 
     inline
     Basepair(
             json::JSON & j,
             util::Uuid const & res1_uuid,
             util::Uuid const & res2_uuid,
-            util::Uuid const & uuid):
+            util::Uuid const & uuid) :
             primitives::Basepair() {
         uuid_ = uuid;
         res1_uuid_ = res1_uuid;
@@ -60,41 +55,23 @@ public:
         c1_prime_coords_[0] = math::Point(j[2]);
         c1_prime_coords_[1] = math::Point(j[3]);
         bp_type_ = static_cast<primitives::BasepairType>(j[4].ToInt());
-        x3dna_type_ = static_cast<util::X3dnaBPType>(j[5].ToInt());
-        name_ = std::make_shared<base::SimpleString>(j[6].ToString());
+        name_ = std::make_shared<base::SimpleString>(j[5].ToString());
     }
 
-public:
-    inline
-    bool
-    operator==(Basepair const & other) const {
-        return is_equal(other);
-    }
-
-    inline
-    bool
-    operator!=(Basepair const & other) const {
-        return !is_equal(other);
-    }
-
-public:
     bool
     is_equal(
             Basepair const & bp,
             CheckUUID check_uuid = CheckUUID::YES) const {
-        if(check_uuid == CheckUUID::YES) {
-            if(uuid_ != bp.uuid_) { return false; };
-            if(res1_uuid_ != bp.res1_uuid_) { return false; }
-            if(res2_uuid_ != bp.res2_uuid_) { return false; }
+        if (check_uuid == CheckUUID::YES) {
+            if (uuid_ != bp.uuid_) { return false; };
+            if (res1_uuid_ != bp.res1_uuid_) { return false; }
+            if (res2_uuid_ != bp.res2_uuid_) { return false; }
         }
 
-        if(bp_type_ != bp.bp_type_) { return false; }
-        if(x3dna_type_ != bp.x3dna_type_) { return false; }
-
-        if(!math::are_points_equal(center_, bp.center_)) { return false; }
-        if(!math::are_matrices_equal(ref_frame_, bp.ref_frame_)) { return false; }
-        if(!math::are_points_equal(c1_prime_coords_[0], bp.c1_prime_coords_[0])) { return false; }
-        if(!math::are_points_equal(c1_prime_coords_[1], bp.c1_prime_coords_[1])) { return false; }
+        if (!math::are_points_equal(center_, bp.center_)) { return false; }
+        if (!math::are_matrices_equal(ref_frame_, bp.ref_frame_)) { return false; }
+        if (!math::are_points_equal(c1_prime_coords_[0], bp.c1_prime_coords_[0])) { return false; }
+        if (!math::are_points_equal(c1_prime_coords_[1], bp.c1_prime_coords_[1])) { return false; }
         return true;
 
     }
@@ -151,14 +128,14 @@ public: // non const methods
         ref_frame_ = ref_frame_.get_flip_orientation();
     }
 
+
 public:
     json::JSON
     get_json() const {
         return json::Array(
                 center_.get_json(), ref_frame_.get_json(), c1_prime_coords_[0].get_json(),
-                c1_prime_coords_[1].get_json(), (int)bp_type_, (int)x3dna_type_, name_->get_str());
+                c1_prime_coords_[1].get_json(), (int) bp_type_, name_->get_str());
     }
-
 
 public: // getters
     inline
@@ -181,37 +158,13 @@ public: // getters
     math::Point const &
     get_res2_c1_prime_coord() const { return c1_prime_coords_[1]; }
 
-    inline
-    util::X3dnaBPType const &
-    get_x3dna_bp_type() const { return x3dna_type_; }
-
-
 private:
     math::Point center_;
     math::Points c1_prime_coords_;
     math::Matrix ref_frame_;
-    util::X3dnaBPType x3dna_type_;
-
 };
 
-typedef std::shared_ptr<Basepair> BasepairOP;
-typedef std::vector<Basepair> Basepairs;
-
-inline
-String
-generate_bp_name(
-        Residue const & res1,
-        Residue const & res2) {
-    return primitives::generate_bp_name<Residue>(res1, res2);
 }
 
-primitives::BasepairType
-generate_bp_type(
-        Residue const &,
-        Residue const &,
-        util::X3dnaBPType);
 
-
-}
-
-#endif //RNAMAKE_NEW_ALL_ATOM_BASEPAIR_H
+#endif //RNAMAKE_NEW_STATE_BASEPAIR_H

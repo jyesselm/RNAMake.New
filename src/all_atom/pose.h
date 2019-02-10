@@ -100,7 +100,7 @@ public:
     bool
     is_equal(
             Pose const & p,
-            bool check_uuid = true) const {
+            CheckUUID check_uuid = CheckUUID::YES) const {
         if(basepairs_.size() != p.basepairs_.size()) { return false; }
         if(end_indexes_.size() != p.end_indexes_.size()) { return false; }
         if(*name_ != *p.name_) { return false; }

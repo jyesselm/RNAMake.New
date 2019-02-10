@@ -195,8 +195,8 @@ public:
     bool
     is_equal(
             Residue const & r,
-            bool check_uuid = true) const {
-        if(check_uuid && uuid_ != r.uuid_) { return false; }
+            CheckUUID check_uuid = CheckUUID::YES) const {
+        if(check_uuid == CheckUUID::YES && uuid_ != r.uuid_) { return false; }
         if(name_ != r.name_) { return false; }
         if(num_ != r.num_) { return false; }
         if(chain_id_ != r.chain_id_) { return false; }
@@ -395,20 +395,6 @@ public: // non const
     void
     build_beads() { _build_beads(); }
 
-    inline
-    void
-    new_uuid() { uuid_ = util::Uuid(); }
-
-
-public: // getters
-
-    /**
-     * getter for the one letter residue type
-     */
-    /*inline
-    String
-    short_name() const { return res_type_->short_name(); }*/
-
 private:
     void
     _build_beads();
@@ -437,14 +423,16 @@ private:
 /**
  * Shared pointer typedef for Residue. Only use shared pointers!
  */
-typedef std::vector<Residue> Residues;
 typedef std::shared_ptr<Residue> ResidueOP;
-typedef std::shared_ptr<Residue const> ResidueCOP;
 
 /**
  * Typedef of a vector of shared pointer vectors, only used this.
  */
 typedef std::vector<ResidueOP> ResidueOPs;
+
+typedef std::shared_ptr<Residue const> ResidueCOP;
+typedef std::vector<Residue> Residues;
+
 
 inline
 bool

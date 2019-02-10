@@ -58,13 +58,15 @@ public:
     inline
     Atom(
             String const & s) {
-
         auto spl = base::split_str_by_delimiter(s, " ");
         name_ = std::make_shared<base::SimpleString const>(spl[0]);
         coords_ = math::Point(std::stof(spl[1]), std::stof(spl[2]), std::stof(spl[3]));
     }
 
-
+    /**
+     * json constructor
+     * @param   j   a json::JSON object with all name and coords
+     */
     inline
     Atom(
             json::JSON & j) {
@@ -83,6 +85,11 @@ public:
             coords_(a.coords_) {}
 
 public:
+
+    /**
+     * == operator
+     * @param   a   an atom object to compare too
+     */
     inline
     bool
     operator == (
@@ -92,6 +99,10 @@ public:
         return true;
     }
 
+    /**
+     * != operator
+     * @param   a   an atom object to compare too
+     */
     inline
     bool
     operator != (
@@ -171,6 +182,9 @@ public: //accessors
     base::SimpleStringCOP
     get_name() const { return name_; }
 
+    /**
+     * returns String object for name instead of SimpleString
+     */
     inline
     String
     get_str_name() const { return name_->get_str(); }
@@ -213,7 +227,7 @@ private:
 typedef std::shared_ptr<Atom> AtomOP;
 
 /**
- * Typedef of a vector of shared pointer atoms, only used this.
+ * Typedef of a vector of shared pointer atoms.
  */
 typedef std::vector<AtomOP> AtomOPs;
 

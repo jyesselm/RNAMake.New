@@ -11,6 +11,7 @@
 #include <all_atom/pdb_parser.h>
 #include <all_atom/basepair.h>
 #include <all_atom/structure.h>
+#include <state/basepair.h>
 
 TEST_CASE( "Test all atom base pair ", "[Basepair]" ) {
     init_unittest_safe_logging();
@@ -67,4 +68,93 @@ TEST_CASE( "Test all atom base pair ", "[Basepair]" ) {
 
     }
 
+    SECTION("test copy") {
+        auto bp = bps->at(0);
+        auto bp2 = all_atom::Basepair(bp);
+        REQUIRE(bp == bp2);
+    }
+
+    SECTION("test json") {
+        auto bp = bps->at(0);
+        auto j = bp.get_json();
+        auto bp2 = all_atom::Basepair(j, bp.get_res1_uuid(), bp.get_res2_uuid(), bp.get_uuid());
+
+        REQUIRE(bp.is_equal(bp2, false));
+    }
+
+    SECTION("test swap residues") {
+        auto bp = bps->at(0);
+        auto bp2 = all_atom::Basepair(bp);
+        bp2.swap_residue_positions();
+
+        // should not be equal now
+        REQUIRE(bp != bp2);
+
+        // should be swapped
+        REQUIRE(bp.get_res1_uuid() == bp2.get_res2_uuid());
+        REQUIRE(bp.get_res2_uuid() == bp2.get_res1_uuid());
+
+    }
+
+
+    SECTION("test state creation") {
+        auto bp = bps->at(0);
+        auto bp_state = state::Basepair(bp.get_res1_uuid(), bp.get_res2_uuid(), bp.get_uuid(), bp.get_bp_type(),
+                                        bp.get_name(), bp.get_ref_frame(), bp.get_center(), bp.get_c1_prime_coords());
+
+        REQUIRE(bp.get_res1_uuid() == bp_state.get_res1_uuid());
+        REQUIRE(bp.get_res2_uuid() == bp_state.get_res2_uuid());
+        REQUIRE(bp.get_uuid() == bp_state.get_uuid());
+        REQUIRE(math::are_points_equal(bp.get_center(), bp_state.get_center()));
+        REQUIRE(math::are_points_equal(bp.get_res1_c1_prime_coord(), bp_state.get_res1_c1_prime_coord()));
+        REQUIRE(math::are_points_equal(bp.get_res2_c1_prime_coord(), bp_state.get_res2_c1_prime_coord()));
+
+        SECTION("test copying") {
+            auto bp_state2 = state::Basepair(bp_state);
+
+            REQUIRE(bp_state2.get_res1_uuid() == bp_state.get_res1_uuid());
+            REQUIRE(bp_state2.get_res2_uuid() == bp_state.get_res2_uuid());
+            REQUIRE(bp_state2.get_uuid() == bp_state.get_uuid());
+            REQUIRE(math::are_points_equal(bp_state2.get_center(), bp_state.get_center()));
+            REQUIRE(math::are_points_equal(bp_state2.get_res1_c1_prime_coord(), bp_state.get_res1_c1_prime_coord()));
+            REQUIRE(math::are_points_equal(bp_state2.get_res2_c1_prime_coord(), bp_state.get_res2_c1_prime_coord()));
+
+            bp_state.is_equal(bp_state2, CheckUUID::YES);
+        }
+
+        SECTION("test json") {
+
+        }
+
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

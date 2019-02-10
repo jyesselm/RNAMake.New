@@ -210,6 +210,9 @@ target_link_libraries(parser_unittest secondary_structure_lib)
 
 set(state_files
 	/Users/jyesselm/projects/RNAMake.New/src/state/residue.cc
+	/Users/jyesselm/projects/RNAMake.New/src/state/basepair.cc
+	/Users/jyesselm/projects/RNAMake.New/src/state/structure.cc
+	/Users/jyesselm/projects/RNAMake.New/src/state/pose.cc
 	/Users/jyesselm/projects/RNAMake.New/src/state/chain.cc
 )
 

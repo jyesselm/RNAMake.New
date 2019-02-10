@@ -15,6 +15,15 @@
 //RNAMake Headers
 #include <base/types.h>
 
+/**
+ * enum checking UUID indentifer during object comparision during obj1.is_equal(obj2)
+ *
+ */
+enum class CheckUUID {
+    NO,
+    YES
+};
+
 namespace util {
 
 class Uuid {

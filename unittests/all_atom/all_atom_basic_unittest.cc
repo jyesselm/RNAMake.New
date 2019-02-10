@@ -13,6 +13,7 @@
 
 #include <state/residue.h>
 #include <state/chain.h>
+#include <state/structure.h>
 
 #include <util/sqlite/connection.h>
 
@@ -86,7 +87,7 @@ TEST_CASE( "testing basic all atom classes", "[AllAtom]" ) {
         SECTION("test json") {
             auto j = r.get_json();
             auto r2 = all_atom::Residue(j, rts);
-            REQUIRE(r.is_equal(r2, false));
+            REQUIRE(r.is_equal(r2, CheckUUID::NO));
         }
 
         SECTION("test state generation") {
@@ -134,7 +135,7 @@ TEST_CASE( "testing basic all atom classes", "[AllAtom]" ) {
                 auto j = r_s.get_json();
                 auto r_s2 = state::Residue(j);
 
-                REQUIRE(r_s.is_equal(r_s2, false));
+                REQUIRE(r_s.is_equal(r_s2, CheckUUID::NO));
 
             }
 
@@ -178,7 +179,7 @@ TEST_CASE( "testing basic all atom classes", "[AllAtom]" ) {
         SECTION("test json") {
             auto j = c.get_json();
             auto c2 = all_atom::Chain(j, rts);
-            REQUIRE(c.is_equal(c2, false));
+            REQUIRE(c.is_equal(c2, CheckUUID::NO));
         }
 
         SECTION("test state generation") {
@@ -203,7 +204,7 @@ TEST_CASE( "testing basic all atom classes", "[AllAtom]" ) {
                 auto j = c_s.get_json();
                 auto c_s2 = state::Chain(j);
 
-                REQUIRE(c_s.is_equal(c_s2, false));
+                REQUIRE(c_s.is_equal(c_s2, CheckUUID::NO));
 
             }
 
@@ -227,7 +228,37 @@ TEST_CASE( "testing basic all atom classes", "[AllAtom]" ) {
         SECTION("test json") {
             auto j = struc->get_json();
             auto struc2 = all_atom::Structure(j, rts);
-            REQUIRE(struc->is_equal(struc2, false));
+            REQUIRE(struc->is_equal(struc2, CheckUUID::NO));
+        }
+
+        SECTION("test state generation") {
+            auto res = state::Residues();
+            for(auto const & r : *struc) {
+                res.push_back(*r.get_state());
+            }
+
+            auto struc_s = state::Structure(res, struc->get_cutpoints());
+
+            REQUIRE(struc_s.get_num_residues() == struc->get_num_residues());
+            REQUIRE(struc_s.get_num_chains() == struc->get_num_chains());
+
+            for(auto i = 0; i < struc_s.get_num_residues(); i++) {
+                auto & r_s = struc_s.get_residue(i);
+                auto & r = struc->get_residue(i);
+
+                REQUIRE(r_s.get_name() == r.get_name());
+                REQUIRE(r_s.get_num() == r.get_num());
+                REQUIRE(r_s.get_chain_id() == r.get_chain_id());
+                REQUIRE(r_s.get_i_code() == r.get_i_code());
+                REQUIRE(r_s.get_uuid() == r.get_uuid());
+
+            }
+
+            SECTION("test json") {
+                auto j = struc_s.get_json();
+                auto struc_s2 = state::Structure(j);
+                REQUIRE(struc_s.is_equal(struc_s2, CheckUUID::NO));
+            }
         }
     }
 
@@ -235,15 +266,17 @@ TEST_CASE( "testing basic all atom classes", "[AllAtom]" ) {
         auto p = all_atom::get_pose_from_pdb(path, parser);
         auto j = p->get_json();
         auto p2 = all_atom::Pose(j, rts);
-        REQUIRE(p->is_equal(p2, false));
+        REQUIRE(p->is_equal(p2, CheckUUID::NO));
 
         auto t = math::Point(2, 2, 2);
         p2.move(t);
 
-        REQUIRE(!p->is_equal(p2, false));
+        REQUIRE(!p->is_equal(p2, CheckUUID::NO));
+
+        SECTION("test state generation") {
 
 
-
+        }
     }
 
 }

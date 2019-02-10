@@ -274,6 +274,9 @@ typedef std::shared_ptr<SegmentGraph> SegmentGraphOP;
 
 namespace segment_data_structures {
 
+// helpers for converting between graph types
+/////////////////////////////////////////////////////////////////////////////////
+
 namespace __helpers {
 
 template <typename SegmentType, typename AlignerType>
@@ -327,6 +330,8 @@ get_extra_connections(
 };
 
 }
+
+/////////////////////////////////////////////////////////////////////////////////
 
 template <typename SegmentType, typename AlignerType>
 SegmentGraphOP<SegmentType, AlignerType>

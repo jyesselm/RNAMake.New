@@ -107,7 +107,7 @@ public:
     bool
     is_equal(
             Segment const & s,
-            bool check_uuid = true) const {
+            CheckUUID check_uuid = CheckUUID::YES) const {
         if(segment_type_ != s.segment_type_) { return false; }
         if(aligned_end_index_ != s.aligned_end_index_) { return false; }
         if(basepairs_.size() != s.basepairs_.size()) { return false; }

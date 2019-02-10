@@ -70,7 +70,7 @@ public:
     bool
     is_equal(
             Chain const & c,
-            bool check_uuid = true) const {
+            CheckUUID check_uuid = CheckUUID::YES) const {
 
         if(residues_.size() != c.residues_.size()) { return false; }
 

@@ -116,6 +116,17 @@ public:
     util::Uuid const &
     get_res2_uuid() const { return res2_uuid_; }
 
+public: // non const methods
+
+    inline
+    void
+    new_uuids(
+            util::Uuid const & r1_uuid,
+            util::Uuid const & r2_uuid) {
+        res1_uuid_ = r1_uuid;
+        res2_uuid_ = r2_uuid;
+        uuid_ = util::Uuid();
+    }
 
 protected:
     util::Uuid uuid_;

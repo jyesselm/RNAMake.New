@@ -124,6 +124,12 @@ public: //getters
     String
     get_str() const { return String(""); }
 
+public: // non const
+
+    inline
+    void
+    new_uuid() { uuid_ = util::Uuid(); }
+
 protected:
 
     char name_;
