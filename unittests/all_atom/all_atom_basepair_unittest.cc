@@ -79,7 +79,7 @@ TEST_CASE( "Test all atom base pair ", "[Basepair]" ) {
         auto j = bp.get_json();
         auto bp2 = all_atom::Basepair(j, bp.get_res1_uuid(), bp.get_res2_uuid(), bp.get_uuid());
 
-        REQUIRE(bp.is_equal(bp2, false));
+        REQUIRE(bp.is_equal(bp2, CheckUUID::NO));
     }
 
     SECTION("test swap residues") {
@@ -93,6 +93,9 @@ TEST_CASE( "Test all atom base pair ", "[Basepair]" ) {
         // should be swapped
         REQUIRE(bp.get_res1_uuid() == bp2.get_res2_uuid());
         REQUIRE(bp.get_res2_uuid() == bp2.get_res1_uuid());
+
+        bp2.swap_residue_positions();
+        REQUIRE(bp == bp2);
 
     }
 
@@ -119,11 +122,19 @@ TEST_CASE( "Test all atom base pair ", "[Basepair]" ) {
             REQUIRE(math::are_points_equal(bp_state2.get_res1_c1_prime_coord(), bp_state.get_res1_c1_prime_coord()));
             REQUIRE(math::are_points_equal(bp_state2.get_res2_c1_prime_coord(), bp_state.get_res2_c1_prime_coord()));
 
-            bp_state.is_equal(bp_state2, CheckUUID::YES);
+            bp_state.is_equal(bp_state2);
         }
 
         SECTION("test json") {
+            auto j = bp_state.get_json();
+            auto bp_state_2 = state::Basepair(j, bp_state.get_res1_uuid(), bp_state.get_res2_uuid(), bp_state.get_uuid());
 
+            REQUIRE(bp_state.is_equal(bp_state_2, CheckUUID::NO));
+
+        }
+
+        SECTION("test get_state()") {
+            REQUIRE(bp_state == *bp.get_state());
         }
 
     }

@@ -164,6 +164,9 @@ private:
     math::Matrix ref_frame_;
 };
 
+typedef std::shared_ptr<Basepair> BasepairOP;
+typedef std::vector<Basepair> Basepairs;
+
 }
 
 

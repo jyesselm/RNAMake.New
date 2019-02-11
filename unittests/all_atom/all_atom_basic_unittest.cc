@@ -259,11 +259,16 @@ TEST_CASE( "testing basic all atom classes", "[AllAtom]" ) {
                 auto struc_s2 = state::Structure(j);
                 REQUIRE(struc_s.is_equal(struc_s2, CheckUUID::NO));
             }
+
+            SECTION("test get_state()") {
+                REQUIRE(struc_s == *struc->get_state());
+            }
         }
     }
 
     SECTION("test pose") {
         auto p = all_atom::get_pose_from_pdb(path, parser);
+
         auto j = p->get_json();
         auto p2 = all_atom::Pose(j, rts);
         REQUIRE(p->is_equal(p2, CheckUUID::NO));
@@ -274,8 +279,46 @@ TEST_CASE( "testing basic all atom classes", "[AllAtom]" ) {
         REQUIRE(!p->is_equal(p2, CheckUUID::NO));
 
         SECTION("test state generation") {
+            auto p_state = p->get_state();
 
+            REQUIRE(p_state->get_name() == p->get_name());
+            REQUIRE(p_state->get_num_chains() == p->get_num_chains());
+            REQUIRE(p_state->get_num_residues() == p->get_num_residues());
+            REQUIRE(p_state->get_num_basepairs() == p->get_num_basepairs());
+            REQUIRE(p_state->get_num_ends() == p->get_num_ends());
 
+            for(auto i = 0; i < p->get_num_basepairs(); i++) {
+                auto & bp = p->get_basepair(i);
+                auto & bp_s = p_state->get_basepair(i);
+
+                REQUIRE(bp.get_res1_uuid() == bp_s.get_res1_uuid());
+                REQUIRE(bp.get_res2_uuid() == bp_s.get_res2_uuid());
+                REQUIRE(bp.get_uuid() == bp_s.get_uuid());
+                REQUIRE(math::are_points_equal(bp.get_center(), bp_s.get_center()));
+                REQUIRE(math::are_points_equal(bp.get_res1_c1_prime_coord(), bp_s.get_res1_c1_prime_coord()));
+                REQUIRE(math::are_points_equal(bp.get_res2_c1_prime_coord(), bp_s.get_res2_c1_prime_coord()));
+            }
+
+            SECTION("test copy") {
+                auto p_state_2 = state::Pose(*p_state);
+                REQUIRE(p_state_2 == *p_state);
+
+                auto t = math::Point(2, 2, 2);
+                p_state_2.move(t);
+
+                REQUIRE(p_state_2 != *p_state);
+
+                p_state_2.move(-t);
+                REQUIRE(p_state_2 == *p_state);
+            }
+
+            SECTION("test json") {
+                auto j = p_state->get_json();
+                auto p_state_2 = state::Pose(j);
+
+                REQUIRE(p_state_2.is_equal(*p_state, CheckUUID::NO));
+
+            }
         }
     }
 

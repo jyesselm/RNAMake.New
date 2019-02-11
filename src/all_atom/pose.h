@@ -7,6 +7,7 @@
 
 
 #include <primitives/pose.h>
+#include <state/pose.h>
 #include <all_atom/structure.h>
 #include <all_atom/basepair.h>
 #include <all_atom/pdb_parser.h>
@@ -111,7 +112,6 @@ public:
         return true;
     }
 
-public:
 public: // non const methods
     void
     move(
@@ -142,7 +142,7 @@ public: // non const methods
         transform(r, t, dummy);
     }
 
-public:
+public: //getters
     inline
     String
     get_dot_bracket() { return dot_bracket_->get_str(); }
@@ -174,6 +174,21 @@ public:
                 "proteins", proteins_.get_json(),
                 "small_molecules", small_molecules_.get_json(),
                 "dot_bracket", dot_bracket_->get_str() };
+    }
+
+    state::PoseOP
+    get_state() const {
+        auto s_state = structure_.get_state();
+        auto proteins_state = proteins_.get_state();
+        auto small_molecules_state = small_molecules_.get_state();
+        auto bp_states = state::Basepairs();
+        for(auto const & bp : basepairs_) {
+            bp_states.push_back(*bp.get_state());
+        }
+
+        return std::make_shared<state::Pose>(
+                *s_state, bp_states, end_indexes_, end_ids_, name_,
+                *proteins_state, *small_molecules_state, dot_bracket_);
     }
 
 protected:

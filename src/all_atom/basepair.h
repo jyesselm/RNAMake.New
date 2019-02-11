@@ -151,12 +151,19 @@ public: // non const methods
         ref_frame_ = ref_frame_.get_flip_orientation();
     }
 
-public:
+public: // getters
+
     json::JSON
     get_json() const {
         return json::Array(
                 center_.get_json(), ref_frame_.get_json(), c1_prime_coords_[0].get_json(),
                 c1_prime_coords_[1].get_json(), (int)bp_type_, (int)x3dna_type_, name_->get_str());
+    }
+
+    state::BasepairOP
+    get_state() const {
+        return std::make_shared<state::Basepair>(res1_uuid_, res2_uuid_, uuid_, bp_type_, name_,
+                                                 ref_frame_, center_, c1_prime_coords_);
     }
 
 

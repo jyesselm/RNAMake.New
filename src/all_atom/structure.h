@@ -11,6 +11,7 @@
 #include <all_atom/residue.h>
 #include <all_atom/chain.h>
 #include <all_atom/basepair.h>
+#include <state/structure.h>
 
 namespace all_atom {
 
@@ -162,8 +163,17 @@ public: //getters
         return json::JSON{
                 "residues", j_res,
                 "cutpoints", j_cuts};
-
     }
+
+    state::StructureOP
+    get_state() const {
+        auto res = state::Residues();
+        for(auto const & r : residues_) {
+            res.push_back(*r.get_state());
+        }
+        return std::make_shared<state::Structure>(res, cut_points_);
+    };
+
 
     String
     get_pdb_str(

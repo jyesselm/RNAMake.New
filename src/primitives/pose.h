@@ -518,7 +518,7 @@ get_res_wc_or_gu_basepair(
     for(auto const & bp : basepairs) {
         if(bp.get_bp_type() == BasepairType::NC) { continue; }
         if(bp.get_res1_uuid() == r.get_uuid() ||
-            bp.get_res2_uuid() == r.get_uuid()) {
+           bp.get_res2_uuid() == r.get_uuid()) {
             return &bp;
         }
     }

@@ -124,6 +124,8 @@ public: //getters
 
 };
 
+typedef std::shared_ptr<Structure> StructureOP;
+
 
 }
 
