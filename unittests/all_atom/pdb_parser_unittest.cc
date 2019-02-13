@@ -27,7 +27,7 @@ TEST_CASE( "Test Parsing PDB formatted files ", "[PDBParser]" ) {
         auto residues_2 = parser.parse(path);
 
         // rebuilt residue is indentical to ideal residue
-        REQUIRE(residues_1->RNA_residues[0]->is_equal(*residues_2->RNA_residues[0], false));
+        REQUIRE(residues_1->RNA_residues[0]->is_equal(*residues_2->RNA_residues[0], CheckUUID::NO));
     }
 
     SECTION("test parsing p4-p6") {

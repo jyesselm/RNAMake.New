@@ -13,6 +13,7 @@
 
 //RNAMake Headers
 #include <base/types.h>
+#include <base/global_constants.h>
 #include <util/uuid.h>
 #include <primitives/residue.h>
 #include <all_atom/atom.h>
@@ -443,7 +444,7 @@ residue_steric_clash_RNA(
         if(it1->get_type() == util::BeadType::PHOS) { continue;}
         for(auto it2 = r2.bead_begin(); it2 != r2.bead_end(); it2++) {
             if(it2->get_type() == util::BeadType::PHOS) { continue;}
-            if(it1->distance(*it2) < 2.5) { return true; }
+            if(it1->distance(*it2) < STERIC_CLASH_RADIUS) { return true; }
         }
     }
 
@@ -457,7 +458,7 @@ residue_steric_clash(
         Residue const & r2) {
     for(auto it1 = r1.bead_begin(); it1 != r1.bead_end(); it1++) {
         for(auto it2 = r2.bead_begin(); it2 != r2.bead_end(); it2++) {
-            if(it1->distance(*it2) < 2.5) { return true; }
+            if(it1->distance(*it2) < STERIC_CLASH_RADIUS) { return true; }
         }
     }
 

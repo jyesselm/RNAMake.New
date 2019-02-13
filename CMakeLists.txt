@@ -50,6 +50,7 @@ set(base_files
 	/Users/jyesselm/projects/RNAMake.New/src/base/base.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/simple_string.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/paths.cc
+	/Users/jyesselm/projects/RNAMake.New/src/base/global_constants.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/log.cc
 	/Users/jyesselm/projects/RNAMake.New/src/base/option.cc
 )
@@ -209,6 +210,7 @@ target_link_libraries(parser_unittest secondary_structure_lib)
 ###########################################################################
 
 set(state_files
+	/Users/jyesselm/projects/RNAMake.New/src/state/segment.cc
 	/Users/jyesselm/projects/RNAMake.New/src/state/residue.cc
 	/Users/jyesselm/projects/RNAMake.New/src/state/basepair.cc
 	/Users/jyesselm/projects/RNAMake.New/src/state/structure.cc

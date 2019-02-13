@@ -24,19 +24,10 @@
 		<Unit filename="/Users/jyesselm/projects/RNAMake.New/pybind11/CMakeLists.txt">
 			<Option virtualFolder="CMake Files\pybind11\"/>
 		</Unit>
-		<Unit filename="/Users/jyesselm/projects/RNAMake.New/pybind11/CMakeLists.txt">
-			<Option virtualFolder="CMake Files\pybind11\"/>
-		</Unit>
-		<Unit filename="/Users/jyesselm/projects/RNAMake.New/pybind11/tools/pybind11Tools.cmake">
-			<Option virtualFolder="CMake Files\pybind11\tools\"/>
-		</Unit>
 		<Unit filename="/Users/jyesselm/projects/RNAMake.New/pybind11/tools/FindPythonLibsNew.cmake">
 			<Option virtualFolder="CMake Files\pybind11\tools\"/>
 		</Unit>
 		<Unit filename="/Users/jyesselm/projects/RNAMake.New/pybind11/tools/pybind11Tools.cmake">
-			<Option virtualFolder="CMake Files\pybind11\tools\"/>
-		</Unit>
-		<Unit filename="/Users/jyesselm/projects/RNAMake.New/pybind11/tools/FindPythonLibsNew.cmake">
 			<Option virtualFolder="CMake Files\pybind11\tools\"/>
 		</Unit>
 		<Unit filename="/Users/jyesselm/projects/RNAMake.New/cmake/build/compiler.cmake">

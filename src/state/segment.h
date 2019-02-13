@@ -1,31 +1,21 @@
 //
-// Created by Joseph Yesselman on 12/20/17.
+// Created by Joseph Yesselman on 2/11/19.
 //
 
-#ifndef RNAMAKE_NEW_ALL_ATOM_SEGMENT_H
-#define RNAMAKE_NEW_ALL_ATOM_SEGMENT_H
+#ifndef RNAMAKE_NEW_STATE_SEGMENT_H
+#define RNAMAKE_NEW_STATE_SEGMENT_H
 
 #include <util/segment_type.h>
 #include <primitives/segment.h>
 #include <secondary_structure/segment.h>
-#include <state/segment.h>
-#include <all_atom/structure.h>
-#include <all_atom/basepair.h>
+#include <state/structure.h>
+#include <state/basepair.h>
 
-// forward declaration to allow SegmentSqliteLibrary to call new_uuids()
-namespace resource_management {
-    class SegmentSqliteLibrary;
-}
-
-namespace all_atom {
+namespace state {
 
 class Segment : public primitives::Segment<Basepair, Structure, Chain, Residue>  {
 public:
     typedef primitives::Segment<Basepair, Structure, Chain, Residue> BaseClass;
-
-public:
-    friend class SegmentFactory;
-    friend class resource_management::SegmentSqliteLibrary;
 
 public:
     Segment(
@@ -54,14 +44,13 @@ public:
             dot_bracket_(seg.dot_bracket_) {}
 
     Segment(
-            json::JSON & j,
-            ResidueTypeSet const & rts):
+            json::JSON & j):
             BaseClass(),
-            proteins_(Structure(j["proteins"], rts)),
-            small_molecules_(Structure(j["small_molecules"], rts)) {
+            proteins_(Structure(j["proteins"])),
+            small_molecules_(Structure(j["small_molecules"])) {
 
         uuid_ = util::Uuid();
-        structure_ = Structure(j["structure"], rts);
+        structure_ = Structure(j["structure"]);
         name_ = std::make_shared<base::SimpleString const>(j["name"].ToString());
         dot_bracket_ = std::make_shared<base::SimpleString const>(j["dot_bracket"].ToString());
         segment_type_ = static_cast<util::SegmentType>(j["segment_type"].ToInt());
@@ -104,6 +93,7 @@ public:
     const_iterator small_molecules_begin() const { return small_molecules_.begin(); }
     const_iterator small_molecules_end()   const { return small_molecules_.end(); }
 
+
 public:
     inline
     bool
@@ -140,8 +130,6 @@ public:
         return true;
     }
 
-
-
 public: // non const methods
     void
     move(
@@ -173,112 +161,8 @@ public: // non const methods
         transform(r, t, dummy);
     }
 
-public:
-    bool
-    steric_clash(
-            Segment const & s) {
-
-        for(auto const & r1 : *this) {
-            // RNA/RNA clashes
-            for(auto const & r2 : s) {
-                if(residue_steric_clash_RNA(r1, r2)) { return true; }
-            }
-            // RNA/protein clashes
-            for(auto const & r2 : s.proteins_) {
-                if(residue_steric_clash_RNA(r1, r2)) { return true; }
-            }
-            // RNA/small molecule clashes
-            for(auto const & r2 : s.small_molecules_) {
-                if(residue_steric_clash_RNA(r1, r2)) { return true; }
-            }
-        }
-
-        for(auto const & r1 : proteins_) {
-            // protein/RNA clashes
-            for(auto const & r2 : s) {
-                if(residue_steric_clash_RNA(r1, r2)) { return true; }
-            }
-            // protein/protein clashes
-            for(auto const & r2 : s.proteins_) {
-                if(residue_steric_clash(r1, r2)) { return true; }
-            }
-            // protein/small molecule clashes
-            for(auto const & r2 : s.small_molecules_) {
-                if(residue_steric_clash(r1, r2)) { return true; }
-            }
-        }
-
-        for(auto const & r1 : small_molecules_) {
-            // small_molecule/RNA clashes
-            for(auto const & r2 : s) {
-                if(residue_steric_clash_RNA(r1, r2)) { return true; }
-            }
-            // small_molecule/protein clashes
-            for(auto const & r2 : s.proteins_) {
-                if(residue_steric_clash(r1, r2)) { return true; }
-            }
-            // small_molecule/small molecule clashes
-            for(auto const & r2 : s.small_molecules_) {
-                if(residue_steric_clash(r1, r2)) { return true; }
-            }
-        }
-        return false;
-    }
-
-    int
-    get_num_steric_clashes(
-            Segment const & s) {
-        int steric_clash_count = 0;
-
-        for(auto const & r1 : *this) {
-            // RNA/RNA clashes
-            for(auto const & r2 : s) {
-                if(residue_steric_clash_RNA(r1, r2)) { steric_clash_count += 1; }
-            }
-            // RNA/protein clashes
-            for(auto const & r2 : s.proteins_) {
-                if(residue_steric_clash_RNA(r1, r2)) { steric_clash_count += 1;  }
-            }
-            // RNA/small molecule clashes
-            for(auto const & r2 : s.small_molecules_) {
-                if(residue_steric_clash_RNA(r1, r2)) { steric_clash_count += 1;  }
-            }
-        }
-
-        for(auto const & r1 : proteins_) {
-            // protein/RNA clashes
-            for(auto const & r2 : s) {
-                if(residue_steric_clash_RNA(r1, r2)) { steric_clash_count += 1;  }
-            }
-            // protein/protein clashes
-            for(auto const & r2 : s.proteins_) {
-                if(residue_steric_clash(r1, r2)) { steric_clash_count += 1;  }
-            }
-            // protein/small molecule clashes
-            for(auto const & r2 : s.small_molecules_) {
-                if(residue_steric_clash(r1, r2)) { steric_clash_count += 1;  }
-            }
-        }
-
-        for(auto const & r1 : small_molecules_) {
-            // small_molecule/RNA clashes
-            for(auto const & r2 : s) {
-                if(residue_steric_clash_RNA(r1, r2)) { steric_clash_count += 1;  }
-            }
-            // small_molecule/protein clashes
-            for(auto const & r2 : s.proteins_) {
-                if(residue_steric_clash(r1, r2)) { steric_clash_count += 1;  }
-            }
-            // small_molecule/small molecule clashes
-            for(auto const & r2 : s.small_molecules_) {
-                if(residue_steric_clash(r1, r2)) { steric_clash_count += 1;  }
-            }
-        }
-
-        return steric_clash_count;
-    }
-
 public: // outputing functions
+
     json::JSON
     get_json() const {
         auto j_bps = json::Array();
@@ -317,8 +201,8 @@ public: // outputing functions
         auto residues = secondary_structure::Residues();
         auto cutpoints = structure_.get_cutpoints();
         for(auto const & r : structure_) {
-           auto ss_r = secondary_structure::Residue(r.get_name(), dot_bracket_str[i], r.get_num(),
-                                                    r.get_chain_id(), r.get_i_code(), r.get_uuid());
+            auto ss_r = secondary_structure::Residue(r.get_name(), dot_bracket_str[i], r.get_num(),
+                                                     r.get_chain_id(), r.get_i_code(), r.get_uuid());
             residues.push_back(ss_r);
             i += 1;
         }
@@ -336,50 +220,6 @@ public: // outputing functions
                 ss_structure, ss_bps, end_indexes_, end_ids_, name_, segment_type_, aligned_end_index_, uuid_);
     }
 
-    state::SegmentOP
-    get_state() const {
-
-        auto s_state = structure_.get_state();
-        auto proteins_state = proteins_.get_state();
-        auto small_molecules_state = small_molecules_.get_state();
-        auto bp_states = state::Basepairs();
-        for(auto const & bp : basepairs_) {
-            bp_states.push_back(*bp.get_state());
-        }
-
-        return std::make_shared<state::Segment>(
-                *s_state, bp_states, end_indexes_, end_ids_, name_,
-                *proteins_state, *small_molecules_state, dot_bracket_,
-                segment_type_, aligned_end_index_, uuid_);
-
-    }
-
-
-
-public: // pdb functions
-    String
-    get_pdb_str(
-            int &,
-            int &,
-            char &) const;
-
-    inline
-    String
-    get_pdb_str(
-            int acount = 0) const {
-        auto num = structure_.get_residue(0).get_num();
-        auto chain_id = structure_.get_residue(0).get_chain_id();
-        return get_pdb_str(acount, num, chain_id);
-    }
-
-    void
-    write_pdb(
-            String const &) const;
-
-    void
-    write_steric_beads_to_pdb(
-            String const &);
-
 public:
     inline
     String
@@ -390,35 +230,9 @@ public:
     get_aligned_end() { return basepairs_[end_indexes_[aligned_end_index_]]; }
 
 protected:
-    void
-    new_uuids() {
-        uuid_ = util::Uuid();
-        auto uuid_map = std::map<util::Uuid, int>();
-        int i = 0;
-        for(auto const & r : structure_) {
-            uuid_map[r.get_uuid()] = i;
-            i++;
-        }
-        structure_.new_uuids();
-
-        for(auto & bp : basepairs_) {
-            auto r1_pos = uuid_map[bp.get_res1_uuid()];
-            auto r2_pos = uuid_map[bp.get_res2_uuid()];
-            auto & r1 = structure_.get_residue(r1_pos);
-            auto & r2 = structure_.get_residue(r2_pos);
-            bp.new_uuids(r1.get_uuid(), r2.get_uuid());
-        }
-
-        proteins_.new_uuids();
-        small_molecules_.new_uuids();
-    }
-
-protected:
     Structure proteins_;
     Structure small_molecules_;
     base::SimpleStringCOP dot_bracket_;
-
-
 };
 
 typedef std::shared_ptr<Segment> SegmentOP;
@@ -428,4 +242,4 @@ typedef std::vector<SegmentOP>   SegmentOPs;
 }
 
 
-#endif //RNAMAKE_NEW_ALL_ATOM_SEGMENT_H
+#endif //RNAMAKE_NEW_STATE_SEGMENT_H

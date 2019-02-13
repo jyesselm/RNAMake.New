@@ -52,6 +52,7 @@ public:
 
 public: //overrided
 
+    // allows lazy update of end_id strings if sequence changes
     base::SimpleStringCOP
     get_end_id(
             Index index) const{
