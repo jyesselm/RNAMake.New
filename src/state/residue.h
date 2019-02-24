@@ -6,6 +6,7 @@
 #define RNAMAKE_NEW_state_RESIDUE_H
 
 //RNAMake Headers
+#include <base/global_constants.h>
 #include <primitives/residue.h>
 #include <util/bead.h>
 
@@ -154,8 +155,6 @@ public:
         transform(r, t, dummy);
     }
 
-
-
 private:
     /**
      * vector of bead objects for sterics
@@ -167,6 +166,38 @@ private:
 typedef std::vector<Residue>     Residues;
 typedef std::shared_ptr<Residue> ResidueOP;
 typedef std::vector<ResidueOP>   ResidueOPs;
+
+
+inline
+bool
+residue_steric_clash_RNA(
+        Residue const & r1,
+        Residue const & r2) {
+    for(auto const & b1 : r1) {
+        if(b1.get_type() == util::BeadType::PHOS) { continue;}
+        for(auto const & b2 : r2) {
+            if(b2.get_type() == util::BeadType::PHOS) { continue;}
+            if(b1.distance(b2) < STERIC_CLASH_RADIUS) { return true; }
+        }
+    }
+
+    return false;
+}
+
+inline
+bool
+residue_steric_clash(
+        Residue const & r1,
+        Residue const & r2) {
+    for(auto const & b1 : r1) {
+        for(auto const & b2 : r2) {
+            if(b1.distance(b2) < STERIC_CLASH_RADIUS) { return true; }
+        }
+    }
+
+    return false;
+}
+
 
 }
 

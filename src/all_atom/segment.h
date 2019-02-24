@@ -173,7 +173,7 @@ public: // non const methods
         transform(r, t, dummy);
     }
 
-public:
+public: //sterics
     bool
     steric_clash(
             Segment const & s) {

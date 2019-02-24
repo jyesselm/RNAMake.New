@@ -216,6 +216,7 @@ set(state_files
 	/Users/jyesselm/projects/RNAMake.New/src/state/structure.cc
 	/Users/jyesselm/projects/RNAMake.New/src/state/pose.cc
 	/Users/jyesselm/projects/RNAMake.New/src/state/chain.cc
+	/Users/jyesselm/projects/RNAMake.New/src/state/aligner.cc
 )
 
 add_library(state_lib ${state_files})
@@ -252,6 +253,9 @@ target_link_libraries(all_atom secondary_structure_lib  state_lib  pybind11::mod
 
 add_executable(all_atom_generate_all_segments /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/all_atom_generate_all_segments.cc)
 target_link_libraries(all_atom_generate_all_segments all_atom_lib)
+
+add_executable(state_segment_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/state_segment_unittest.cc)
+target_link_libraries(state_segment_unittest all_atom_lib)
 
 add_executable(pdb_parser_unittest /Users/jyesselm/projects/RNAMake.New/unittests/all_atom/pdb_parser_unittest.cc)
 target_link_libraries(pdb_parser_unittest all_atom_lib)

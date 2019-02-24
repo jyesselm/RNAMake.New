@@ -143,5 +143,8 @@ protected:
 typedef Residue                          PrimitiveResidue;
 typedef std::vector<Residue>             PrimitiveResidues;
 
+
+
+
 }
 #endif //PRIMITIVES_RESIDUE_H

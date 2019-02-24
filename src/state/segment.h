@@ -161,6 +161,111 @@ public: // non const methods
         transform(r, t, dummy);
     }
 
+public: //sterics
+    bool
+    steric_clash(
+            Segment const & s) {
+
+        for(auto const & r1 : *this) {
+            // RNA/RNA clashes
+            for(auto const & r2 : s) {
+                if(residue_steric_clash_RNA(r1, r2)) { return true; }
+            }
+            // RNA/protein clashes
+            for(auto const & r2 : s.proteins_) {
+                if(residue_steric_clash_RNA(r1, r2)) { return true; }
+            }
+            // RNA/small molecule clashes
+            for(auto const & r2 : s.small_molecules_) {
+                if(residue_steric_clash_RNA(r1, r2)) { return true; }
+            }
+        }
+
+        for(auto const & r1 : proteins_) {
+            // protein/RNA clashes
+            for(auto const & r2 : s) {
+                if(residue_steric_clash_RNA(r1, r2)) { return true; }
+            }
+            // protein/protein clashes
+            for(auto const & r2 : s.proteins_) {
+                if(residue_steric_clash(r1, r2)) { return true; }
+            }
+            // protein/small molecule clashes
+            for(auto const & r2 : s.small_molecules_) {
+                if(residue_steric_clash(r1, r2)) { return true; }
+            }
+        }
+
+        for(auto const & r1 : small_molecules_) {
+            // small_molecule/RNA clashes
+            for(auto const & r2 : s) {
+                if(residue_steric_clash_RNA(r1, r2)) { return true; }
+            }
+            // small_molecule/protein clashes
+            for(auto const & r2 : s.proteins_) {
+                if(residue_steric_clash(r1, r2)) { return true; }
+            }
+            // small_molecule/small molecule clashes
+            for(auto const & r2 : s.small_molecules_) {
+                if(residue_steric_clash(r1, r2)) { return true; }
+            }
+        }
+        return false;
+    }
+
+    int
+    get_num_steric_clashes(
+            Segment const & s) {
+        int steric_clash_count = 0;
+
+        for(auto const & r1 : *this) {
+            // RNA/RNA clashes
+            for(auto const & r2 : s) {
+                if(residue_steric_clash_RNA(r1, r2)) { steric_clash_count += 1; }
+            }
+            // RNA/protein clashes
+            for(auto const & r2 : s.proteins_) {
+                if(residue_steric_clash_RNA(r1, r2)) { steric_clash_count += 1;  }
+            }
+            // RNA/small molecule clashes
+            for(auto const & r2 : s.small_molecules_) {
+                if(residue_steric_clash_RNA(r1, r2)) { steric_clash_count += 1;  }
+            }
+        }
+
+        for(auto const & r1 : proteins_) {
+            // protein/RNA clashes
+            for(auto const & r2 : s) {
+                if(residue_steric_clash_RNA(r1, r2)) { steric_clash_count += 1;  }
+            }
+            // protein/protein clashes
+            for(auto const & r2 : s.proteins_) {
+                if(residue_steric_clash(r1, r2)) { steric_clash_count += 1;  }
+            }
+            // protein/small molecule clashes
+            for(auto const & r2 : s.small_molecules_) {
+                if(residue_steric_clash(r1, r2)) { steric_clash_count += 1;  }
+            }
+        }
+
+        for(auto const & r1 : small_molecules_) {
+            // small_molecule/RNA clashes
+            for(auto const & r2 : s) {
+                if(residue_steric_clash_RNA(r1, r2)) { steric_clash_count += 1;  }
+            }
+            // small_molecule/protein clashes
+            for(auto const & r2 : s.proteins_) {
+                if(residue_steric_clash(r1, r2)) { steric_clash_count += 1;  }
+            }
+            // small_molecule/small molecule clashes
+            for(auto const & r2 : s.small_molecules_) {
+                if(residue_steric_clash(r1, r2)) { steric_clash_count += 1;  }
+            }
+        }
+
+        return steric_clash_count;
+    }
+
 public: // outputing functions
 
     json::JSON
