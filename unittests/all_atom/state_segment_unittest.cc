@@ -9,6 +9,7 @@
 #include <util/random_number_generator.h>
 #include <all_atom/residue_type_set.h>
 #include <all_atom/segment_factory.h>
+#include <state/aligner.h>
 
 TEST_CASE( "Test states derivived from all atom segments", "[StateSegments]" ) {
     init_unittest_safe_logging();
@@ -115,5 +116,50 @@ TEST_CASE( "Test states derivived from all atom segments", "[StateSegments]" ) {
         REQUIRE(math::are_matrices_equal(seg->get_end(1).get_ref_frame(), seg_state->get_end(1).get_ref_frame()));
     }
 
+    SECTION("test aligner") {
+        auto aligner = state::Aligner();
+        auto seg_state_1 = seg->get_state();
+        auto seg_state_2 = seg->get_state();
+
+        aligner.align(seg_state_1->get_end(1), *seg_state_2);
+
+
+
+    }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
