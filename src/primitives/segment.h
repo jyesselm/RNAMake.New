@@ -43,6 +43,10 @@ public:
     Index
     get_aligned_end_index() const{ return aligned_end_index_; }
 
+    inline
+    String
+    get_aligned_end_name() const { return get_end(aligned_end_index_)->get_name_str(); }
+
     util::Uuid const &
     get_uuid() const { return uuid_; }
 

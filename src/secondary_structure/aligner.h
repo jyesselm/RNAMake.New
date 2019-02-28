@@ -10,26 +10,7 @@
 
 namespace secondary_structure {
 
-class Aligner : public primitives::Aligner<Segment, Basepair> {
-public:
-    Aligner() {}
-
-    ~Aligner() {}
-
-public:
-    void
-    align(
-            Basepair const & ref_bp,
-            Segment & seg) const { }
-
-    SegmentOP
-    get_aligned(
-            Basepair const & ref_bp,
-            Segment const & seg) const {
-        return std::make_shared<Segment>(seg);
-    }
-};
-
+using Aligner = primitives::NoAligner<Segment, Basepair>;
 
 }
 

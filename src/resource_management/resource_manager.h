@@ -104,6 +104,20 @@ public: // get segments
         return false;
     }
 
+    inline
+    all_atom::SegmentOP
+    get_all_atom_from_state(
+            state::SegmentOP seg_state) {
+        auto args = StringStringMap{{"name",  seg_state->get_name_str()},
+                                    {"end_name", seg_state->get_aligned_end_name()}};
+        auto seg = get_segment(args);
+
+        return seg;
+
+        //auto m = motif(ms->name(), "", ms->end_names()[0]);
+        //align_motif(ms->end_states()[0], m->ends()[0], m);
+    }
+
 
 public:
     all_atom::ResidueTypeSet const &

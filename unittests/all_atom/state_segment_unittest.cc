@@ -118,11 +118,21 @@ TEST_CASE( "Test states derivived from all atom segments", "[StateSegments]" ) {
 
     SECTION("test aligner") {
         auto aligner = state::Aligner();
+        auto all_atom_aligner = all_atom::Aligner();
+        auto hybrid_aligner = primitives::Aligner<all_atom::Segment, state::Basepair>();
         auto seg_state_1 = seg->get_state();
         auto seg_state_2 = seg->get_state();
+        auto seg_copy_1 = all_atom::Segment(*seg);
+        auto seg_copy_2 = all_atom::Segment(*seg);
 
         aligner.align(seg_state_1->get_end(1), *seg_state_2);
+        all_atom_aligner.align(seg->get_end(1), seg_copy_1);
 
+        // move all_atom motif to where state is oriented
+        hybrid_aligner.align(seg_state_2->get_aligned_end(), seg_copy_2);
+
+        REQUIRE(math::are_points_equal(seg_copy_1.get_end(1).get_center(), seg_copy_2.get_end(1).get_center()));
+        REQUIRE(math::are_matrices_equal(seg_copy_1.get_end(1).get_ref_frame(), seg_copy_2.get_end(1).get_ref_frame()));
 
 
     }
